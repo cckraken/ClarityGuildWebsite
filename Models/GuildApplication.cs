@@ -1,6 +1,6 @@
 ﻿namespace ClarityGuildWebsite.Api.Models
 {
-    public class ApplicationForm
+    public class GuildApplication
     {
         //form facing fields
         public required string DiscordId { get; set; }
