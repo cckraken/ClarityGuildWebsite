@@ -16,7 +16,7 @@ namespace ClarityGuildWebsite.Api.Models
         public required string Tech {  get; set; }
         [MaxLength(500)]
         public required string Schedule {  get; set; }
-        public bool? Splits { get; set; }
+        public bool Splits { get; set; }
         [MaxLength(150)]
         public required string Communication { get; set; }
         [MaxLength(2000)]
