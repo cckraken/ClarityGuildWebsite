@@ -54,7 +54,29 @@ public class GuildApplicationController : ControllerBase
             return NotFound();
         }
 
-        return Ok(application);
+        var officerResponse = new OfficerResponseDTO
+        {
+            DiscordId = application.DiscordId,
+            Age = application.Age,
+            Country = application.Country,
+            WarcraftLogsLink = application.WarcraftLogsLink,
+            Tech = application.Tech,
+            Schedule = application.Schedule,
+            Splits = application.Splits,
+            Communication = application.Communication,
+            History = application.History,
+            Screenshot = application.Screenshot,
+            Vouch = application.Vouch,
+            Goals = application.Goals,
+
+            Id = application.Id,
+            Status = application.Status,
+            PostStatus = application.PostStatus,
+            TimestampUtc = application.TimestampUtc
+
+        };
+
+        return Ok(officerResponse);
     }
 }
 
