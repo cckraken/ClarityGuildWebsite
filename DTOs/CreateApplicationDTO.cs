@@ -22,7 +22,7 @@ namespace ClarityGuildWebsite.Api.DTOs
         [StringLength(500)]
         public string Schedule { get; set; } = string.Empty;
         [Required]
-        public bool? Splits { get; set; }
+        public bool Splits { get; set; }
 
         [Required]
         [StringLength(150)]
