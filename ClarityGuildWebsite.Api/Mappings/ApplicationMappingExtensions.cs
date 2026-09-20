@@ -9,7 +9,7 @@ namespace ClarityGuildWebsite.Api.Mappings
         {
             return new OfficerResponseDTO
             {
-                DiscordId = guildApplication.DiscordId,
+                DiscordId = guildApplication.DiscordId
                 Age = guildApplication.Age,
                 Country = guildApplication.Country,
                 WarcraftLogsLink = guildApplication.WarcraftLogsLink,
