@@ -1,8 +1,5 @@
 ﻿using ClarityGuildWebsite.Api.DTOs;
 using ClarityGuildWebsite.Api.Models;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
-using System.Net.NetworkInformation;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ClarityGuildWebsite.Api.Mappings
 {
@@ -28,7 +25,7 @@ namespace ClarityGuildWebsite.Api.Mappings
                 Id = guildApplication.Id,
                 Status = guildApplication.Status,
                 PostStatus = guildApplication.PostStatus,
-                TimestampUtc = guildApplication.TimestampUtc,             
+                TimestampUtc = guildApplication.TimestampUtc,
             };
         }
 
