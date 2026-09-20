@@ -1,122 +1,125 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
 import './App.css'
 
+interface ApplicationForm {
+  discordId: string
+  age: number | null
+  country: string
+  warcraftlogslink: string
+  tech: string
+  schedule: string
+  splits: boolean | null
+  communication: string
+  history: string
+  screenshot: string
+  vouch: string | null
+  goals: boolean | null
+  
+}
+
+
 function App() {
-  const [count, setCount] = useState(0)
 
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+const [form, setForm] = useState<ApplicationForm>({
+  discordId: '',
+  age: null,
+  country: '',
+  warcraftlogslink: '',
+  tech: '',
+  schedule: '',
+  splits: null,
+  communication: '',
+  history: '',
+  screenshot: '',
+  vouch: '',
+  goals: null
+})
 
-      <div className="ticks"></div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+
+function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+  setForm({ ...form, [e.target.name]: e.target.value })
+}
+
+return (
+  <>
+  <h1>Clarity Guild Application</h1>
+
+  <input
+  type="text"
+  name="discordId"
+  value={form.discordId}
+  onChange={handleChange}
+/>
+<input
+  type="number"
+  name="age"
+  value={form.age ?? ''}
+  onChange={handleChange}
+/>
+<input 
+type="text"
+name="country"
+value={form.country}
+onChange={handleChange}
+/>
+<input 
+type="text"
+name="warcraftlogslink"
+value={form.warcraftlogslink}
+onChange={handleChange}
+/>
+<input 
+type="text"
+name="tech"
+value={form.tech}
+onChange={handleChange}
+/>
+<input 
+type="text"
+name="schedule"
+value={form.schedule}
+onChange={handleChange}
+/>
+<input 
+type="checkbox"
+name="splits"
+checked={form.splits ?? false}
+onChange={(e) => setForm({ ...form, splits: e.target.checked })}
+/>
+<input 
+type="text"
+name="communication"
+value={form.communication}
+onChange={handleChange}
+/>
+<input 
+type="text"
+name="history"
+value={form.history}
+onChange={handleChange}
+/>
+<input 
+type="text"
+name="screenshot"
+value={form.screenshot}
+onChange={handleChange}
+/>
+<input 
+type="text"
+name="vouch"
+value={form.vouch ?? ''}
+onChange={handleChange}
+/>
+<input 
+type="checkbox"
+name="goals"
+checked={form.goals ?? false}
+onChange={(e) => setForm({ ...form, goals: e.target.checked })}
+/>  
+</>
+)
 }
 
 export default App
