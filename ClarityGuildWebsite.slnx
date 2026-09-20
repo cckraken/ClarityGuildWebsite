@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ClarityGuildWebsite.Api.Tests/ClarityGuildWebsite.Api.Tests.csproj" />
+  <Project Path="ClarityGuildWebsite.Api/ClarityGuildWebsite.Api.csproj" />
+</Solution>
