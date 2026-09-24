@@ -14,6 +14,8 @@ public class ApplicationMappingExtensionTests
         CreateApplicationDTO cDto = new CreateApplicationDTO
         {
             DiscordId = "testId",
+            WowClass = "testClassChoice",
+            WowSpecs = "testSpecs",
             Age = 30,
             Country = "testCountry",
             WarcraftLogsLink = "testUrl",
@@ -31,6 +33,8 @@ public class ApplicationMappingExtensionTests
         Assert.Multiple(() =>
         {
             Assert.Equal(cDto.DiscordId, result.DiscordId);
+            Assert.Equal(cDto.WowClass, result.WowClass);
+            Assert.Equal(cDto.WowSpecs, result.WowSpecs);
             Assert.Equal(cDto.Age, result.Age);
             Assert.Equal(cDto.Country, result.Country);
             Assert.Equal(cDto.WarcraftLogsLink, result.WarcraftLogsLink);
@@ -51,6 +55,8 @@ public class ApplicationMappingExtensionTests
         GuildApplication application = new GuildApplication
         {
             DiscordId = "testId",
+            WowClass = "testClassChoice",
+            WowSpecs = "testSpecs",
             Age = 30,
             Country = "testCountry",
             WarcraftLogsLink = "testUrl",
@@ -72,6 +78,8 @@ public class ApplicationMappingExtensionTests
         Assert.Multiple(() =>
         {
             Assert.Equal(application.DiscordId, result.DiscordId);
+            Assert.Equal(application.WowClass, result.WowClass);
+            Assert.Equal(application.WowSpecs, result.WowSpecs);
             Assert.Equal(application.Age, result.Age);
             Assert.Equal(application.Country, result.Country);
             Assert.Equal(application.WarcraftLogsLink, result.WarcraftLogsLink);
