@@ -1,6 +1,5 @@
 ﻿using ClarityGuildWebsite.Api.Data;
 using ClarityGuildWebsite.Api.DTOs;
-using ClarityGuildWebsite.Api.Models;
 using ClarityGuildWebsite.Api.Mappings;
 using Microsoft.AspNetCore.Mvc;
 
