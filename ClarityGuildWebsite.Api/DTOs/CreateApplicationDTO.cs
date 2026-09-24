@@ -7,12 +7,13 @@ namespace ClarityGuildWebsite.Api.DTOs
         [Required]
         [StringLength(50)]
         public  string DiscordId { get; set; } = string.Empty;
+        public string WowSpecs { get; set; } = string.Empty;
+        public string WowClass { get; set; } = string.Empty;
         public int? Age { get; set; }
         [Required]
         [StringLength(30)]
         public string Country { get; set; } = string.Empty;
         [Required]
-        [Url]
         [StringLength(500)]
         public string WarcraftLogsLink { get; set; } = string.Empty;
         [StringLength(500)]
@@ -30,7 +31,6 @@ namespace ClarityGuildWebsite.Api.DTOs
         [StringLength(2000)]
         public string? History { get; set; }
         [Required]
-        [Url]
         [StringLength(100)]
         public string Screenshot { get; set; } = string.Empty;
         [StringLength(100)]

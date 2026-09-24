@@ -4,6 +4,8 @@
     public class ApplicantResponseDTO
     {
         public string DiscordId { get; set; } = string.Empty;
+        public string WowClass { get; set; } = string.Empty;
+        public string WowSpecs {  get; set; } = string.Empty;
         public int? Age { get; set; }
         public string Country { get; set; } = string.Empty;
         public string WarcraftLogsLink { get; set; } = string.Empty;

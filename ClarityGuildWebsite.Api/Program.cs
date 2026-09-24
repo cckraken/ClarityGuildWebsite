@@ -1,15 +1,27 @@
 using ClarityGuildWebsite.Api.Data;
-using ClarityGuildWebsite.Api.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Data.Common;
 
 var builder = WebApplication.CreateBuilder(args);
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>()
+    ?? throw new InvalidOperationException("Cors:AllowedOrigins is not configured.");
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ClarityDb")));
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ClarityDb")
+    ?? throw new InvalidOperationException("Connection string 'ClarityDb' is not configured.")));
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 
 
@@ -22,6 +34,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("Frontend");
 app.MapControllers();
 
 app.Run();

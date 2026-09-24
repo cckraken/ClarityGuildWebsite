@@ -10,6 +10,8 @@ namespace ClarityGuildWebsite.Api.Mappings
             return new OfficerResponseDTO
             {
                 DiscordId = guildApplication.DiscordId,
+                WowClass = guildApplication.WowClass,
+                WowSpecs = guildApplication.WowSpecs,
                 Age = guildApplication.Age,
                 Country = guildApplication.Country,
                 WarcraftLogsLink = guildApplication.WarcraftLogsLink,
@@ -34,6 +36,8 @@ namespace ClarityGuildWebsite.Api.Mappings
             return new GuildApplication
             {
                 DiscordId = dto.DiscordId,
+                WowClass = dto.WowClass,
+                WowSpecs = dto.WowSpecs,
                 Age = dto.Age,
                 Country = dto.Country,
                 WarcraftLogsLink = dto.WarcraftLogsLink,
