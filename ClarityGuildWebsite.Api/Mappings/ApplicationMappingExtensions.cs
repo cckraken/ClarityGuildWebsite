@@ -50,7 +50,7 @@ namespace ClarityGuildWebsite.Api.Mappings
                 About = dto.About,
                 Tech = dto.Tech,
                 History = dto.History,
-                Extra = dto.About,
+                Extra = dto.Extra,
             };
         }
     }

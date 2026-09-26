@@ -28,7 +28,6 @@ public class ApplicationMappingExtensionTests
             Tech = "testTech",
             History = "testHistory",
             Extra = "testExtra",
-
         };
 
         var result = cDto.ToEntity();
