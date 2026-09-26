@@ -4,19 +4,20 @@
     public class ApplicantResponseDTO
     {
         public string DiscordId { get; set; } = string.Empty;
-        public string WowClass { get; set; } = string.Empty;
-        public string WowSpecs {  get; set; } = string.Empty;
-        public int? Age { get; set; }
-        public string Country { get; set; } = string.Empty;
-        public string WarcraftLogsLink { get; set; } = string.Empty;
-        public string Tech { get; set; } = string.Empty;
+        public string MainName {  get; set; } = string.Empty;
+        public string MainRealm { get; set;  } = string.Empty;
+        public string MainRole {  get; set; } = string.Empty;
+        public string AltName { get; set; } = string.Empty;
+        public string AltRealm { get; set; } = string.Empty;
+        public string AltRole { get; set; } = string.Empty;
+        public string Screenshot { get; set; } = string.Empty;
         public string Schedule { get; set; } = string.Empty;
         public bool Splits { get; set; }
-        public string Communication { get; set; } = string.Empty;
-        public string? History { get; set; }
-        public string Screenshot { get; set; } = string.Empty;
-        public string? Vouch { get; set; }
-        public bool? Goals { get; set; }
+        public bool Goals { get; set; }
+        public string About {  get; set; } = string.Empty;
+        public string Tech { get; set; } = string.Empty;
+        public string History { get; set; } = string.Empty;
+        public string? Extra { get; set; }
     }
 
     public class OfficerResponseDTO : ApplicantResponseDTO

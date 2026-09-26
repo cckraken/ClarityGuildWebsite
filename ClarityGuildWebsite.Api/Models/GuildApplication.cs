@@ -7,27 +7,45 @@ namespace ClarityGuildWebsite.Api.Models
         //form facing fields
         [MaxLength(50)]
         public required string DiscordId { get; set; }
-        public required string WowClass {  get; set; }
-        public required string WowSpecs { get; set; }
-        public int? Age { get; set; }
-        [MaxLength(30)]
-        public required string Country { get; set; }
+
+        [MaxLength(50)]
+        public required string MainName { get; set; }
+
+        [MaxLength(50)]
+        public required string MainRealm { get; set; }
+
+        [MaxLength(50)]
+        public required string MainRole { get; set; }
+
+        [MaxLength(50)]
+        public required string AltName { get; set; }
+
+        [MaxLength(50)]
+        public required string AltRealm { get; set; }
+
+        [MaxLength(50)]
+        public required string AltRole { get; set; }
+
+        [MaxLength(100)]
+        public required string Screenshot { get; set; }
+
         [MaxLength(500)]
-        public required string WarcraftLogsLink { get; set; }
-        [MaxLength(500)]
-        public required string Tech {  get; set; }
-        [MaxLength(500)]
-        public required string Schedule {  get; set; }
+        public required string Schedule { get; set; }
+
         public bool Splits { get; set; }
-        [MaxLength(150)]
-        public required string Communication { get; set; }
-        [MaxLength(2000)]
-        public string? History { get; set; }
-        [MaxLength(100)]
-        public required string Screenshot {  get; set; }
-        [MaxLength(100)]
-        public string? Vouch {  get; set; }
-        public bool? Goals { get; set; }
+        public bool Goals { get; set; }
+
+        [MaxLength(1500)]
+        public required string About { get; set; }
+
+        [MaxLength(1500)]
+        public required string Tech { get; set; }
+
+        [MaxLength(1500)]
+        public required string History { get; set; }
+        
+        [MaxLength(1500)]
+        public string? Extra {  get; set; }
 
         //db only
         public int Id { get; set; }

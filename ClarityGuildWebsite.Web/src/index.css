@@ -2,13 +2,32 @@
 @import "tailwindcss";
 
 @theme {
-    /*Non tailwind colours*/
-    --color-clarity-blue: #1e9bf0;
-
     /*Fonts*/
-    --font-display: "Space Grotesk", sans-serif;
-    --font-sans: "Inter", sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-sans: "Inter", sans-serif, #E6EDF3;
 
+    /*colours*/
+  --color-background: #f1f5f9;
+  --color-surface: #ffffff;
+  --color-field: #ffffff;
+  --color-foreground: #0f172a;
+  --color-muted: #475569;
+  --color-line: #64748b;
+  --color-error: #b91c1c;
+  --color-clarity-blue: #0094fe;
+  --color-clarity-blue-deep: #0059cf;
+  --color-clarity-blue-darkest: #01438e;
+  --color-on-brand-muted: #cfe8ff;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
 }
 
 

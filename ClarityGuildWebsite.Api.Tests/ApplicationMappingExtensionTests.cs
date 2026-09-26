@@ -14,38 +14,40 @@ public class ApplicationMappingExtensionTests
         CreateApplicationDTO cDto = new CreateApplicationDTO
         {
             DiscordId = "testId",
-            WowClass = "testClassChoice",
-            WowSpecs = "testSpecs",
-            Age = 30,
-            Country = "testCountry",
-            WarcraftLogsLink = "testUrl",
-            Tech = "testTech",
+            MainName = "TestName",
+            MainRealm = "TestRealm",
+            MainRole = "TestRole",
+            AltName = "AltName",
+            AltRealm = "AltRealm",
+            AltRole = "AltRole",
+            Screenshot = "testScreenshot",
             Schedule = "testSchedule",
             Splits = true,
-            Communication = "testCommunication",
-            History = "testHistory",
-            Screenshot = "testScreenshot",
-            Vouch = "testVouch",
             Goals = true,
+            About = "testAbout",
+            Tech = "testTech",
+            History = "testHistory",
+            Extra = "testExtra",
         };
 
         var result = cDto.ToEntity();
         Assert.Multiple(() =>
         {
             Assert.Equal(cDto.DiscordId, result.DiscordId);
-            Assert.Equal(cDto.WowClass, result.WowClass);
-            Assert.Equal(cDto.WowSpecs, result.WowSpecs);
-            Assert.Equal(cDto.Age, result.Age);
-            Assert.Equal(cDto.Country, result.Country);
-            Assert.Equal(cDto.WarcraftLogsLink, result.WarcraftLogsLink);
-            Assert.Equal(cDto.Tech, result.Tech);
+            Assert.Equal(cDto.MainName, result.MainName);
+            Assert.Equal(cDto.MainRealm, result.MainRealm);
+            Assert.Equal(cDto.MainRole, result.MainRole);
+            Assert.Equal(cDto.AltName, result.AltName);
+            Assert.Equal(cDto.AltRealm, result.AltRealm);
+            Assert.Equal(cDto.AltRole, result.AltRole);
+            Assert.Equal(cDto.Screenshot, result.Screenshot);
             Assert.Equal(cDto.Schedule, result.Schedule);
             Assert.Equal(cDto.Splits, result.Splits);
-            Assert.Equal(cDto.Communication, result.Communication);
-            Assert.Equal(cDto.History, result.History);
-            Assert.Equal(cDto.Screenshot, result.Screenshot);
-            Assert.Equal(cDto.Vouch, result.Vouch);
             Assert.Equal(cDto.Goals, result.Goals);
+            Assert.Equal(cDto.About, result.About);
+            Assert.Equal(cDto.Tech, result.Tech);
+            Assert.Equal(cDto.History, result.History);
+            Assert.Equal(cDto.Extra, result.Extra);
         });
     }
 
@@ -55,19 +57,20 @@ public class ApplicationMappingExtensionTests
         GuildApplication application = new GuildApplication
         {
             DiscordId = "testId",
-            WowClass = "testClassChoice",
-            WowSpecs = "testSpecs",
-            Age = 30,
-            Country = "testCountry",
-            WarcraftLogsLink = "testUrl",
-            Tech = "testTech",
+            MainName = "TestName",
+            MainRealm = "TestRealm",
+            MainRole = "TestRole",
+            AltName = "AltName",
+            AltRealm = "AltRealm",
+            AltRole = "AltRole",
+            Screenshot = "testScreenshot",
             Schedule = "testSchedule",
             Splits = true,
-            Communication = "testCommunication",
-            History = "testHistory",
-            Screenshot = "testScreenshot",
-            Vouch = "testVouch",
             Goals = true,
+            About = "testAbout",
+            Tech = "testTech",
+            History = "testHistory",
+            Extra = "testExtra",
             Id = 1,
             Status = ApplicationStatus.Pending,
             PostStatus = PostStatus.Pending,
@@ -78,19 +81,21 @@ public class ApplicationMappingExtensionTests
         Assert.Multiple(() =>
         {
             Assert.Equal(application.DiscordId, result.DiscordId);
-            Assert.Equal(application.WowClass, result.WowClass);
-            Assert.Equal(application.WowSpecs, result.WowSpecs);
-            Assert.Equal(application.Age, result.Age);
-            Assert.Equal(application.Country, result.Country);
-            Assert.Equal(application.WarcraftLogsLink, result.WarcraftLogsLink);
-            Assert.Equal(application.Tech, result.Tech);
+            Assert.Equal(application.MainName, result.MainName);
+            Assert.Equal(application.MainRealm, result.MainRealm);
+            Assert.Equal(application.MainRole, result.MainRole);
+            Assert.Equal(application.AltName, result.AltName);
+            Assert.Equal(application.AltRealm, result.AltRealm);
+            Assert.Equal(application.AltRole, result.AltRole);
+            Assert.Equal(application.Screenshot, result.Screenshot);
             Assert.Equal(application.Schedule, result.Schedule);
             Assert.Equal(application.Splits, result.Splits);
-            Assert.Equal(application.Communication, result.Communication);
-            Assert.Equal(application.History, result.History);
-            Assert.Equal(application.Screenshot, result.Screenshot);
-            Assert.Equal(application.Vouch, result.Vouch);
             Assert.Equal(application.Goals, result.Goals);
+            Assert.Equal(application.About, result.About);
+            Assert.Equal(application.Tech, result.Tech);
+            Assert.Equal(application.History, result.History);
+            Assert.Equal(application.Extra, result.Extra);
+
             Assert.Equal(application.Id, result.Id);
             Assert.Equal(application.Status, result.Status);
             Assert.Equal(application.PostStatus, result.PostStatus);
