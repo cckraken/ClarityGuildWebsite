@@ -35,16 +35,16 @@ namespace ClarityGuildWebsite.Api.Models
         public bool Splits { get; set; }
         public bool Goals { get; set; }
 
-        [MaxLength(1500)]
+        [MaxLength(2000)]
         public required string About { get; set; }
 
-        [MaxLength(1500)]
+        [MaxLength(2000)]
         public required string Tech { get; set; }
 
-        [MaxLength(1500)]
+        [MaxLength(2000)]
         public required string History { get; set; }
         
-        [MaxLength(1500)]
+        [MaxLength(2000)]
         public string? Extra {  get; set; }
 
         //db only

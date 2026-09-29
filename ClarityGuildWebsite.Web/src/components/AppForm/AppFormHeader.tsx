@@ -9,7 +9,7 @@ export function AppFormHeader() {
         className="size-8 rounded-lg ring-2 ring-white/30"
       />
       <div>
-        <p className="font-display text-sm text-on-brand-muted">Clarity Guild Application</p>
+        <p className="font-header text-sm text-on-brand-muted">Clarity Guild Application</p>
       </div>
     </header>
   );

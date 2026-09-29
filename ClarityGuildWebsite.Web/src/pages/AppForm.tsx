@@ -1,29 +1,28 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
-import './App.css';
-import { AppFormHeader } from './components/AppForm/AppFormHeader';
-import { AppFormRadioGroup } from './components/AppForm/AppFormRadioGroup';
+import "../index.css";
+import { AppFormRadioGroup } from '../components/AppForm/AppFormRadioGroup';
 import { useState, useRef } from  'react'
 
 const roles = ["Tank", "Healer", "DPS"] as const;
 
 const schema = z.object({
-  discordId: z.string().min(1, { error: "Discord ID is required" }),
-  mainName: z.string().min(1, { error: "Main is required" }),
-  mainRealm: z.string().min(1, { error: "Realm is required" }),
+  discordId: z.string().min(1, { error: "Discord ID is required" }).max(50, {error: "50 characters or less"}),
+  mainName: z.string().min(1, { error: "Main is required" }).max(50, {error: "50 characters or less"}),
+  mainRealm: z.string().min(1, { error: "Realm is required" }).max(50, {error: "50 characters or less"}),
   mainRole: z.enum(roles, { error: "Role is required" }),
-  altName: z.string().min(1, { error: "Alt is required" }),
-  altRealm: z.string().min(1, { error: "Realm is required" }),
+  altName: z.string().min(1, { error: "Alt is required" }).max(50, {error: "50 characters or less"}),
+  altRealm: z.string().min(1, { error: "Realm is required" }).max(50, {error: "50 characters or less"}),
   altRole: z.enum(roles, { error: "Role is required" }),
-  uiScreenshot: z.url().min(1, {error: "Screenshot is required"}),
-  schedule: z.string().min(1, { error: "Schedule is required" }),
+  screenshot: z.url({error:"Screenshot is required"}).refine((val) => !val.toLowerCase().includes("imgur"), {error: "No Imgur links, sorry!"}).max(100, {error: "Too long!"}),
+  schedule: z.string().min(1, { error: "Schedule is required" }).max(500, {error: "500 characters or less"}),
   splits: z.enum(["true", "false"], { error: "Please select an option" }).transform((val) => val === "true"),
   goals: z.enum(["true", "false"], { error: "Please select an option" }).transform((val) => val === "true"),
-  about: z.string().min(1, {error: "About is required"}),
-  tech: z.string().min(1, { error: "Tech is required" }),
-  history: z.string().min(1, { error: "History is required" }),
-  extra: z.string().optional(),
+  about: z.string().min(1, {error: "About is required"}).max(2000, { error: "2k characters or less"}),
+  tech: z.string().min(1, { error: "Tech is required" }).max(500, {error: "500 characters or less"}),
+  history: z.string().min(1,  { error: "History is required" }).max(2000, {error: "2k characters or less"}),
+  extra: z.string().max(2000, {error: "2k characters or less"}).optional(),
 });
 
 const yesNoOptions = [
@@ -32,7 +31,7 @@ const yesNoOptions = [
 ];
 
 
-function App() {
+function AppForm() {
   const {
      register,
       handleSubmit,
@@ -78,9 +77,6 @@ function App() {
 
   return (
     <>
-
-<div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-3 font-display">
-  <AppFormHeader />
 
 <form className="grid grid-cols-1 gap-6 font-light md:grid-cols-2" onSubmit={handleSubmit(onSubmit)}>
 
@@ -182,14 +178,14 @@ function App() {
       </div>
 
         <div className="flex flex-col gap-1">
-        <label className = "text-sm font-medium" htmlFor="uiScreenshot">UI Screenshot</label>
+        <label className = "text-sm font-medium" htmlFor="screenshot">UI Screenshot</label>
           <p className="text-xs text-muted ">Preferably taken in combat</p>
         <input className = "w-full rounded-md border border-line bg-field px-3 py-1.5 outline-none focus-visible:border-clarity-blue focus-visible:ring-3 focus-visible:ring-clarity-blue/20 aria-invalid:border-error"
-          {...register("uiScreenshot") }
+          {...register("screenshot") }
           type="url"
-          id="uiScreenshot"
+          id="screenshot"
         />
-          {errors.uiScreenshot && (<div className="text-xs text-error">{errors.uiScreenshot.message}</div>)}
+          {errors.screenshot && (<div className="text-xs text-error">{errors.screenshot.message}</div>)}
       </div> 
 
         <div className="flex flex-col gap-1">
@@ -204,7 +200,7 @@ function App() {
       </div> 
 
       <p className="text-xs text-muted">Splits and goals info found on other tab</p> 
-    <div className="flex flex-col gap-1 w-full rounded-md border border-line bg-field px-1 py-1.5 focus-visible:border-clarity-blue focus-visible:ring-3"> 
+    <div className="flex flex-col gap-1 w-full rounded-md border border-line bg-field px-1 py-1.5 focus-visible:border-clarity-blue focus-within:ring-3"> 
     <div className="grid grid-cols-2">
       <AppFormRadioGroup 
         legend="Can you attend our splits?"
@@ -306,18 +302,17 @@ function App() {
 
   </div>
 
-    <div className = "md:col-span-2 flex justify-center focus-visible:outline-accent">
-    <button className= "rounded-md bg-clarity-blue-deep px-6 py-2 font-medium text-white hover:bg-clarity-blue-darkest focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50" disabled={isSubmitting} type="submit">
+    <div className = "md:col-span-2 flex justify-center focus-visible:outline-clarity-blue-darkest">
+    <button className= "rounded-md bg-clarity-blue-deep px-6 py-2 font-medium text-white hover:bg-clarity-blue-darkest focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent disabled:cursor-not-allowed disabled:opacity-50" disabled={isSubmitting} type="submit">
         {isSubmitting ? "Submitting..." : "Submit"}
     </button>
     </div>
 
   </form>
-</div>
     </>
   )
 }
 
-export default App
+export default AppForm
 
 

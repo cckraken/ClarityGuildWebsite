@@ -17,7 +17,7 @@ export function AppFormRadioGroup({ legend, options, registration, error }: Radi
   const errorId = useId();
 
   return (
-    <fieldset className="border-border rounded p-3">
+    <fieldset className="border-line rounded p-3">
       <legend className="px-1 text-sm font-medium">{legend}</legend>
 
       <div className="flex gap-6">

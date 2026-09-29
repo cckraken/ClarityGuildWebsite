@@ -46,6 +46,7 @@ namespace ClarityGuildWebsite.Api.DTOs
         [Required]
         public bool Goals { get; set; }
 
+        [Required]
         [StringLength(2000)]
         public string About { get; set; } = string.Empty;
 
@@ -53,6 +54,7 @@ namespace ClarityGuildWebsite.Api.DTOs
         [Required]
         public string Tech { get; set; } = string.Empty;
 
+        [Required]
         [StringLength(2000)]
         public string History { get; set; } = string.Empty;
 
