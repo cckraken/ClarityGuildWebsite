@@ -1,86 +1,123 @@
+import {
+  cardClass,
+  cardTop,
+  textBodyFull,
+  fieldTitleClasses,
+  appFormButtonClass,
+} from "../components/styles/applicationClasses";
+import { Link } from "react-router";
+
 function GuildDesc() {
+  return (
+    <div className="mx-auto grid max-w-4xl gap-6">
+      <div className="text-center">
+        <p className="px-4 py-1 w-fit mx-auto rounded-full border border-clarity-blue/60 bg-clarity-blue/10 text-clarity-blue">
+          Currently looking for a <strong>Shadow Priest</strong> and{" "}
+          <strong>Elemental Shaman</strong>
+        </p>
+      </div>
 
- return (
+      <div className={cardTop}>
+        <h2 className={fieldTitleClasses}>Who are we?</h2>
+        <p className={textBodyFull}>
+          Clarity (Tarren Mill) is a long-standing mythic raiding guild. We are
+          English speaking, CE experienced and progression focused, without
+          losing the banter.
+        </p>
+        <p className={textBodyFull}>
+          Currently WR 190-240 and climbing. Most of our prog lands Sun/Mon, so
+          our rank jumps later in the week.
+        </p>
+      </div>
 
-<section className="drop-shadow-md">
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className={cardClass}>
+          <h3 className={fieldTitleClasses}>Before you apply</h3>
+          <p className={textBodyFull}>
+            Make sure you meet our requirements below:
+          </p>
+          <ul
+            className={`${textBodyFull} list-disc list-outside pl-5 marker:text-clarity-blue`}
+          >
+            <li>
+              Have a main and an alt character ready for raiding. Alts are
+              mostly used for our mandatory splits at the start of the season
+              (first 2-3 IDs), then for any roster needs during mythic prog
+            </li>
+            <li>Have a solid understanding of your class and role</li>
+            <li>Be able to commit to our raid schedule</li>
+            <li>Previous Cutting Edge experience</li>
+            <li>90%+ attendance</li>
+            <li>Full fight knowledge from prep</li>
+          </ul>
 
-<h1 className="w-fit rounded-t-xl rounded-tr-xl bg-surface px-6 py-2 text-base font-medium text-foreground">
-    About us
-  </h1>
+          <h3 className={fieldTitleClasses}>What you get from us</h3>
+          <ul
+            className={`${textBodyFull} list-disc list-outside pl-5 marker:text-clarity-blue`}
+          >
+            <li>
+              A highly experienced bench raid leader. Real leadership depth and
+              organisation a lot of guilds don't have
+            </li>
+            <li>
+              Clear prep material and prog analysis, provided ahead of every
+              raid
+            </li>
+            <li>
+              A seasoned core, efficient raid environment, and a lively guild
+              banter culture
+            </li>
+          </ul>
+        </div>
 
-<div className="flex flex-col gap-6 rounded-b-xl rounded-tr-xl bg-surface p-6">
+        <div className="grid gap-6">
+          <div className={cardClass}>
+            <h3 className={fieldTitleClasses}>Raid Schedule</h3>
+            <dl
+              className={`${textBodyFull} grid grid-cols-[auto_1fr] gap-x-4 gap-y-1`}
+            >
+              <dt className="font-medium">Wed</dt>
+              <dd>19:45-23:10 ST</dd>
+              <dt className="font-medium">Sun</dt>
+              <dd>18:45-23:10 ST</dd>
+              <dt className="font-medium">Mon</dt>
+              <dd>19:45-23:10 ST</dd>
+              <dt className="font-medium">Thu (Extra)</dt>
+              <dd>19:45-23:10 ST</dd>
+            </dl>
+            <p className={`${textBodyFull} text-sm`}>
+              (first 1-2 IDs of a new season / end-boss prog if we&apos;re close to
+              HoF)
+            </p>
+          </div>
 
-<div className="flex flex-col gap-1 rounded-xl bg-surface p-2 border-4 border-line">
-<h2 className="text-base font-medium text-foreground">Who are we?</h2>
-<p className="text-sm text-muted">Clarity (Tarren Mill) is a long-standing 2x Hall of Fame guild (Undermine, Chimaerus).
-We are English speaking, CE experienced, and progression-focused, without losing the banter.</p>
-<p className="text-sm text-muted">Currently WR 190-240 and climbing - most of our prog lands Sun/Mon, so our rank jumps later in the week.</p>
+          <div className={cardClass}>
+            <h3 className={fieldTitleClasses}>Progression</h3>
+            <dl
+              className={`${textBodyFull} grid grid-cols-[auto_1fr] gap-x-4 gap-y-1`}
+            >
+              <dt className="font-medium text-clarity-blue">Current tier</dt>
+              <dd className="text-clarity-blue">6/8M VA</dd>
+              <dt className="font-medium">MDN S1</dt>
+              <dd>9/9M WR 381</dd>
+              <dt className="font-medium">TWW S3</dt>
+              <dd>8/8M WR 320</dd>
+              <dt className="font-medium">TWW S2</dt>
+              <dd>8/8M WR 216 (HoF)</dd>
+              <dt className="font-medium">TWW S1</dt>
+              <dd>8/8M WR 327</dd>
+            </dl>
+          </div>
+        </div>
 
-<div className ="grid grid-cols-1 gap-6 sm:grid-cols-2">
-
-<div className ="flex flex-col gap-2 rounded-xl bg-surface p-4 shadow-lg">
-<h2 className="text-base font-medium text-foreground">What we provide:</h2>
-<ul className="list-disc space-y-1 pl-5 text-sm text-muted">
-<li>A highly experienced bench raid leader - real leadership depth and organisation a lot of guilds don't have</li>
-<li>Clear prep material and prog analysis, provided ahead of every raid</li>
-<li>A seasoned core, efficient raid environment, and a lively guild banter culture</li>
-</ul>
-</div>
-
-<div className ="flex flex-col gap-2 rounded-xl bg-surface p-4 shadow-lg">
-<h2 className="text-base font-medium text-foreground">What we expect:</h2>
-<ul className="list-disc space-y-1 pl-5 text-sm text-muted">
-<li>2 raid-ready characters maintained all season</li>
-<li>90%+ attendance</li>
-<li>Full fight knowledge from prep - you apply it, not just read it</li>
-<li>Consumables/gems/enchants sorted every raid (feasts/cauldrons provided); solid class + itemization knowledge</li>
-</ul>
-</div>
-
-</div>
-
-</div>
-
-<div className="grid grid-cols-1 gap-6 px-6 sm:grid-cols-2">
-
-<div className="flex flex-col gap-1 justify-center rounded-xl bg-surface p-2 shadow-lg border-4 border-line">
-<h2 className="text-base font-medium text-foreground"> Raid Times (+10 min break):</h2>
-<ul className="list-disc space-y-1 pl-5 text-sm text-muted">
-<li>Wed / Mon 19:45 - 23:10 ST</li>
-<li>Sun 18:45 - 23:10 ST</li>
-<li>Extra: Thu 19:45 - 23:10 ST (first 1-2 IDs of a new season / end-boss prog)</li>
-</ul>
-</div>
-
-<div className="flex flex-col gap-1 content-center rounded-xl bg-surface p-2 shadow-lg border-4 border-line">
-<h2 className="text-base font-medium text-foreground"> Splits:</h2>
-<p className="text-sm text-muted">We do splits for the first 2-3 ID's of the season.
-    You need 2 raid ready characters (hence why we ask for an alt on our form)
-</p>
-</div>
-
-<div className="flex flex-col gap-1 content-center rounded-xl bg-surface p-2 shadow-lg border-4 border-line">
-<h2 className="text-base font-medium text-foreground"> Guild goals:</h2>
-<p className="text-sm text-muted">We have achieved HoF before but went through a big guild restructure at the end of TWW.
-   We are currently building back up to that level, and want people with us who want the same.
-</p>
-</div>
-
-<div className="flex flex-col gap-1 content-center rounded-xl bg-surface p-2 shadow-lg border-4 border-line">
-<h2 className="text-base font-medium text-foreground">Progression:</h2>
-<ul className="list-disc space-y-1 pl-5 text-sm text-muted">
-<li>MDN S1: Chimaerus WR 291 (HoF), Alleria WR 421, L'ura WR 378</li>
-<li>Manaforge Omega WR 319 · Undermine WR 216 (HoF) · Nerub-ar WR 327</li>
-</ul>
-</div>
-
-</div>
-
-</div>
-
-</section>
- )
+        <div className="md:col-span-2 flex justify-center">
+          <Link to="/apply" className={appFormButtonClass}>
+            Apply now
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
 }
 
-
-export default GuildDesc
+export default GuildDesc;

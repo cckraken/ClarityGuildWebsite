@@ -1,0 +1,21 @@
+{
+  // Format with Prettier on save; ESLint (separate extension) reports problems
+  "editor.formatOnSave": true,
+  "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[javascript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[json]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[css]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+  "[tailwindcss]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+
+  // The frontend lives in a subfolder, so tell ESLint where its config is
+  "eslint.workingDirectories": ["./ClarityGuildWebsite.Web"],
+
+  // Tailwind v4 CSS syntax support
+  "files.associations": { "*.css": "tailwindcss" },
+
+  // Tailwind autocomplete inside class constants, e.g. cardClass = "..."
+  "tailwindCSS.experimental.classRegex": [
+    ["(?:Class|Classes)\\s*=\\s*[\"'`]([^\"'`]*)[\"'`]", "([^\"'`]*)"]
+  ]
+}
