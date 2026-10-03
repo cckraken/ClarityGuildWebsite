@@ -1,31 +1,40 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Space+Grotesk:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Commissioner:wght@100..900&family=Encode+Sans+Expanded:wght@100;200;300;400;500;600;700;800;900&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Special+Gothic+Condensed+One&family=Trykker&display=swap');
 @import "tailwindcss";
 
 @theme {
     /*Fonts*/
-  --font-header: "Space Grotesk", sans-serif;
-  --font-body: "Inter", sans-serif, #E6EDF3;
+  --font-header: "IBM Plex Serif", sans-serif;
+  --font-body: "Commissioner", sans-serif;
 
     /*colours*/
-  --color-background: #f1f5f9;
-  --color-surface: #ffffff;
-  --color-field: #ffffff;
-  --color-foreground: #0f172a;
+  --color-background: #555555;
+  --color-cards: #000000;
+  --color-field: #b4c4cf;
+  --color-input: #808080;
+  --color-foreground: #201f72;
+  --color-border: #555555;
   --color-muted: #475569;
-  --color-line: #64748b;
   --color-error: #b91c1c;
   --color-clarity-blue: #0094fe;
   --color-clarity-blue-deep: #0059cf;
   --color-clarity-blue-darkest: #01438e;
-  --color-on-brand-muted: #cfe8ff;
+  --color-titles: #e1f2f5;
+  --color-inactive: #4f5557;
+  --color-hints: #b9b2b2;
+
+  /*Borders & Shadows*/
+  --radius-5xl: 5rem;
+ 
 }
 
 @layer base {
   html {
-    color-scheme: light;
+    color-scheme: dark;
   }
   body {
-    background-color: var(--color-background);
+    *, ::before, ::after { border-color: var(--color-background); }
+    border-color: var(--color-border);
+    font-family: var(--font-body);
     color: var(--color-foreground);
   }
 }
