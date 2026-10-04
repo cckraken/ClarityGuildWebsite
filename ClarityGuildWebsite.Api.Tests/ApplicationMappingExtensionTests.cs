@@ -13,27 +13,29 @@ public class ApplicationMappingExtensionTests
     {
         CreateApplicationDTO cDto = new CreateApplicationDTO
         {
-            DiscordId = "testId",
+            DiscordId = "TestId",
+            Country = "TestCountry",
             MainName = "TestName",
             MainRealm = "TestRealm",
             MainRole = "TestRole",
             AltName = "AltName",
             AltRealm = "AltRealm",
             AltRole = "AltRole",
-            Screenshot = "testScreenshot",
-            Schedule = "testSchedule",
+            Screenshot = "TestScreenshot",
+            Schedule = "TestSchedule",
             Splits = true,
             Goals = true,
-            About = "testAbout",
-            Tech = "testTech",
-            History = "testHistory",
-            Extra = "testExtra",
+            About = "TestAbout",
+            Tech = "TestTech",
+            History = "TestHistory",
+            Extra = "TestExtra",
         };
 
         var result = cDto.ToEntity();
         Assert.Multiple(() =>
         {
             Assert.Equal(cDto.DiscordId, result.DiscordId);
+            Assert.Equal(cDto.Country, result.Country);
             Assert.Equal(cDto.MainName, result.MainName);
             Assert.Equal(cDto.MainRealm, result.MainRealm);
             Assert.Equal(cDto.MainRole, result.MainRole);
@@ -57,20 +59,21 @@ public class ApplicationMappingExtensionTests
         GuildApplication application = new GuildApplication
         {
             DiscordId = "testId",
+            Country = "TestCountry",
             MainName = "TestName",
             MainRealm = "TestRealm",
             MainRole = "TestRole",
             AltName = "AltName",
             AltRealm = "AltRealm",
             AltRole = "AltRole",
-            Screenshot = "testScreenshot",
-            Schedule = "testSchedule",
+            Screenshot = "TestScreenshot",
+            Schedule = "TestSchedule",
             Splits = true,
             Goals = true,
-            About = "testAbout",
-            Tech = "testTech",
-            History = "testHistory",
-            Extra = "testExtra",
+            About = "TestAbout",
+            Tech = "TestTech",
+            History = "TestHistory",
+            Extra = "TestExtra",
             Id = 1,
             Status = ApplicationStatus.Pending,
             PostStatus = PostStatus.Pending,
@@ -81,6 +84,7 @@ public class ApplicationMappingExtensionTests
         Assert.Multiple(() =>
         {
             Assert.Equal(application.DiscordId, result.DiscordId);
+            Assert.Equal(application.Country, result.Country);
             Assert.Equal(application.MainName, result.MainName);
             Assert.Equal(application.MainRealm, result.MainRealm);
             Assert.Equal(application.MainRole, result.MainRole);

@@ -1,9 +1,10 @@
 import {
   cardClass,
-  cardTop,
-  textBodyFull,
-  fieldTitleClasses,
+  cardTopClass,
+  textBodyFullClass,
+  fieldTitleClass,
   appFormButtonClass,
+  dataTableClass,
 } from "../components/styles/applicationClasses";
 import { Link } from "react-router";
 
@@ -16,15 +17,15 @@ function GuildDesc() {
           <strong>Elemental Shaman</strong>
         </p>
       </div>
-
-      <div className={cardTop}>
-        <h2 className={fieldTitleClasses}>Who are we?</h2>
-        <p className={textBodyFull}>
+    
+      <div className={cardTopClass}>
+        <h2 className={fieldTitleClass}>Who are we?</h2>
+        <p className={textBodyFullClass}>
           Clarity (Tarren Mill) is a long-standing mythic raiding guild. We are
           English speaking, CE experienced and progression focused, without
           losing the banter.
         </p>
-        <p className={textBodyFull}>
+        <p className={textBodyFullClass}>
           Currently WR 190-240 and climbing. Most of our prog lands Sun/Mon, so
           our rank jumps later in the week.
         </p>
@@ -32,12 +33,12 @@ function GuildDesc() {
 
       <div className="grid gap-6 md:grid-cols-2">
         <div className={cardClass}>
-          <h3 className={fieldTitleClasses}>Before you apply</h3>
-          <p className={textBodyFull}>
+          <h3 className={fieldTitleClass}>Before you apply</h3>
+          <p className={textBodyFullClass}>
             Make sure you meet our requirements below:
           </p>
           <ul
-            className={`${textBodyFull} list-disc list-outside pl-5 marker:text-clarity-blue`}
+            className={`${textBodyFullClass} list-disc pl-5 marker:text-clarity-blue`}
           >
             <li>
               Have a main and an alt character ready for raiding. Alts are
@@ -51,9 +52,9 @@ function GuildDesc() {
             <li>Full fight knowledge from prep</li>
           </ul>
 
-          <h3 className={fieldTitleClasses}>What you get from us</h3>
+          <h3 className={fieldTitleClass}>What you get from us</h3>
           <ul
-            className={`${textBodyFull} list-disc list-outside pl-5 marker:text-clarity-blue`}
+            className={`${textBodyFullClass} list-disc pl-5 marker:text-clarity-blue`}
           >
             <li>
               A highly experienced bench raid leader. Real leadership depth and
@@ -72,9 +73,9 @@ function GuildDesc() {
 
         <div className="grid gap-6">
           <div className={cardClass}>
-            <h3 className={fieldTitleClasses}>Raid Schedule</h3>
+            <h3 className={fieldTitleClass}>Raid Schedule</h3>
             <dl
-              className={`${textBodyFull} grid grid-cols-[auto_1fr] gap-x-4 gap-y-1`}
+              className={`${dataTableClass}`}
             >
               <dt className="font-medium">Wed</dt>
               <dd>19:45-23:10 ST</dd>
@@ -85,16 +86,16 @@ function GuildDesc() {
               <dt className="font-medium">Thu (Extra)</dt>
               <dd>19:45-23:10 ST</dd>
             </dl>
-            <p className={`${textBodyFull} text-sm`}>
+            <p className={`${textBodyFullClass} text-sm`}>
               (first 1-2 IDs of a new season / end-boss prog if we&apos;re close to
               HoF)
             </p>
           </div>
 
           <div className={cardClass}>
-            <h3 className={fieldTitleClasses}>Progression</h3>
+            <h3 className={fieldTitleClass}>Progression</h3>
             <dl
-              className={`${textBodyFull} grid grid-cols-[auto_1fr] gap-x-4 gap-y-1`}
+              className={`${dataTableClass}`}
             >
               <dt className="font-medium text-clarity-blue">Current tier</dt>
               <dd className="text-clarity-blue">6/8M VA</dd>

@@ -10,6 +10,7 @@ namespace ClarityGuildWebsite.Api.Mappings
             return new OfficerResponseDTO
             {
                 DiscordId = guildApplication.DiscordId,
+                Country = guildApplication.Country,
                 MainName = guildApplication.MainName,
                 MainRealm = guildApplication.MainRealm,
                 MainRole = guildApplication.MainRole,
@@ -37,6 +38,7 @@ namespace ClarityGuildWebsite.Api.Mappings
             return new GuildApplication
             {
                 DiscordId = dto.DiscordId,
+                Country = dto.Country,
                 MainName = dto.MainName,
                 MainRealm = dto.MainRealm,
                 MainRole = dto.MainRole,

@@ -2,8 +2,8 @@ import { NavLink, Outlet } from "react-router";
 import { AppFormHeader } from "../AppForm/AppFormHeader";
 
 const tabClasses =
-  "border-b-2 border-transparent px-1 py-2 text-md font-titles " +
-  "aria-[current=page]:border-clarity-blue-deep aria-[current=page]:text-medium aria-[current=page]:text-titles hover:text-foreground aria-[before]: text-inactive hover:text-input";
+  "border-b-2 border-transparent px-1 py-2 font-header " +
+  "aria-[current=page]:border-clarity-blue-deep aria-[current=page]:font-medium aria-[current=page]:text-titles text-titles/45 hover:text-titles";
 
 export function SiteLayout() {
   return (

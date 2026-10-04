@@ -1,8 +1,10 @@
-
-export const textBodyFull = "text-titles/70"
+export const textBodyFullClass = "text-titles/70";
 export const cardClass = "flex flex-col gap-2 rounded-3xl border-1 border-clarity-blue/60 bg-cards/30 p-6 shadow-lg";
-export const cardTop = `${cardClass} border-y-2`;
-export const fieldTitleClasses = "text-xl mb-1 font-medium font-header text-titles";
-export const fieldSubTitleClasses = "text-md mb-1 font-medium font-header text-titles";
-export const fieldHintClasses = "text-sm text-hints";
+export const cardTopClass = `${cardClass} border-y-2`;
+export const fieldTitleClass = "text-xl mb-1 font-medium font-header text-titles";
+export const fieldSubTitleClass = "mb-1 font-medium font-header text-titles";
+export const fieldHintClass = "text-sm text-hints";
+export const fieldInputClass = "w-full rounded-md border-input border-2 bg-field px-3 py-1.5 outline-none focus-visible:border-clarity-blue focus-visible:ring-3 focus-visible:ring-clarity-blue/20";
 export const appFormButtonClass = "rounded-md bg-clarity-blue-deep px-6 py-2 font-medium text-white hover:bg-clarity-blue-darkest focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clarity-blue disabled:cursor-not-allowed disabled:opacity-50";
+export const resizeTabsClass = "text-sm bg-clarity-blue/70 hover:bg-clarity-blue-darkest aria-pressed:bg-clarity-blue-deep aria-pressed:text-white xl:px-1 xl:py-2 xl:aria-pressed:px-4 transition-all focus-visible:outline-2 focus-visible:outline-clarity-blue-deep";
+export const dataTableClass = `${textBodyFullClass} grid grid-cols-[auto_1fr] gap-x-4 gap-y-1`;
