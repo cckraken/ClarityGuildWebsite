@@ -22,7 +22,6 @@ public class ApplicationMappingExtensionTests
             AltRealm = "AltRealm",
             AltRole = "AltRole",
             Screenshot = "TestScreenshot",
-            Schedule = "TestSchedule",
             Splits = true,
             Goals = true,
             About = "TestAbout",
@@ -43,7 +42,6 @@ public class ApplicationMappingExtensionTests
             Assert.Equal(cDto.AltRealm, result.AltRealm);
             Assert.Equal(cDto.AltRole, result.AltRole);
             Assert.Equal(cDto.Screenshot, result.Screenshot);
-            Assert.Equal(cDto.Schedule, result.Schedule);
             Assert.Equal(cDto.Splits, result.Splits);
             Assert.Equal(cDto.Goals, result.Goals);
             Assert.Equal(cDto.About, result.About);
@@ -67,7 +65,6 @@ public class ApplicationMappingExtensionTests
             AltRealm = "AltRealm",
             AltRole = "AltRole",
             Screenshot = "TestScreenshot",
-            Schedule = "TestSchedule",
             Splits = true,
             Goals = true,
             About = "TestAbout",
@@ -92,7 +89,6 @@ public class ApplicationMappingExtensionTests
             Assert.Equal(application.AltRealm, result.AltRealm);
             Assert.Equal(application.AltRole, result.AltRole);
             Assert.Equal(application.Screenshot, result.Screenshot);
-            Assert.Equal(application.Schedule, result.Schedule);
             Assert.Equal(application.Splits, result.Splits);
             Assert.Equal(application.Goals, result.Goals);
             Assert.Equal(application.About, result.About);

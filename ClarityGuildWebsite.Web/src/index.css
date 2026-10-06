@@ -14,7 +14,6 @@
   --color-input: #808080;
   --color-foreground: #201f72;
   --color-border: #555555;
-  --color-muted: #475569;
   --color-error: #b91c1c;
   --color-clarity-blue: #0094fe;
   --color-clarity-blue-deep: #0059cf;
@@ -22,10 +21,6 @@
   --color-titles: #e1f2f5;
   --color-inactive: #4f5557;
   --color-hints: #b9b2b2;
-
-  /*Borders & Shadows*/
-  --radius-5xl: 5rem;
- 
 }
 
 @layer base {
@@ -36,7 +31,6 @@
     min-height: 100vh;
     background-color: var(--color-background);
     background-image: radial-gradient(ellipse at top, rgb(0 148 254 / 0.12), transparent 60%);
-    ;
     background-attachment: fixed;
     *, ::before, ::after { border-color: var(--color-background); }
     background-color: var(--color-background);
