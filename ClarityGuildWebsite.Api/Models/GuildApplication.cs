@@ -32,9 +32,6 @@ namespace ClarityGuildWebsite.Api.Models
         [MaxLength(100)]
         public required string Screenshot { get; set; }
 
-        [MaxLength(500)]
-        public required string Schedule { get; set; }
-
         public bool Splits { get; set; }
         public bool Goals { get; set; }
 

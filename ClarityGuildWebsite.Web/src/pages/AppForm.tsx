@@ -2,6 +2,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
 import { useState, useRef } from 'react'
+import { AppFormSubmitDialogue } from "../components/AppForm/AppFormSubmitDialogue";
 import { cardClass, fieldInputClass, fieldTitleClass, fieldSubTitleClass, fieldHintClass, appFormButtonClass, resizeTabsClass } from "../components/styles/applicationClasses";
 
 const roles = ["Tank", "Healer", "DPS"] as const;
@@ -22,11 +23,11 @@ const schema = z.object({
   extra: z.string().max(2000, {error: "2k characters or less"}).optional(),
 });
 
-
-function AppForm() {
+export function AppForm() {
   const {
      register,
       handleSubmit,
+      reset,
        formState: { errors, isSubmitting },
        } = useForm<z.input<typeof schema>,
         unknown, z.output<typeof schema>>({ resolver: zodResolver(schema),
@@ -38,6 +39,7 @@ function AppForm() {
         ? "grid grid-cols-1 gap-4 md:col-span-2"
         : "grid grid-cols-1 gap-12.5"
 
+const [status, setStatus] = useState<"success" | "error" | null>(null);
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async (data) => {
     console.log(data);
@@ -52,16 +54,12 @@ function AppForm() {
     );
 
     if (response.ok) {
-      alert('Application submitted successfully!');
+      setStatus("success");
     } else {
-      alert(
-        'Failed to submit application. Please contact cckraken17 on Discord for assistance.'
-      );
+      setStatus("error");
     }
   } catch {
-    alert(
-      'An error occurred while submitting the application. Please try again later.'
-    );
+    setStatus("error");
   }
   };
 
@@ -69,7 +67,13 @@ function AppForm() {
 
   return (
 
+    
+
 <form className="grid grid-cols-1 gap-6 font-light md:grid-cols-2" onSubmit={handleSubmit(onSubmit)}>
+  <AppFormSubmitDialogue
+  status={status}
+  onClose={() => setStatus(null)}
+/>
 
  <div className={`self-start ${cardClass}`}>
 
@@ -262,7 +266,7 @@ function AppForm() {
    
         <div className="flex flex-col gap-1">
         <label className={fieldTitleClass} htmlFor="extra">Extra</label>
-        <p className={fieldHintClass}>Anything extra? If you play other alts, here's the place</p>
+        <p className={fieldHintClass}>Anything extra? If you play other alts, here&apos;s the place</p>
           <textarea className ={fieldInputClass}
           rows={isEnlarged ? 12 : 3}
           {...register("extra")}
@@ -276,16 +280,18 @@ function AppForm() {
 
   </div>
 
-    <div className ="md:col-span-2 flex justify-center">
+<>
+<div className={"md:col-span-2 flex justify-center"}>
     <button className={appFormButtonClass} disabled={isSubmitting} type="submit">
         {isSubmitting ? "Submitting..." : "Submit"}
     </button>
     </div>
 
+</>
   </form>
   )
 }
-export default AppForm;
+
 
 
 

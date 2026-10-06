@@ -12,7 +12,6 @@
         public string AltRealm { get; set; } = string.Empty;
         public string AltRole { get; set; } = string.Empty;
         public string Screenshot { get; set; } = string.Empty;
-        public string Schedule { get; set; } = string.Empty;
         public bool Splits { get; set; }
         public bool Goals { get; set; }
         public string About {  get; set; } = string.Empty;

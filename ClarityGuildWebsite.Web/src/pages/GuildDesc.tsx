@@ -8,7 +8,7 @@ import {
 } from "../components/styles/applicationClasses";
 import { Link } from "react-router";
 
-function GuildDesc() {
+export function GuildDesc() {
   return (
     <div className="mx-auto grid max-w-4xl gap-6">
       <div className="text-center">
@@ -58,7 +58,7 @@ function GuildDesc() {
           >
             <li>
               A highly experienced bench raid leader. Real leadership depth and
-              organisation a lot of guilds don't have
+              organisation a lot of guilds don&apos;t have
             </li>
             <li>
               Clear prep material and prog analysis, provided ahead of every
@@ -120,5 +120,3 @@ function GuildDesc() {
     </div>
   );
 }
-
-export default GuildDesc;

@@ -41,10 +41,6 @@ namespace ClarityGuildWebsite.Api.DTOs
         public string Screenshot { get; set; } = string.Empty;
 
         [Required]
-        [StringLength(500)]
-        public string Schedule { get; set; } = string.Empty;
-
-        [Required]
         public bool Splits { get; set; }
 
         [Required]

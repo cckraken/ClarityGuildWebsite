@@ -8,3 +8,4 @@ export const fieldInputClass = "w-full rounded-md border-input border-2 bg-field
 export const appFormButtonClass = "rounded-md bg-clarity-blue-deep px-6 py-2 font-medium text-white hover:bg-clarity-blue-darkest focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clarity-blue disabled:cursor-not-allowed disabled:opacity-50";
 export const resizeTabsClass = "text-sm bg-clarity-blue/70 hover:bg-clarity-blue-darkest aria-pressed:bg-clarity-blue-deep aria-pressed:text-white xl:px-1 xl:py-2 xl:aria-pressed:px-4 transition-all focus-visible:outline-2 focus-visible:outline-clarity-blue-deep";
 export const dataTableClass = `${textBodyFullClass} grid grid-cols-[auto_1fr] gap-x-4 gap-y-1`;
+export const dialogClass = "flex flex-col gap-2 rounded-3xl border-3 border-clarity-blue/60 bg-background p-6 shadow-lg";
