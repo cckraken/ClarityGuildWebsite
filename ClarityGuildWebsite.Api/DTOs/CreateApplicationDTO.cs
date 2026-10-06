@@ -6,6 +6,9 @@ namespace ClarityGuildWebsite.Api.DTOs
     {
         [Required]
         [StringLength(50)]
+        public Guid PublicId { get; set; } = Guid.NewGuid();
+        [Required]
+        [StringLength(50)]
         public string DiscordId { get; set; } = string.Empty;
 
         [Required]
@@ -39,12 +42,6 @@ namespace ClarityGuildWebsite.Api.DTOs
         [Required]
         [StringLength(100)]
         public string Screenshot { get; set; } = string.Empty;
-
-        [Required]
-        public bool Splits { get; set; }
-
-        [Required]
-        public bool Goals { get; set; }
 
         [Required]
         [StringLength(2000)]

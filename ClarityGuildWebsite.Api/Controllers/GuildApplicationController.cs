@@ -2,6 +2,7 @@
 using ClarityGuildWebsite.Api.DTOs;
 using ClarityGuildWebsite.Api.Mappings;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -18,6 +19,7 @@ public class GuildApplicationController : ControllerBase
     public async Task<IActionResult> Create(CreateApplicationDTO dto)
     {
         var application = dto.ToEntity();
+        application.PublicId = Guid.NewGuid();
         application.TimestampUtc = DateTime.UtcNow;
         application.Status = ApplicationStatus.Pending;
         application.PostStatus = PostStatus.Pending;
@@ -25,13 +27,13 @@ public class GuildApplicationController : ControllerBase
 
         _context.GuildApplications.Add(application);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetById), new { id = application.Id }, application.ToOfficerResponse());
+        return CreatedAtAction(nameof(GetById), new { publicId = application.PublicId }, application.ToOfficerResponse());
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    [HttpGet("{publicId:guid}")]
+    public async Task<IActionResult> GetById(Guid publicId)
     {
-        var application = await _context.GuildApplications.FindAsync(id);
+        var application = await _context.GuildApplications.FirstOrDefaultAsync(a => a.PublicId == publicId);
 
         if (application is null)
         {

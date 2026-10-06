@@ -13,6 +13,7 @@ public class ApplicationMappingExtensionTests
     {
         CreateApplicationDTO cDto = new CreateApplicationDTO
         {
+            PublicId = Guid.NewGuid(),
             DiscordId = "TestId",
             Country = "TestCountry",
             MainName = "TestName",
@@ -22,8 +23,6 @@ public class ApplicationMappingExtensionTests
             AltRealm = "AltRealm",
             AltRole = "AltRole",
             Screenshot = "TestScreenshot",
-            Splits = true,
-            Goals = true,
             About = "TestAbout",
             Tech = "TestTech",
             History = "TestHistory",
@@ -33,6 +32,7 @@ public class ApplicationMappingExtensionTests
         var result = cDto.ToEntity();
         Assert.Multiple(() =>
         {
+            Assert.Equal(cDto.PublicId, result.PublicId);
             Assert.Equal(cDto.DiscordId, result.DiscordId);
             Assert.Equal(cDto.Country, result.Country);
             Assert.Equal(cDto.MainName, result.MainName);
@@ -42,8 +42,6 @@ public class ApplicationMappingExtensionTests
             Assert.Equal(cDto.AltRealm, result.AltRealm);
             Assert.Equal(cDto.AltRole, result.AltRole);
             Assert.Equal(cDto.Screenshot, result.Screenshot);
-            Assert.Equal(cDto.Splits, result.Splits);
-            Assert.Equal(cDto.Goals, result.Goals);
             Assert.Equal(cDto.About, result.About);
             Assert.Equal(cDto.Tech, result.Tech);
             Assert.Equal(cDto.History, result.History);
@@ -56,6 +54,7 @@ public class ApplicationMappingExtensionTests
     {
         GuildApplication application = new GuildApplication
         {
+            PublicId = Guid.NewGuid(),
             DiscordId = "testId",
             Country = "TestCountry",
             MainName = "TestName",
@@ -65,8 +64,6 @@ public class ApplicationMappingExtensionTests
             AltRealm = "AltRealm",
             AltRole = "AltRole",
             Screenshot = "TestScreenshot",
-            Splits = true,
-            Goals = true,
             About = "TestAbout",
             Tech = "TestTech",
             History = "TestHistory",
@@ -80,6 +77,7 @@ public class ApplicationMappingExtensionTests
         var result = application.ToOfficerResponse();
         Assert.Multiple(() =>
         {
+            Assert.Equal(application.PublicId, result.PublicId);
             Assert.Equal(application.DiscordId, result.DiscordId);
             Assert.Equal(application.Country, result.Country);
             Assert.Equal(application.MainName, result.MainName);
@@ -89,8 +87,6 @@ public class ApplicationMappingExtensionTests
             Assert.Equal(application.AltRealm, result.AltRealm);
             Assert.Equal(application.AltRole, result.AltRole);
             Assert.Equal(application.Screenshot, result.Screenshot);
-            Assert.Equal(application.Splits, result.Splits);
-            Assert.Equal(application.Goals, result.Goals);
             Assert.Equal(application.About, result.About);
             Assert.Equal(application.Tech, result.Tech);
             Assert.Equal(application.History, result.History);

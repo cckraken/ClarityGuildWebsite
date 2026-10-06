@@ -8,7 +8,7 @@ namespace ClarityGuildWebsite.Api.Mappings
         public static OfficerResponseDTO ToOfficerResponse(this GuildApplication guildApplication)
         {
             return new OfficerResponseDTO
-            {
+            {      
                 DiscordId = guildApplication.DiscordId,
                 Country = guildApplication.Country,
                 MainName = guildApplication.MainName,
@@ -18,13 +18,12 @@ namespace ClarityGuildWebsite.Api.Mappings
                 AltRealm = guildApplication.AltRealm,
                 AltRole = guildApplication.AltRole,
                 Screenshot = guildApplication.Screenshot,
-                Splits = guildApplication.Splits,
-                Goals = guildApplication.Goals,
                 About = guildApplication.About,
                 Tech = guildApplication.Tech,
                 History = guildApplication.History,
                 Extra = guildApplication.Extra,
 
+                PublicId = guildApplication.PublicId,
                 Id = guildApplication.Id,
                 Status = guildApplication.Status,
                 PostStatus = guildApplication.PostStatus,
@@ -36,6 +35,7 @@ namespace ClarityGuildWebsite.Api.Mappings
         {
             return new GuildApplication
             {
+                PublicId = dto.PublicId,
                 DiscordId = dto.DiscordId,
                 Country = dto.Country,
                 MainName = dto.MainName,
@@ -45,8 +45,6 @@ namespace ClarityGuildWebsite.Api.Mappings
                 AltRealm = dto.AltRealm,
                 AltRole = dto.AltRole,
                 Screenshot = dto.Screenshot,
-                Splits = dto.Splits,
-                Goals = dto.Goals,
                 About = dto.About,
                 Tech = dto.Tech,
                 History = dto.History,
