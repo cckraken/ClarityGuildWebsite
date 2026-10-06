@@ -3,6 +3,7 @@
 
     public class ApplicantResponseDTO
     {
+        //Guid to be added once endpoint exposed on live site
         public string DiscordId { get; set; } = string.Empty;
         public string Country {  get; set; } = string.Empty;
         public string MainName {  get; set; } = string.Empty;
@@ -12,8 +13,6 @@
         public string AltRealm { get; set; } = string.Empty;
         public string AltRole { get; set; } = string.Empty;
         public string Screenshot { get; set; } = string.Empty;
-        public bool Splits { get; set; }
-        public bool Goals { get; set; }
         public string About {  get; set; } = string.Empty;
         public string Tech { get; set; } = string.Empty;
         public string History { get; set; } = string.Empty;
@@ -22,6 +21,7 @@
 
     public class OfficerResponseDTO : ApplicantResponseDTO
     {
+        public Guid PublicId { get; set; }
         public int Id { get; set; }
         public ApplicationStatus Status { get; set; }
         public PostStatus PostStatus { get; set; }

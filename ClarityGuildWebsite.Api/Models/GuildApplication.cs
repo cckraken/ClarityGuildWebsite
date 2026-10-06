@@ -32,22 +32,20 @@ namespace ClarityGuildWebsite.Api.Models
         [MaxLength(100)]
         public required string Screenshot { get; set; }
 
-        public bool Splits { get; set; }
-        public bool Goals { get; set; }
-
         [MaxLength(2000)]
         public required string About { get; set; }
 
-        [MaxLength(2000)]
+        [MaxLength(500)]
         public required string Tech { get; set; }
 
         [MaxLength(2000)]
         public required string History { get; set; }
         
         [MaxLength(2000)]
-        public string? Extra {  get; set; }
+        public string? Extra { get; set; }
 
         //db only
+        public Guid PublicId { get; set; }
         public int Id { get; set; }
         public DateTime TimestampUtc { get; set; }
         [MaxLength(50)]
