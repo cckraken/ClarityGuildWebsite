@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace ClarityGuildWebsite.Api.Models
 {
+    [Index(nameof(PublicId), IsUnique = true)]
     public class GuildApplication
     {
         //form facing fields
