@@ -2,6 +2,7 @@
 using ClarityGuildWebsite.Api.DTOs;
 using ClarityGuildWebsite.Api.Mappings;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 [ApiController]
@@ -16,6 +17,7 @@ public class GuildApplicationController : ControllerBase
     }
 
     [HttpPost]
+    [EnableRateLimiting("fixed")]
     public async Task<IActionResult> Create(CreateApplicationDTO dto)
     {
         var application = dto.ToEntity();

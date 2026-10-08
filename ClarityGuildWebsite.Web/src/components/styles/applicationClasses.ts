@@ -9,3 +9,6 @@ export const appFormButtonClass = "rounded-md bg-clarity-blue-deep px-6 py-2 fon
 export const resizeTabsClass = "text-sm bg-clarity-blue/70 hover:bg-clarity-blue-darkest aria-pressed:bg-clarity-blue-deep aria-pressed:text-white xl:px-1 xl:py-2 xl:aria-pressed:px-4 transition-all focus-visible:outline-2 focus-visible:outline-clarity-blue-deep";
 export const dataTableClass = `${textBodyFullClass} grid grid-cols-[auto_1fr] gap-x-4 gap-y-1`;
 export const dialogClass = "flex flex-col gap-2 rounded-3xl border-3 border-clarity-blue/60 bg-background p-6 shadow-lg";
+export const footerContainerClass = "flex flex-wrap justify-center gap-3 border-t border-clarity-blue/20 pt-2 mt-8";
+export const footerItemClass = "text-titles/60";
+export const footerLinkClass = `${footerItemClass} hover:text-titles underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-clarity-blue outline-offset-2`;

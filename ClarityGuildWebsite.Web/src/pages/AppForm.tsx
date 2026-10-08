@@ -39,7 +39,7 @@ export function AppForm() {
         ? "grid grid-cols-1 gap-4 md:col-span-2"
         : "grid grid-cols-1 gap-12.5"
 
-const [status, setStatus] = useState<"success" | "error" | null>(null);
+const [status, setStatus] = useState<"success" | "error" | "servererror" | "errorTooManyRequests" | null>(null);
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async (data) => {
     console.log(data);
@@ -53,14 +53,18 @@ const [status, setStatus] = useState<"success" | "error" | null>(null);
       }
     );
 
-    if (response.ok) {
+    if (response.status === 203) {
       setStatus("success");
-    } else {
-      setStatus("error");
+      
+    } else if (response.status === 429) {
+      setStatus("errorTooManyRequests");
+    } else if (response.status === 404) {
+      setStatus("servererror");
     }
   } catch {
     setStatus("error");
   }
+
   };
 
   const textAreasRef = useRef<HTMLDivElement>(null);

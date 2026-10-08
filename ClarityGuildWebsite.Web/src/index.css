@@ -29,13 +29,11 @@
   }
   body {
     min-height: 100vh;
-    background-color: var(--color-background);
     background-image: radial-gradient(ellipse at top, rgb(0 148 254 / 0.12), transparent 60%);
     background-attachment: fixed;
-    *, ::before, ::after { border-color: var(--color-background); }
     background-color: var(--color-background);
     font-family: var(--font-body);
-    color: var(--color-foreground);
+    color: var(--color-titles);
   }
 }
 

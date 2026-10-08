@@ -5,6 +5,7 @@ namespace ClarityGuildWebsite.Api.DTOs
     public class CreateApplicationDTO
     {
         [Required]
+        [StringLength(50)]
         public string DiscordId { get; set; } = string.Empty;
 
         [Required]

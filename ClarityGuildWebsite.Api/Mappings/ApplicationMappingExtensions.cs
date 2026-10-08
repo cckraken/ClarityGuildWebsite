@@ -22,8 +22,7 @@ namespace ClarityGuildWebsite.Api.Mappings
                 Tech = guildApplication.Tech,
                 History = guildApplication.History,
                 Extra = guildApplication.Extra,
-
-               // Id = guildApplication.Id,
+                //Id To be added later
                 Status = guildApplication.Status,
                 PostStatus = guildApplication.PostStatus,
                 TimestampUtc = guildApplication.TimestampUtc,

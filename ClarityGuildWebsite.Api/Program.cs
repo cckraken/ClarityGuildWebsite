@@ -1,4 +1,5 @@
 using ClarityGuildWebsite.Api.Data;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,16 @@ var allowedOrigins = builder.Configuration
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddFixedWindowLimiter("fixed", cfg =>
+    {
+        cfg.PermitLimit = 3;
+        cfg.Window = TimeSpan.FromMinutes(1);
+    });
+});
+
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ClarityDb")
     ?? throw new InvalidOperationException("Connection string 'ClarityDb' is not configured.")));
 builder.Services.AddCors(options =>
@@ -35,6 +46,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors("Frontend");
+app.UseRateLimiter();
 app.MapControllers();
 
 app.Run();
