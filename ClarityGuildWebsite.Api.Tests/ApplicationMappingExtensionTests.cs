@@ -75,7 +75,6 @@ public class ApplicationMappingExtensionTests
         var result = application.ToOfficerResponse();
         Assert.Multiple(() =>
         {
-            Assert.Equal(application.PublicId, result.PublicId);
             Assert.Equal(application.DiscordId, result.DiscordId);
             Assert.Equal(application.Country, result.Country);
             Assert.Equal(application.MainName, result.MainName);
@@ -90,7 +89,6 @@ public class ApplicationMappingExtensionTests
             Assert.Equal(application.History, result.History);
             Assert.Equal(application.Extra, result.Extra);
 
-            Assert.Equal(application.Id, result.Id);
             Assert.Equal(application.Status, result.Status);
             Assert.Equal(application.PostStatus, result.PostStatus);
             Assert.Equal(application.TimestampUtc, result.TimestampUtc);

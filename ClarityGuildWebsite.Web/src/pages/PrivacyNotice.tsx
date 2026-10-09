@@ -9,7 +9,7 @@ export function PrivacyNotice() {
             <h1 className={fieldTitleClass}>Privacy Notice</h1>
             <p className={textBodyFullClass}>
                 We collect and use whatever information you provide in the application only as necessary to process your application and communicate with you regarding your application status.
-                This data is stored securely on Azure and only officers of the guild will ever see it.
+                This data is stored securely on Azure.
             </p>
             <p className={textBodyFullClass}>
                 We do not share your personal information with third parties without your consent, except as required by law.

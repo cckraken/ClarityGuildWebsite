@@ -52,13 +52,15 @@ const [status, setStatus] = useState<"success" | "error" | "servererror" | "erro
       }
     );
 
-    if (response.status === 201) {
+    if (response.ok) {
       setStatus("success");
       reset(); 
     } else if (response.status === 429) {
       setStatus("errorTooManyRequests");
     } else if (response.status === 404) {
       setStatus("servererror");
+    } else {
+      setStatus("error");
     }
   } catch {
     setStatus("error");
