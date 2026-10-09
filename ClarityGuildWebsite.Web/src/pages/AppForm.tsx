@@ -8,19 +8,19 @@ import { cardClass, fieldInputClass, fieldTitleClass, fieldSubTitleClass, fieldH
 const roles = ["Tank", "Healer", "DPS"] as const;
 
 const schema = z.object({
-  discordId: z.string().min(1, { error: "Discord ID is required" }).max(50, {error: "50 characters or less"}),
-  country: z.string().min(1, { error: "Country is required" }).max(50, {error: "50 characters or less"}),
-  mainName: z.string().min(1, { error: "Main is required" }).max(50, {error: "50 characters or less"}),
-  mainRealm: z.string().min(1, { error: "Realm is required" }).max(50, {error: "50 characters or less"}),
+  discordId: z.string().trim().min(1, { error: "Discord ID is required" }).max(50, {error: "50 characters or less"}),
+  country: z.string().trim().min(1, { error: "Country is required" }).max(50, {error: "50 characters or less"}),
+  mainName: z.string().trim().min(1, { error: "Main is required" }).max(50, {error: "50 characters or less"}),
+  mainRealm: z.string().trim().min(1, { error: "Realm is required" }).max(50, {error: "50 characters or less"}),
   mainRole: z.enum(roles, { error: "Role is required" }),
-  altName: z.string().min(1, { error: "Alt is required" }).max(50, {error: "50 characters or less"}),
-  altRealm: z.string().min(1, { error: "Realm is required" }).max(50, {error: "50 characters or less"}),
+  altName: z.string().trim().min(1, { error: "Alt is required" }).max(50, {error: "50 characters or less"}),
+  altRealm: z.string().trim().min(1, { error: "Realm is required" }).max(50, {error: "50 characters or less"}),
   altRole: z.enum(roles, { error: "Role is required" }),
   screenshot: z.url({error:"Screenshot is required"}).refine((val) => !val.toLowerCase().includes("imgur"), {error: "No Imgur links, sorry!"}).max(100, {error: "Too long!"}),
-  about: z.string().min(1, {error: "About is required"}).max(2000, { error: "2k characters or less"}),
-  tech: z.string().min(1, { error: "Tech is required" }).max(500, {error: "500 characters or less"}),
-  history: z.string().min(1,  { error: "History is required" }).max(2000, {error: "2k characters or less"}),
-  extra: z.string().max(2000, {error: "2k characters or less"}).optional(),
+  about: z.string().trim().min(1, {error: "About is required"}).max(2000, { error: "2k characters or less"}),
+  tech: z.string().trim().min(1, { error: "Tech is required" }).max(500, {error: "500 characters or less"}),
+  history: z.string().trim().min(1,  { error: "History is required" }).max(2000, {error: "2k characters or less"}),
+  extra: z.string().trim().max(2000, {error: "2k characters or less"}).optional(),
 });
 
 export function AppForm() {
@@ -39,13 +39,12 @@ export function AppForm() {
         ? "grid grid-cols-1 gap-4 md:col-span-2"
         : "grid grid-cols-1 gap-12.5"
 
-const [status, setStatus] = useState<"success" | "error" | null>(null);
+const [status, setStatus] = useState<"success" | "error" | "servererror" | "errorTooManyRequests" | null>(null);
 
-  const onSubmit: SubmitHandler<z.infer<typeof schema>> = async (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<z.infer<typeof schema>> = async (data) => { 
   try {
     const response = await fetch(
-      'http://localhost:5055/api/guildapplication',
+      `${import.meta.env.VITE_API_BASE_URL}/api/guildapplication`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -55,12 +54,18 @@ const [status, setStatus] = useState<"success" | "error" | null>(null);
 
     if (response.ok) {
       setStatus("success");
+      reset(); 
+    } else if (response.status === 429) {
+      setStatus("errorTooManyRequests");
+    } else if (response.status === 404) {
+      setStatus("servererror");
     } else {
       setStatus("error");
     }
   } catch {
     setStatus("error");
   }
+
   };
 
   const textAreasRef = useRef<HTMLDivElement>(null);

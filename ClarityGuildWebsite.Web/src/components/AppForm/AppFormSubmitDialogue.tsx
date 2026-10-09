@@ -1,7 +1,7 @@
 import { Description, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import { dialogClass, textBodyFullClass, appFormButtonClass, fieldTitleClass } from '../styles/applicationClasses';
 
-type Props = { status: "success" | "error" | null; onClose: () => void };
+type Props = { status: "success" | "error" | "servererror" | "errorTooManyRequests" | null; onClose: () => void };
 const content = {
   success: {
     title: "Application submitted",
@@ -13,10 +13,21 @@ const content = {
     message: "Please contact cckraken17 on Discord for assistance.",
     disclaimer: "We apologize for the inconvenience and appreciate your understanding."
   },
+  servererror: {
+    title: "Problem with the server",
+    message: "We could not connect to the server. Please try again later.",
+    disclaimer: "If the problem persists, contact cckraken17 on Discord for assistance."
+  },
+  errorTooManyRequests: {
+    title: "Too many requests",
+    message: "You have sent too many requests in a short period of time. Please wait and try again later.",
+    disclaimer: "If the problem persists, contact cckraken17 on Discord for assistance."
+  }
 };
 
 export function AppFormSubmitDialogue({ status, onClose }: Props) {
 const current = status ? content[status] : null;
+
     return (
       <Dialog open={status !== null} onClose={onClose} className="relative z-50">
        <div className="fixed inset-0 bg-black/70" aria-hidden="true"/>
@@ -26,9 +37,6 @@ const current = status ? content[status] : null;
             <Description className={textBodyFullClass}>{current?.message}</Description>
             {current?.disclaimer && <Description className={textBodyFullClass}>{current?.disclaimer}</Description>}
             <div className="flex gap-4">
-              <button onClick={onClose} className={appFormButtonClass}
-               type="button"
-               >Back</button>
                <button onClick={onClose} className={appFormButtonClass}
                type="button"
                >Finish</button>

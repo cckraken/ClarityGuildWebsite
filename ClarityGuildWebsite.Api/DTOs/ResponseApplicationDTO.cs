@@ -21,8 +21,7 @@
 
     public class OfficerResponseDTO : ApplicantResponseDTO
     {
-        public Guid PublicId { get; set; }
-        public int Id { get; set; }
+        //PublicId and Id to be added later
         public ApplicationStatus Status { get; set; }
         public PostStatus PostStatus { get; set; }
         public DateTime TimestampUtc { get; set; }

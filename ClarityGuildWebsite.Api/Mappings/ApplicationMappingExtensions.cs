@@ -22,9 +22,7 @@ namespace ClarityGuildWebsite.Api.Mappings
                 Tech = guildApplication.Tech,
                 History = guildApplication.History,
                 Extra = guildApplication.Extra,
-
-                PublicId = guildApplication.PublicId,
-                Id = guildApplication.Id,
+                //Id To be added later
                 Status = guildApplication.Status,
                 PostStatus = guildApplication.PostStatus,
                 TimestampUtc = guildApplication.TimestampUtc,
@@ -35,7 +33,6 @@ namespace ClarityGuildWebsite.Api.Mappings
         {
             return new GuildApplication
             {
-                PublicId = dto.PublicId,
                 DiscordId = dto.DiscordId,
                 Country = dto.Country,
                 MainName = dto.MainName,

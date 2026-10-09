@@ -2,6 +2,7 @@
 using ClarityGuildWebsite.Api.DTOs;
 using ClarityGuildWebsite.Api.Mappings;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 [ApiController]
@@ -16,6 +17,7 @@ public class GuildApplicationController : ControllerBase
     }
 
     [HttpPost]
+    [EnableRateLimiting("appPostPolicy")]
     public async Task<IActionResult> Create(CreateApplicationDTO dto)
     {
         var application = dto.ToEntity();
@@ -27,7 +29,8 @@ public class GuildApplicationController : ControllerBase
 
         _context.GuildApplications.Add(application);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetById), new { publicId = application.PublicId }, application.ToOfficerResponse());
+        return Ok();
+        //return CreatedAtAction(nameof(GetById), new { publicId = application.PublicId }, application.ToOfficerResponse());
     }
 
     [HttpGet("{publicId:guid}")]
