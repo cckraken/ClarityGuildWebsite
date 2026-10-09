@@ -17,7 +17,7 @@ public class GuildApplicationController : ControllerBase
     }
 
     [HttpPost]
-    [EnableRateLimiting("fixed")]
+    [EnableRateLimiting("appPostPolicy")]
     public async Task<IActionResult> Create(CreateApplicationDTO dto)
     {
         var application = dto.ToEntity();

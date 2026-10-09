@@ -13,7 +13,6 @@ public class ApplicationMappingExtensionTests
     {
         CreateApplicationDTO cDto = new CreateApplicationDTO
         {
-            PublicId = Guid.NewGuid(),
             DiscordId = "TestId",
             Country = "TestCountry",
             MainName = "TestName",
@@ -32,7 +31,6 @@ public class ApplicationMappingExtensionTests
         var result = cDto.ToEntity();
         Assert.Multiple(() =>
         {
-            Assert.Equal(cDto.PublicId, result.PublicId);
             Assert.Equal(cDto.DiscordId, result.DiscordId);
             Assert.Equal(cDto.Country, result.Country);
             Assert.Equal(cDto.MainName, result.MainName);
