@@ -15,7 +15,7 @@ export function PrivacyNotice() {
                 We do not share your personal information with third parties without your consent, except as required by law.
             </p>
             <p className={textBodyFullClass}>
-                Your information is automatically deleted after 3 months, but if you would like this deleted sooner, please contact cckraken17 on Discord.
+                We delete your information manually after 3 months, but if you would like this deleted sooner, please contact cckraken17 on Discord.
             </p>           
         </div>
         <button className={appFormButtonClass} type="button" onClick={() => navigate(-1)}>

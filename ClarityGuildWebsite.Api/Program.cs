@@ -11,6 +11,8 @@ var allowedOrigins = builder.Configuration
     .Get<string[]>()
     ?? throw new InvalidOperationException("Cors:AllowedOrigins is not configured.");
 
+
+
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -25,7 +27,9 @@ builder.Services.AddRateLimiter(options =>
             HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
             factory: _ => new TokenBucketRateLimiterOptions
             {
+                //verify forwarded headers resolve real client IPs after deploying; rate limiting silently degrades to a single global bucket otherwise
                 TokenLimit = 3,
+                QueueLimit = 3,
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
                 ReplenishmentPeriod = TimeSpan.FromMinutes(1),
                 TokensPerPeriod = 3,

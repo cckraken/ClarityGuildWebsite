@@ -37,9 +37,6 @@ const current = status ? content[status] : null;
             <Description className={textBodyFullClass}>{current?.message}</Description>
             {current?.disclaimer && <Description className={textBodyFullClass}>{current?.disclaimer}</Description>}
             <div className="flex gap-4">
-              <button onClick={onClose} className={appFormButtonClass}
-               type="button"
-               >Back</button>
                <button onClick={onClose} className={appFormButtonClass}
                type="button"
                >Finish</button>

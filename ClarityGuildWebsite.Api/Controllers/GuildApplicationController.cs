@@ -29,7 +29,8 @@ public class GuildApplicationController : ControllerBase
 
         _context.GuildApplications.Add(application);
         await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetById), new { publicId = application.PublicId }, application.ToOfficerResponse());
+        return Ok();
+        //return CreatedAtAction(nameof(GetById), new { publicId = application.PublicId }, application.ToOfficerResponse());
     }
 
     [HttpGet("{publicId:guid}")]
