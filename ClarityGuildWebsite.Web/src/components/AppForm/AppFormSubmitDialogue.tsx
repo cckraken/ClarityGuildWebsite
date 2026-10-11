@@ -1,7 +1,7 @@
 import { Description, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import { dialogClass, textBodyFullClass, appFormButtonClass, fieldTitleClass } from '../styles/applicationClasses';
 
-type Props = { status: "success" | "error" | "servererror" | "errorTooManyRequests" | null; onClose: () => void };
+type Props = { status: "success" | "error" | "servererror" | "errorTooManyRequests" | null; submissionDate: string | null; onClose: () => void };
 const content = {
   success: {
     title: "Application submitted",
@@ -25,7 +25,7 @@ const content = {
   }
 };
 
-export function AppFormSubmitDialogue({ status, onClose }: Props) {
+export function AppFormSubmitDialogue({ status, submissionDate, onClose }: Props) {
 const current = status ? content[status] : null;
 
     return (
@@ -36,6 +36,9 @@ const current = status ? content[status] : null;
             <DialogTitle className={fieldTitleClass}>{current?.title}</DialogTitle>
             <Description className={textBodyFullClass}>{current?.message}</Description>
             {current?.disclaimer && <Description className={textBodyFullClass}>{current?.disclaimer}</Description>}
+            {status === "success" && submissionDate && (
+              <Description className={textBodyFullClass}> {`Submitted: ${new Date(submissionDate).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })}`}</Description>
+            )}
             <div className="flex gap-4">
                <button onClick={onClose} className={appFormButtonClass}
                type="button"

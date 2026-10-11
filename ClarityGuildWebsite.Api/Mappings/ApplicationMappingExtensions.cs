@@ -26,8 +26,18 @@ namespace ClarityGuildWebsite.Api.Mappings
                 Status = guildApplication.Status,
                 PostStatus = guildApplication.PostStatus,
                 TimestampUtc = guildApplication.TimestampUtc,
+                LastPostError = guildApplication.LastPostError
             };
         }
+
+        public static ApplicantResponseDTO ToApplicantResponse(this GuildApplication guildApplication)
+        {
+            return new ApplicantResponseDTO
+            {
+                TimestampUtc = guildApplication.TimestampUtc
+            };
+        }
+
 
         public static GuildApplication ToEntity(this CreateApplicationDTO dto)
         {

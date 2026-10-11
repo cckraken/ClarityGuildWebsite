@@ -1,6 +1,8 @@
 ﻿using ClarityGuildWebsite.Api.Data;
 using ClarityGuildWebsite.Api.DTOs;
 using ClarityGuildWebsite.Api.Mappings;
+using ClarityGuildWebsite.Api.Services;
+using ClarityGuildWebsite.Api.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -10,15 +12,19 @@ using Microsoft.EntityFrameworkCore;
 public class GuildApplicationController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly IApplicationNotifier _notifier;
+    private readonly ILogger<GuildApplicationController> _logger;
 
-    public GuildApplicationController(ApplicationDbContext context)
+    public GuildApplicationController(ApplicationDbContext context, IApplicationNotifier notifier, ILogger<GuildApplicationController> logger)
     {
         _context = context;
+        _notifier = notifier;
+        _logger = logger;
     }
 
     [HttpPost]
     [EnableRateLimiting("appPostPolicy")]
-    public async Task<IActionResult> Create(CreateApplicationDTO dto)
+    public async Task<IActionResult> Create(CreateApplicationDTO dto, CancellationToken ctoken)
     {
         var application = dto.ToEntity();
         application.PublicId = Guid.NewGuid();
@@ -29,8 +35,24 @@ public class GuildApplicationController : ControllerBase
 
         _context.GuildApplications.Add(application);
         await _context.SaveChangesAsync();
-        return Ok();
-        //return CreatedAtAction(nameof(GetById), new { publicId = application.PublicId }, application.ToOfficerResponse());
+
+        var result = await _notifier.NotifyNewApplicationAsync(application, ctoken);
+        application.LastAttemptedUtc = DateTime.UtcNow;
+        if (result.Success)
+        {
+            application.PostStatus = PostStatus.Delivered;
+            application.DiscordMessageId = result.MessageId;
+            application.LastPostError = null;
+            _logger.LogInformation("Post successful for {PublicId} : {DiscordMessageId}", application.PublicId, application.DiscordMessageId);
+        }
+        else
+        {
+            application.PostStatus = PostStatus.Failed;
+            application.LastPostError = ApplicationHelpers.Truncate(result.Error, 250) ?? "Unknown Error";
+            _logger.LogWarning("Post failed for {PublicId}: {Error}", application.PublicId, result.Error);
+        }
+        await _context.SaveChangesAsync();
+        return CreatedAtAction(nameof(GetById), new { publicId = application.PublicId }, application.ToApplicantResponse());
     }
 
     [HttpGet("{publicId:guid}")]

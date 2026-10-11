@@ -40,6 +40,8 @@ export function AppForm() {
         : "grid grid-cols-1 gap-12.5"
 
 const [status, setStatus] = useState<"success" | "error" | "servererror" | "errorTooManyRequests" | null>(null);
+const [submissionDate, setSubmissionDate] = useState<string | null>(null);
+
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async (data) => { 
   try {
@@ -51,9 +53,10 @@ const [status, setStatus] = useState<"success" | "error" | "servererror" | "erro
         body: JSON.stringify(data),
       }
     );
-
     if (response.ok) {
+      const body = await response.json();
       setStatus("success");
+      setSubmissionDate(body.timestampUtc);
       reset(); 
     } else if (response.status === 429) {
       setStatus("errorTooManyRequests");
@@ -77,7 +80,8 @@ const [status, setStatus] = useState<"success" | "error" | "servererror" | "erro
 <form className="grid grid-cols-1 gap-6 font-light md:grid-cols-2" onSubmit={handleSubmit(onSubmit)}>
   <AppFormSubmitDialogue
   status={status}
-  onClose={() => setStatus(null)}
+  submissionDate={submissionDate}
+  onClose={() => { setStatus(null); setSubmissionDate(null); }}
 />
 
  <div className={`self-start ${cardClass}`}>

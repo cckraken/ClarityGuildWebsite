@@ -1,4 +1,5 @@
 using ClarityGuildWebsite.Api.Data;
+using ClarityGuildWebsite.Api.Services;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +43,7 @@ builder.Services.AddRateLimiter(options =>
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ClarityDb")
     ?? throw new InvalidOperationException("Connection string 'ClarityDb' is not configured.")));
+builder.Services.AddHttpClient<IApplicationNotifier, DiscordWebhookNotifier>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
@@ -72,6 +74,7 @@ app.UseHttpsRedirection();
 app.UseCors("Frontend");
 app.UseRateLimiter();
 app.MapControllers();
+
 
 app.Run();
 
