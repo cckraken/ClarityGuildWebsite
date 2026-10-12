@@ -1,12 +1,5 @@
-﻿using Azure;
-using ClarityGuildWebsite.Api.Helpers;
+﻿using ClarityGuildWebsite.Api.Helpers;
 using ClarityGuildWebsite.Api.Models;
-using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.AspNetCore.HttpLogging;
-using Microsoft.IdentityModel.Tokens;
-using System.Data;
-using System.Diagnostics.Eventing.Reader;
-using System.Reflection;
 using System.Text.Json;
 
 
@@ -88,7 +81,7 @@ namespace ClarityGuildWebsite.Api.Services
             }
             catch (JsonException ex)
             {
-                return new NotificationResult(false, null, $"Discords reponse was not valid JSON: {ex.Message}");
+                return new NotificationResult(false, null, $"Discord's reponse was not valid JSON: {ex.Message}");
             }
         }
     }

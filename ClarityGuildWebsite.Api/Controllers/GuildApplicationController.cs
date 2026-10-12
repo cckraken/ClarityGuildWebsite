@@ -48,7 +48,7 @@ public class GuildApplicationController : ControllerBase
         else
         {
             application.PostStatus = PostStatus.Failed;
-            application.LastPostError = ApplicationHelpers.Truncate(result.Error, 250) ?? "Unknown Error";
+            application.LastPostError = string.IsNullOrWhiteSpace(result.Error) ? "Unknown Error" : ApplicationHelpers.Truncate(result.Error, 250);
             _logger.LogWarning("Post failed for {PublicId}: {Error}", application.PublicId, result.Error);
         }
         await _context.SaveChangesAsync();
@@ -64,7 +64,7 @@ public class GuildApplicationController : ControllerBase
         {
             return NotFound();
         }
-        return Ok(application.ToOfficerResponse());      
+        return Ok(application.ToApplicantResponse());      
     }
 }
 

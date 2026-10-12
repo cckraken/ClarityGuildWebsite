@@ -1,7 +1,4 @@
-﻿using Microsoft.Identity.Client;
-using Microsoft.IdentityModel.Tokens;
-
-namespace ClarityGuildWebsite.Api.Helpers
+﻿namespace ClarityGuildWebsite.Api.Helpers
 {
     public static class ApplicationHelpers
     {
@@ -23,17 +20,25 @@ namespace ClarityGuildWebsite.Api.Helpers
 
         public static (string wlogs, string rio) LinkBuilder(string name, string realm)
         {
-            const string wlogsBase = "https://www.warcraftlogs.com/character/eu/";
-            const string rioBase = "https://raider.io/characters/eu";
             const string error = "Unable to generate link";
 
             if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(realm))
                 return (error, error);
 
-            var wlogsLink = $"{wlogsBase}{realm}/{name}";
-            var rioLink = $"{rioBase}/{realm}/{name}";
+            const string wlogsBase = "https://www.warcraftlogs.com/character/eu";
+            const string rioBase = "https://raider.io/characters/eu";
+            string escapedName = Uri.EscapeDataString(name.Trim());
+            string realmSlug = Uri.EscapeDataString(ToRealmSlug(realm));      
+
+            var wlogsLink = $"{wlogsBase}/{realmSlug}/{escapedName}";
+            var rioLink = $"{rioBase}/{realmSlug}/{escapedName}";
 
             return (wlogsLink, rioLink);
+        }
+
+        public static string ToRealmSlug(string realm)
+        {
+            return realm.Trim().ToLowerInvariant().Replace(" ", "-");
         }
     }
 }
