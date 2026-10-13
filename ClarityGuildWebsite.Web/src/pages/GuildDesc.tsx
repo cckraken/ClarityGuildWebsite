@@ -25,10 +25,6 @@ export function GuildDesc() {
           English speaking, CE experienced and progression focused, without
           losing the banter.
         </p>
-        <p className={textBodyFullClass}>
-          Currently WR 190-240 and climbing. Most of our prog lands Sun/Mon, so
-          our rank jumps later in the week.
-        </p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -98,7 +94,7 @@ export function GuildDesc() {
               className={`${dataTableClass}`}
             >
               <dt className="font-medium text-clarity-blue">Current tier</dt>
-              <dd className="text-clarity-blue">6/8M VA</dd>
+              <dd className="text-clarity-blue">7/8M VA</dd>
               <dt className="font-medium">MDN S1</dt>
               <dd>9/9M WR 381</dd>
               <dt className="font-medium">TWW S3</dt>
