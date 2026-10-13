@@ -12,13 +12,11 @@ using Microsoft.EntityFrameworkCore;
 public class GuildApplicationController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
-    private readonly IApplicationNotifier _notifier;
     private readonly IApplicationDiscordPostingService _service;
 
-    public GuildApplicationController(ApplicationDbContext context, IApplicationNotifier notifier, IApplicationDiscordPostingService service)
+    public GuildApplicationController(ApplicationDbContext context, IApplicationDiscordPostingService service)
     {
         _context = context;
-        _notifier = notifier;
         _service = service;
     }
 

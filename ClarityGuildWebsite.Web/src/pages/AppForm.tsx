@@ -1,7 +1,7 @@
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm, type SubmitHandler, type DefaultValues } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { AppFormSubmitDialogue } from "../components/AppForm/AppFormSubmitDialogue";
 import { cardClass, fieldInputClass, fieldTitleClass, fieldSubTitleClass, fieldHintClass, appFormButtonClass, resizeTabsClass } from "../components/styles/applicationClasses";
 
@@ -23,16 +23,66 @@ const schema = z.object({
   extra: z.string().trim().max(2000, {error: "2k characters or less"}).optional(),
 });
 
+const DRAFT_KEY = "guildApplicationDraft";
+const emptyForm: DefaultValues<z.input<typeof schema>> = {
+  discordId: "",
+  country: "",
+  mainName: "",
+  mainRealm: "",
+  mainRole: undefined,
+  altName: "",
+  altRealm: "",
+  altRole: undefined,
+  screenshot: "",
+  about: "",
+  tech: "",
+  history: "",
+  extra: "",
+};
+
+function clearDraft() {
+  try {
+    sessionStorage.removeItem(DRAFT_KEY);
+  } catch {
+    // storage unavailable: nothing to clear
+  }
+}
+
+function loadDraft() {
+  try {
+    const raw = sessionStorage.getItem(DRAFT_KEY);
+    return raw ? JSON.parse(raw) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 export function AppForm() {
   const {
-     register,
-      handleSubmit,
-      reset,
-       formState: { errors, isSubmitting },
-       } = useForm<z.input<typeof schema>,
-        unknown, z.output<typeof schema>>({ resolver: zodResolver(schema),
+    register,
+    handleSubmit,
+    subscribe,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<z.input<typeof schema>, unknown, z.output<typeof schema>>({
+    resolver: zodResolver(schema),
+    defaultValues: loadDraft() ?? emptyForm,
+  });
 
-        });
+  // Save every change to sessionStorage so the draft survives tab switches and refreshes
+  useEffect(() => {
+    const unsubscribe = subscribe({
+      formState: { values: true },
+      callback: ({ values }) => {
+        try {
+          sessionStorage.setItem(DRAFT_KEY, JSON.stringify(values));
+        } catch {
+          // storage unavailable: the form still works, just without a saved draft
+        }
+      },
+    });
+    return unsubscribe;
+  }, [subscribe]);
 
         const [isEnlarged, setIsEnlarged] = useState(false);
         const textAreaGridClasses = isEnlarged
@@ -41,7 +91,6 @@ export function AppForm() {
 
 const [status, setStatus] = useState<"success" | "error" | "servererror" | "errorTooManyRequests" | null>(null);
 const [submissionDate, setSubmissionDate] = useState<string | null>(null);
-
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async (data) => { 
   try {
@@ -57,7 +106,8 @@ const [submissionDate, setSubmissionDate] = useState<string | null>(null);
       const body = await response.json();
       setStatus("success");
       setSubmissionDate(body.timestampUtc);
-      reset(); 
+      reset(emptyForm);
+      clearDraft();
     } else if (response.status === 429) {
       setStatus("errorTooManyRequests");
     } else if (response.status === 404) {
@@ -107,7 +157,6 @@ const [submissionDate, setSubmissionDate] = useState<string | null>(null);
         <p className={fieldHintClass}>Where do you play the game from</p>
         <input className={fieldInputClass}
           {...register('country') }
-          defaultValue=""
           type="text"
           id="country"
           />
