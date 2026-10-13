@@ -1,6 +1,8 @@
 ﻿using ClarityGuildWebsite.Api.Data;
 using ClarityGuildWebsite.Api.DTOs;
 using ClarityGuildWebsite.Api.Mappings;
+using ClarityGuildWebsite.Api.Services;
+using ClarityGuildWebsite.Api.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -10,15 +12,17 @@ using Microsoft.EntityFrameworkCore;
 public class GuildApplicationController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly IApplicationDiscordPostingService _service;
 
-    public GuildApplicationController(ApplicationDbContext context)
+    public GuildApplicationController(ApplicationDbContext context, IApplicationDiscordPostingService service)
     {
         _context = context;
+        _service = service;
     }
 
     [HttpPost]
     [EnableRateLimiting("appPostPolicy")]
-    public async Task<IActionResult> Create(CreateApplicationDTO dto)
+    public async Task<IActionResult> Create(CreateApplicationDTO dto, CancellationToken ctoken)
     {
         var application = dto.ToEntity();
         application.PublicId = Guid.NewGuid();
@@ -29,8 +33,9 @@ public class GuildApplicationController : ControllerBase
 
         _context.GuildApplications.Add(application);
         await _context.SaveChangesAsync();
-        return Ok();
-        //return CreatedAtAction(nameof(GetById), new { publicId = application.PublicId }, application.ToOfficerResponse());
+
+        await _service.PostAppToDiscord(application, ctoken);
+        return CreatedAtAction(nameof(GetById), new { publicId = application.PublicId }, application.ToApplicantResponse());
     }
 
     [HttpGet("{publicId:guid}")]
@@ -42,7 +47,7 @@ public class GuildApplicationController : ControllerBase
         {
             return NotFound();
         }
-        return Ok(application.ToOfficerResponse());      
+        return Ok(application.ToApplicantResponse());      
     }
 }
 

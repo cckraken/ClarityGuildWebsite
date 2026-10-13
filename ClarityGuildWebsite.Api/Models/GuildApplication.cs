@@ -52,6 +52,8 @@ namespace ClarityGuildWebsite.Api.Models
         public DateTime TimestampUtc { get; set; }
         [MaxLength(50)]
         public string? DiscordMessageId { get; set; }
+        [MaxLength(250)]
+        public string? LastPostError { get; set; }
         public DateTime? LastAttemptedUtc { get; set; }
         public int Retry {  get; set; }
         public ApplicationStatus Status { get; set; }
