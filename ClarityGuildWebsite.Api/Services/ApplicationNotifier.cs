@@ -18,7 +18,7 @@ namespace ClarityGuildWebsite.Api.Services
             _webhookUrl = config["Discord:WebhookUrl"] ?? throw new InvalidOperationException("Discord:WebhookUrl is not configured.");          
         }
 
-        public async Task<NotificationResult> NotifyNewApplicationAsync(GuildApplication application, CancellationToken ctoken)
+        public async Task<NotificationResult> PostAndRecordAsync(GuildApplication application, CancellationToken ctoken)
         {
             var embed = new DiscordEmbed(
                 Title: "New Application " + application.MainName,

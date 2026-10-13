@@ -44,6 +44,7 @@ builder.Services.AddRateLimiter(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ClarityDb")
     ?? throw new InvalidOperationException("Connection string 'ClarityDb' is not configured.")));
 builder.Services.AddHttpClient<IApplicationNotifier, DiscordWebhookNotifier>();
+builder.Services.AddScoped<IApplicationDiscordPostingService, ApplicationDiscordPostingService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>

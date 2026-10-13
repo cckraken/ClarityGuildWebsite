@@ -13,13 +13,13 @@ public class GuildApplicationController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
     private readonly IApplicationNotifier _notifier;
-    private readonly ILogger<GuildApplicationController> _logger;
+    private readonly IApplicationDiscordPostingService _service;
 
-    public GuildApplicationController(ApplicationDbContext context, IApplicationNotifier notifier, ILogger<GuildApplicationController> logger)
+    public GuildApplicationController(ApplicationDbContext context, IApplicationNotifier notifier, IApplicationDiscordPostingService service)
     {
         _context = context;
         _notifier = notifier;
-        _logger = logger;
+        _service = service;
     }
 
     [HttpPost]
@@ -36,22 +36,7 @@ public class GuildApplicationController : ControllerBase
         _context.GuildApplications.Add(application);
         await _context.SaveChangesAsync();
 
-        var result = await _notifier.NotifyNewApplicationAsync(application, ctoken);
-        application.LastAttemptedUtc = DateTime.UtcNow;
-        if (result.Success)
-        {
-            application.PostStatus = PostStatus.Delivered;
-            application.DiscordMessageId = result.MessageId;
-            application.LastPostError = null;
-            _logger.LogInformation("Post successful for {PublicId} : {DiscordMessageId}", application.PublicId, application.DiscordMessageId);
-        }
-        else
-        {
-            application.PostStatus = PostStatus.Failed;
-            application.LastPostError = string.IsNullOrWhiteSpace(result.Error) ? "Unknown Error" : ApplicationHelpers.Truncate(result.Error, 250);
-            _logger.LogWarning("Post failed for {PublicId}: {Error}", application.PublicId, result.Error);
-        }
-        await _context.SaveChangesAsync();
+        await _service.PostAppToDiscord(application, ctoken);
         return CreatedAtAction(nameof(GetById), new { publicId = application.PublicId }, application.ToApplicantResponse());
     }
 
