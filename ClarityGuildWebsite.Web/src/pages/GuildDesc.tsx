@@ -13,8 +13,7 @@ export function GuildDesc() {
     <div className="mx-auto grid max-w-4xl gap-6">
       <div className="text-center">
         <p className="px-4 py-1 w-fit mx-auto rounded-full border border-clarity-blue/60 bg-clarity-blue/10 text-clarity-blue">
-          Currently looking for a <strong>Shadow Priest</strong> and{" "}
-          <strong>Elemental Shaman</strong>
+          Currently looking for a <strong>Shadow Priest</strong>
         </p>
       </div>
     
