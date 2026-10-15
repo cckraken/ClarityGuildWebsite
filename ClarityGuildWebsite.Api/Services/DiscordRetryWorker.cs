@@ -1,28 +1,83 @@
 ﻿using ClarityGuildWebsite.Api.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.Eventing.Reader;
+
 
 namespace ClarityGuildWebsite.Api.Services
 {
-    public class DiscordRetryWorker : IDiscordRetryWorker
+    public class DiscordRetryWorker : BackgroundService
     {
-        private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
+        private readonly IServiceScopeFactory _scopeFactory;
+        const int MaxRetries = 5;
 
-        public DiscordRetryWorker(ApplicationDbContext context, ILogger<DiscordRetryWorker> logger)
+        public DiscordRetryWorker(ILogger<DiscordRetryWorker> logger, IServiceScopeFactory scopeFactory)
         {
-            _context = context;
             _logger = logger;
+            _scopeFactory = scopeFactory;
         }
 
-        public async Task StartAsync(CancellationToken ctoken)
+        protected override async Task ExecuteAsync(CancellationToken ctoken)
         {
-            var postFailures = await _context.GuildApplications.FromSql($"EXECUTE dbo.GetFailedDiscordPosts").ToListAsync(ctoken);
-            
-        }
+            using var timer = new PeriodicTimer(TimeSpan.FromHours(2));
+            _logger.LogInformation($"DiscordRetryWorker is now starting.");
 
-        public Task StopAsync(CancellationToken ctoken)
-        {
-            throw new NotImplementedException();
+            ctoken.Register(() =>
+            _logger.LogDebug($"DiscordRetryWorker stopped via cancellation token. Background task is stopping."));
+
+            while (!ctoken.IsCancellationRequested && await timer.WaitForNextTickAsync(ctoken))
+            {
+                DateTime cutOff = DateTime.UtcNow.AddMinutes(-10);
+                try
+                {
+                    using var scope = _scopeFactory.CreateScope();
+                    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                    var poster = scope.ServiceProvider.GetRequiredService<IApplicationDiscordPostingService>();
+
+                    var toRetry = await context.GuildApplications
+                        .Where(a => a.Retry < MaxRetries &&
+                    (a.PostStatus == PostStatus.Failed ||
+                    (a.PostStatus == PostStatus.Pending && a.TimestampUtc < cutOff)))
+                        .ToListAsync(ctoken);
+
+                    foreach (var application in toRetry)
+                    {
+                        application.Retry++;
+                        await poster.PostAppToDiscord(application, ctoken);
+                        if (application.PostStatus == PostStatus.Failed)
+                        {
+
+                        }
+                        else
+                        {
+
+                        }
+
+                      
+                    }
+                    await context.SaveChangesAsync(ctoken);
+
+                    var giveUp = await context.GuildApplications
+                        .Where(a => a.Retry == MaxRetries && a.PostStatus == PostStatus.Failed)
+                        .ToListAsync(ctoken);
+                    foreach (var maxRetried in giveUp)
+                    {
+                        _logger.LogError("Max retries reached for {publicId}. Last error: {LastPostError}", maxRetried.PublicId, maxRetried.LastPostError);
+                    }
+                }
+                catch (OperationCanceledException) when (ctoken.IsCancellationRequested)
+                {
+                    _logger.LogInformation("App shutdown whilst service in progress.");
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Retry run failed.");
+                }
+            }
+
         }
     }
 }
+
+

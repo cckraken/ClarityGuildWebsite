@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
 using System.Threading.RateLimiting;
+using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddApplicationInsightsTelemetry();
 var allowedOrigins = builder.Configuration
     .GetSection("Cors:AllowedOrigins")
     .Get<string[]>()
@@ -16,6 +18,7 @@ var allowedOrigins = builder.Configuration
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddHostedService<DiscordRetryWorker>();
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 
