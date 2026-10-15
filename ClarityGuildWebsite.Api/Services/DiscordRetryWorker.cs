@@ -54,6 +54,7 @@ namespace ClarityGuildWebsite.Api.Services
                         }
                         catch (Exception ex)
                         {
+                            context.Entry(application).State = EntityState.Detached;
                             _logger.LogError(ex, "Retry failed for {PublicId}", application.PublicId);
                         }
                     }
