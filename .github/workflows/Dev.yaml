@@ -1,5 +1,5 @@
 name: CI
-# NOTE: 'Deploy frontend' (deploy-web.yaml) is triggered by this workflow's name
+# NOTE: 'Deploy frontend' (azure-static-web-apps-ashy-coast-096246c0f.yml) is triggered by this workflow's name
 on:
   push:
     branches: [ main ]
