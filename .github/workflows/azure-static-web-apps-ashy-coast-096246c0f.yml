@@ -1,4 +1,8 @@
 name: Deploy frontend
+# DO NOT RENAME THIS FILE. The Static Web App's deployment authorization policy is 'GitHub':
+# Azure identifies which Static Web App is deploying from the workflow filename in GitHub's
+# OIDC token, and expects the original Azure-generated name. Renaming it breaks deploys with
+# "Could not determine the Static Web App from the GitHub OIDC workflow reference".
 # Note: Runs after the 'CI' workflow (Dev.yaml) finishes. It never builds anything itself. Deploys the web-dist artifact that CI built and tested
 on:
   workflow_run:
