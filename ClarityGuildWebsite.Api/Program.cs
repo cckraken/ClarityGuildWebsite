@@ -1,11 +1,8 @@
 using ClarityGuildWebsite.Api.Data;
 using ClarityGuildWebsite.Api.Services;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Concurrent;
 using System.Threading.RateLimiting;
-using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplicationInsightsTelemetry();
@@ -14,10 +11,6 @@ var allowedOrigins = builder.Configuration
     .Get<string[]>()
     ?? throw new InvalidOperationException("Cors:AllowedOrigins is not configured.");
 
-
-
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddHostedService<DiscordRetryWorker>();
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
@@ -31,7 +24,6 @@ builder.Services.AddRateLimiter(options =>
             HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
             factory: _ => new TokenBucketRateLimiterOptions
             {
-                //verify forwarded headers resolve real client IPs after deploying; rate limiting silently degrades to a single global bucket otherwise
                 TokenLimit = 3,
                 QueueLimit = 3,
                 QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
@@ -64,7 +56,6 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 });
 
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -72,7 +63,6 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
-
 app.UseForwardedHeaders();
 app.UseHttpsRedirection();
 app.UseCors("Frontend");

@@ -1,7 +1,5 @@
 ﻿using ClarityGuildWebsite.Api.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics.Eventing.Reader;
-
 
 namespace ClarityGuildWebsite.Api.Services
 {
@@ -22,7 +20,7 @@ namespace ClarityGuildWebsite.Api.Services
             using var timer = new PeriodicTimer(TimeSpan.FromHours(2));
             _logger.LogInformation("DiscordRetryWorker is now starting.");
 
-            while (!ctoken.IsCancellationRequested && await timer.WaitForNextTickAsync(ctoken))
+            while (await timer.WaitForNextTickAsync(ctoken))
             {
                 DateTime cutOff = DateTime.UtcNow.AddMinutes(-10);
                 try
@@ -53,6 +51,11 @@ namespace ClarityGuildWebsite.Api.Services
                         catch (OperationCanceledException) when (ctoken.IsCancellationRequested)
                         {
                             throw;
+                        }
+                        catch (Exception ex)
+                        {
+                            context.Entry(application).State = EntityState.Detached;
+                            _logger.LogError(ex, "Retry failed for {PublicId}", application.PublicId);
                         }
                     }
                 }
