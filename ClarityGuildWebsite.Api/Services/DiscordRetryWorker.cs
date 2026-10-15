@@ -20,10 +20,7 @@ namespace ClarityGuildWebsite.Api.Services
         protected override async Task ExecuteAsync(CancellationToken ctoken)
         {
             using var timer = new PeriodicTimer(TimeSpan.FromHours(2));
-            _logger.LogInformation($"DiscordRetryWorker is now starting.");
-
-            ctoken.Register(() =>
-            _logger.LogDebug($"DiscordRetryWorker stopped via cancellation token. Background task is stopping."));
+            _logger.LogInformation("DiscordRetryWorker is now starting.");
 
             while (!ctoken.IsCancellationRequested && await timer.WaitForNextTickAsync(ctoken))
             {
@@ -42,27 +39,21 @@ namespace ClarityGuildWebsite.Api.Services
 
                     foreach (var application in toRetry)
                     {
-                        application.Retry++;
-                        await poster.PostAppToDiscord(application, ctoken);
-                        if (application.PostStatus == PostStatus.Failed)
+                        try
                         {
-
+                            application.Retry++;
+                            await poster.PostAppToDiscord(application, ctoken);
+                            if (application.PostStatus == PostStatus.Failed && MaxRetries >= 5)
+                            {
+                                application.PostStatus = PostStatus.Abandoned;
+                                _logger.LogError("Final attempt reached for {PublicId}. Last error: {LastPostError}", application.PublicId, application.LastPostError);
+                                await context.SaveChangesAsync(ctoken);
+                            }
                         }
-                        else
+                        catch (OperationCanceledException) when (ctoken.IsCancellationRequested)
                         {
-
+                            throw;
                         }
-
-                      
-                    }
-                    await context.SaveChangesAsync(ctoken);
-
-                    var giveUp = await context.GuildApplications
-                        .Where(a => a.Retry == MaxRetries && a.PostStatus == PostStatus.Failed)
-                        .ToListAsync(ctoken);
-                    foreach (var maxRetried in giveUp)
-                    {
-                        _logger.LogError("Max retries reached for {publicId}. Last error: {LastPostError}", maxRetried.PublicId, maxRetried.LastPostError);
                     }
                 }
                 catch (OperationCanceledException) when (ctoken.IsCancellationRequested)

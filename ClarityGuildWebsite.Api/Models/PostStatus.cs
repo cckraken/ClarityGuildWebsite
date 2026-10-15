@@ -2,5 +2,6 @@
     {
         Pending,
         Delivered,
-        Failed
+        Failed,
+        Abandoned
     }
