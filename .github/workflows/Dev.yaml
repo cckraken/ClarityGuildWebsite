@@ -1,7 +1,8 @@
 name: CI
-
+# NOTE: 'Deploy frontend' (deploy-web.yaml) is triggered by this workflow's name
 on:
   push:
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -55,3 +56,13 @@ jobs:
 
     - name: Build
       run: npm run build
+      env:
+        VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+
+    - name: Upload build output
+      uses: actions/upload-artifact@v4
+      with:
+        name: web-dist
+        path: ClarityGuildWebsite.Web/dist
+        if-no-files-found: error
+        retention-days: 7
