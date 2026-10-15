@@ -43,7 +43,7 @@ namespace ClarityGuildWebsite.Api.Services
                         {
                             application.Retry++;
                             await poster.PostAppToDiscord(application, ctoken);
-                            if (application.PostStatus == PostStatus.Failed && MaxRetries >= 5)
+                            if (application.PostStatus == PostStatus.Failed && application.Retry >= MaxRetries)
                             {
                                 application.PostStatus = PostStatus.Abandoned;
                                 _logger.LogError("Final attempt reached for {PublicId}. Last error: {LastPostError}", application.PublicId, application.LastPostError);
