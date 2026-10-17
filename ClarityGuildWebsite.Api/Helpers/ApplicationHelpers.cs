@@ -33,6 +33,7 @@ namespace ClarityGuildWebsite.Api.Helpers
             string escapedName = Uri.EscapeDataString(name.Trim());
             string realmSlug = Uri.EscapeDataString(ToRealmSlug(realm));      
 
+
             var wlogsLink = $"{wlogsBase}/{realmSlug}/{escapedName}";
             var rioLink = $"{rioBase}/{realmSlug}/{escapedName}";
 
