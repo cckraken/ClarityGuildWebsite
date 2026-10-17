@@ -1,4 +1,7 @@
-﻿namespace ClarityGuildWebsite.Api.Helpers
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Newtonsoft.Json.Linq;
+
+namespace ClarityGuildWebsite.Api.Helpers
 {
     public static class ApplicationHelpers
     {
@@ -33,7 +36,15 @@
             var wlogsLink = $"{wlogsBase}/{realmSlug}/{escapedName}";
             var rioLink = $"{rioBase}/{realmSlug}/{escapedName}";
 
-            return (wlogsLink, rioLink);
+            if (Uri.TryCreate(wlogsLink, UriKind.Absolute, out var wlUri) &&
+                string.Equals(wlUri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase)
+                && Uri.TryCreate(rioLink, UriKind.Absolute, out var ioUri) &&
+                string.Equals(ioUri.Scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
+            {
+                return (wlUri.AbsoluteUri, ioUri.AbsoluteUri);
+            }
+
+            return (error, error);
         }
 
         public static string ToRealmSlug(string realm)

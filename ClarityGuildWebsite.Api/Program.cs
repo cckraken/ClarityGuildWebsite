@@ -1,11 +1,15 @@
 using ClarityGuildWebsite.Api.Data;
 using ClarityGuildWebsite.Api.Services;
+using Discord.Rest;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddApplicationInsightsTelemetry();
+if (builder.Environment.IsProduction())
+{
+    builder.Services.AddApplicationInsightsTelemetry();
+}
 var allowedOrigins = builder.Configuration
     .GetSection("Cors:AllowedOrigins")
     .Get<string[]>()
@@ -40,6 +44,24 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
     ?? throw new InvalidOperationException("Connection string 'ClarityDb' is not configured.")));
 builder.Services.AddHttpClient<IApplicationNotifier, DiscordWebhookNotifier>();
 builder.Services.AddScoped<IApplicationDiscordPostingService, ApplicationDiscordPostingService>();
+builder.Services.AddSingleton(new DiscordRestClient());
+var notifierMode = builder.Configuration["Discord:NotifierMode"]
+    ?? throw new InvalidOperationException("Discord:NotifierMode is not configured.");
+if (notifierMode == "Bot")
+{
+    builder.Services.AddSingleton (new DiscordRestClient());
+    builder.Services.AddSingleton<DiscordBotConnectionService>();
+    builder.Services.AddScoped<IApplicationNotifier, DiscordBotNotifier>();
+}
+else if (notifierMode == "Webhook")
+{
+    builder.Services.AddHttpClient<IApplicationNotifier, DiscordWebhookNotifier>();
+}
+else
+{
+    throw new InvalidOperationException($"Discord:NotifierMode '{notifierMode}' is invalid. Expected 'Bot' or 'Webhook'.");
+}
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>

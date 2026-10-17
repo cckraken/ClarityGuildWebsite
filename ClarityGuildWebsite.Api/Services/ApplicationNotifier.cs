@@ -1,6 +1,10 @@
 ﻿using ClarityGuildWebsite.Api.Helpers;
 using ClarityGuildWebsite.Api.Models;
 using System.Text.Json;
+using Microsoft.AspNetCore.Components.Routing;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 
 namespace ClarityGuildWebsite.Api.Services
@@ -54,7 +58,7 @@ namespace ClarityGuildWebsite.Api.Services
             }
             try
             {
-                var payload = new DiscordWebhookPayload(Embeds: new List<DiscordEmbed> { embed });
+                var payload = new DiscordPayload(Embeds: new List<DiscordEmbed> { embed });
                 using var response = await _http.PostAsJsonAsync(_webhookUrl + "?wait=true", payload, ctoken);
                 if (!response.IsSuccessStatusCode)
                 {

@@ -31,7 +31,7 @@ namespace ClarityGuildWebsite.Api.Models
         [MaxLength(50)]
         public required string AltRole { get; set; }
 
-        [MaxLength(100)]
+        [MaxLength(500)]
         public required string Screenshot { get; set; }
 
         [MaxLength(2000)]

@@ -37,7 +37,7 @@ namespace ClarityGuildWebsite.Api.DTOs
         public string AltRole { get; set; } = string.Empty;     
 
         [Required]
-        [StringLength(100)]
+        [StringLength(500)]
         public string Screenshot { get; set; } = string.Empty;
 
         [Required]
