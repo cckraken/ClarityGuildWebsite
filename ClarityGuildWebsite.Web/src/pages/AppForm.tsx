@@ -16,7 +16,7 @@ const schema = z.object({
   altName: z.string().trim().min(1, { error: "Alt is required" }).max(50, {error: "50 characters or less"}),
   altRealm: z.string().trim().min(1, { error: "Realm is required" }).max(50, {error: "50 characters or less"}),
   altRole: z.enum(roles, { error: "Role is required" }),
-  screenshot: z.url({error:"Screenshot is required"}).refine((val) => !val.toLowerCase().includes("imgur"), {error: "No Imgur links, sorry!"}).max(100, {error: "Too long!"}),
+  screenshot: z.url({ protocol: /^https$/i, error: "Must be a valid https:// link" }).refine((val) => !val.toLowerCase().includes("imgur"), {error: "No Imgur links, sorry!"}).max(500, {error: "Too long!"}).transform((val) => new URL(val).href),
   about: z.string().trim().min(1, {error: "About is required"}).max(2000, { error: "2k characters or less"}),
   tech: z.string().trim().min(1, { error: "Tech is required" }).max(500, {error: "500 characters or less"}),
   history: z.string().trim().min(1,  { error: "History is required" }).max(2000, {error: "2k characters or less"}),
@@ -69,7 +69,6 @@ export function AppForm() {
     defaultValues: loadDraft() ?? emptyForm,
   });
 
-  // Save every change to sessionStorage so the draft survives tab switches and refreshes
   useEffect(() => {
     const unsubscribe = subscribe({
       formState: { values: true },
