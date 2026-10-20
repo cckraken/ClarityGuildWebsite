@@ -45,11 +45,11 @@ builder.Services.AddControllers();
 
 builder.Services.AddRateLimiter(options =>
 {
-    options.AddPolicy("appPostPolicy", HttpContext =>
+    options.AddPolicy("appPostPolicy", httpContext =>
 
         RateLimitPartition.GetTokenBucketLimiter(
             partitionKey:
-            HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
             factory: _ => new TokenBucketRateLimiterOptions
             {
                 TokenLimit = 3,
@@ -66,14 +66,12 @@ builder.Services.AddRateLimiter(options =>
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ClarityDb")
     ?? throw new InvalidOperationException("Connection string 'ClarityDb' is not configured.")));
-builder.Services.AddHttpClient<IApplicationNotifier, DiscordWebhookNotifier>();
 builder.Services.AddScoped<IApplicationDiscordPostingService, ApplicationDiscordPostingService>();
-builder.Services.AddSingleton(new DiscordRestClient());
 var notifierMode = builder.Configuration["Discord:NotifierMode"]
     ?? throw new InvalidOperationException("Discord:NotifierMode is not configured.");
 if (notifierMode == "Bot")
 {
-    builder.Services.AddSingleton (new DiscordRestClient());
+    builder.Services.AddSingleton<DiscordRestClient>();
     builder.Services.AddSingleton<DiscordBotConnectionService>();
     builder.Services.AddScoped<IApplicationNotifier, DiscordBotNotifier>();
 }
@@ -97,6 +95,8 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddAuthorization();
+
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
@@ -113,6 +113,7 @@ if (app.Environment.IsDevelopment())
 app.UseForwardedHeaders();
 app.UseHttpsRedirection();
 app.UseCors("Frontend");
+app.UseMiddleware<OriginCheckMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
