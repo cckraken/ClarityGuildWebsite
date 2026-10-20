@@ -86,7 +86,7 @@ export function AppForm() {
 
 const [status, setStatus] = useState<"success" | "error" | "serverError" | "signInTimeOut" | "errorTooManyRequests" | null>(null);
 const [submissionDate, setSubmissionDate] = useState<string | null>(null);
-const { state, signOut, signOutError } = useCurrentUser();
+const { state, signOut, signOutError, markSignedOut } = useCurrentUser();
 const submitDisabled = state.status !== "signedIn" || isSubmitting;
 const submitHint =
   state.status === "signedOut"
@@ -117,6 +117,7 @@ const submitHint =
     }
       else if (response.status === 401){
         setStatus("signInTimeOut")
+        markSignedOut();
     }
      else {
       setStatus("error");

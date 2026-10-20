@@ -27,6 +27,10 @@ async function signOut() {
 }
 }
 
-  return { state, signOut, signOutError };
+function markSignedOut() {
+  setSignOutError(null);
+  setState({ status: "signedOut" });
 }
 
+  return { state, signOut, signOutError, markSignedOut };
+}
