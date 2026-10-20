@@ -84,9 +84,14 @@ export function AppForm() {
     return unsubscribe;
   }, [subscribe]);
 
-const [status, setStatus] = useState<"success" | "error" | "servererror" | "errorTooManyRequests" | null>(null);
+const [status, setStatus] = useState<"success" | "error" | "serverError" | "signInTimeOut" | "errorTooManyRequests" | null>(null);
 const [submissionDate, setSubmissionDate] = useState<string | null>(null);
-const { state, signOut } = useCurrentUser();
+const { state, signOut, signOutError } = useCurrentUser();
+const submitDisabled = state.status !== "signedIn" || isSubmitting;
+const submitHint =
+  state.status === "signedOut"
+    ? "Sign in with Discord to submit your application."
+    : undefined;
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async (data) => { 
   try {
@@ -96,6 +101,7 @@ const { state, signOut } = useCurrentUser();
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
+        credentials: 'include'
       }
     );
     if (response.ok) {
@@ -107,8 +113,12 @@ const { state, signOut } = useCurrentUser();
     } else if (response.status === 429) {
       setStatus("errorTooManyRequests");
     } else if (response.status === 404) {
-      setStatus("servererror");
-    } else {
+      setStatus("serverError");
+    }
+      else if (response.status === 401){
+        setStatus("signInTimeOut")
+    }
+     else {
       setStatus("error");
     }
   } catch {
@@ -137,7 +147,7 @@ const { state, signOut } = useCurrentUser();
     <div className="flex flex-col gap-2">
       <div className="flex flex-col gap-1">
     <h2 className={fieldTitleClass}>Your Details</h2>
-    <p className={fieldHintClass}>The basics we need to find you in-game and check you out.</p>
+    <p className={fieldHintClass}>The basics we need to find you in-game and check you out</p>
     </div>
     </div>
 
@@ -164,14 +174,22 @@ const { state, signOut } = useCurrentUser();
           )}
 
           {state.status === "signedIn" && (
-            <button
-              type="button"
-              onClick={signOut}
-              className={appFormButtonDiscordClass}
-            >
-              <img src={discordLogo} alt="" className="h-5 w-5" />
-              Not you? Sign out
-            </button>
+            <div className="flex flex-col items-start gap-1">
+              <button
+                type="button"
+                onClick={signOut}
+                className={appFormButtonDiscordClass}
+              >
+                <img src={discordLogo} alt="" className="h-5 w-5" />
+                Not you? Sign out
+              </button>
+
+              {signOutError && (
+                <p role="alert" className="text-xs text-error">
+                  {signOutError}
+                </p>
+              )}
+            </div>
           )}
 
           {state.status === "loading" && <p>Loading…</p>}
@@ -362,15 +380,17 @@ const { state, signOut } = useCurrentUser();
 
 <>
 <div className="md:col-span-2 flex justify-center"
-  
 >
+<span title={submitHint}>
+
   <button
     className={appFormButtonClass}
-    disabled={state.status !== "signedIn" || isSubmitting}
+    disabled={submitDisabled}
     type="submit"
   >
     {isSubmitting ? "Submitting..." : "Submit"}
   </button>
+  </span>
 </div>
 </>
   </form>

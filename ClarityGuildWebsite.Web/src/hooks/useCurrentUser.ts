@@ -9,7 +9,8 @@ type AuthState =
 
 export function useCurrentUser() {
   const [state, setState] = useState<AuthState>({ status: 'loading' });
-
+  const [signOutError, setSignOutError] = useState<string | null>(null);
+  
   useEffect(() => {
     getMe()
       .then(user => setState(user ? { status: 'signedIn', user } : { status: 'signedOut' }))
@@ -17,9 +18,15 @@ export function useCurrentUser() {
   }, []);
 
 async function signOut() {
+  setSignOutError(null);
+  try {
   await logOut();
-  setState({ status: 'signedOut' });
+  setState({ status: 'signedOut'});
+} catch {
+  setSignOutError("Failed to sign out. Please try again.")
+}
 }
 
-  return { state, signOut };
+  return { state, signOut, signOutError };
 }
+

@@ -8,7 +8,10 @@ namespace ClarityGuildWebsite.Api.Models
     {
         //form facing fields
         [MaxLength(50)]
-        public string? DiscordId { get; set; }
+        public required string DiscordId { get; set; }
+
+        [MaxLength(50)]
+        public required string DiscordName { get; set; }
 
         [MaxLength(50)]
         public required string Country { get; set; }

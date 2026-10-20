@@ -1,7 +1,7 @@
 import { Description, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import { dialogClass, textBodyFullClass, appFormButtonClass, fieldTitleClass } from '../styles/applicationClasses';
 
-type Props = { status: "success" | "error" | "servererror" | "errorTooManyRequests" | null; submissionDate: string | null; onClose: () => void };
+type Props = { status: "success" | "error" | "serverError" | "signInTimeOut" | "errorTooManyRequests" | null; submissionDate: string | null; onClose: () => void };
 const content = {
   success: {
     title: "Application submitted",
@@ -13,7 +13,7 @@ const content = {
     message: "Please contact cckraken17 on Discord for assistance.",
     disclaimer: "We apologize for the inconvenience and appreciate your understanding."
   },
-  servererror: {
+  serverError: {
     title: "Problem with the server",
     message: "We could not connect to the server. Please try again later.",
     disclaimer: "If the problem persists, contact cckraken17 on Discord for assistance."
@@ -21,6 +21,11 @@ const content = {
   errorTooManyRequests: {
     title: "Too many requests",
     message: "You have sent too many requests in a short period of time. Please wait and try again later.",
+    disclaimer: "If the problem persists, contact cckraken17 on Discord for assistance."
+  },
+  signInTimeOut: {
+    title: "Discord authentication timed out",
+    message: "Please sign in again.",
     disclaimer: "If the problem persists, contact cckraken17 on Discord for assistance."
   }
 };

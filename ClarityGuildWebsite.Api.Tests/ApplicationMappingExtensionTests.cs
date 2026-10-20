@@ -1,8 +1,6 @@
 ﻿using ClarityGuildWebsite.Api.DTOs;
 using ClarityGuildWebsite.Api.Mappings;
 using ClarityGuildWebsite.Api.Models;
-using Microsoft.AspNetCore.Components;
-using System.ComponentModel.DataAnnotations;
 
 namespace ClarityGuildWebsite.Api.Tests;
 
@@ -11,7 +9,9 @@ public class ApplicationMappingExtensionTests
     [Fact]
     public void ToEntity_CopiesAllFormFields()
     {
-        CreateApplicationDTO cDto = new CreateApplicationDTO
+        string testDiscordId = "123456";
+        string testDiscordName = "TestDiscName";
+        CreateApplicationDTO cDto = new CreateApplicationDTO()
         {
             Country = "TestCountry",
             MainName = "TestName",
@@ -27,7 +27,7 @@ public class ApplicationMappingExtensionTests
             Extra = "TestExtra",
         };
 
-        var result = cDto.ToEntity();
+        var result = cDto.ToEntity(testDiscordId, testDiscordName);
         Assert.Multiple(() =>
         {
             Assert.Equal(cDto.Country, result.Country);
@@ -50,6 +50,8 @@ public class ApplicationMappingExtensionTests
     {
         GuildApplication application = new GuildApplication
         {
+            DiscordId = "discordId",
+            DiscordName = "TestDiscName",
             PublicId = Guid.NewGuid(),
             Country = "TestCountry",
             MainName = "TestName",
@@ -72,6 +74,8 @@ public class ApplicationMappingExtensionTests
         var result = application.ToOfficerResponse();
         Assert.Multiple(() =>
         {
+            Assert.Equal(application.DiscordId, result.DiscordId);
+            Assert.Equal(application.DiscordName, result.DiscordName);
             Assert.Equal(application.Country, result.Country);
             Assert.Equal(application.MainName, result.MainName);
             Assert.Equal(application.MainRealm, result.MainRealm);
