@@ -6,6 +6,8 @@ using ClarityGuildWebsite.Api.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -20,11 +22,13 @@ public class GuildApplicationController : ControllerBase
         _service = service;
     }
 
+    [Authorize]
     [HttpPost]
     [EnableRateLimiting("appPostPolicy")]
     public async Task<IActionResult> Create(CreateApplicationDTO dto, CancellationToken ctoken)
     {
         var application = dto.ToEntity();
+        application.DiscordId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         application.PublicId = Guid.NewGuid();
         application.TimestampUtc = DateTime.UtcNow;
         application.Status = ApplicationStatus.Pending;

@@ -1,6 +1,7 @@
 using ClarityGuildWebsite.Api.Data;
 using ClarityGuildWebsite.Api.Services;
 using Discord.Rest;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.RateLimiting;
@@ -14,6 +15,29 @@ var allowedOrigins = builder.Configuration
     .GetSection("Cors:AllowedOrigins")
     .Get<string[]>()
     ?? throw new InvalidOperationException("Cors:AllowedOrigins is not configured.");
+
+var discordClientId = builder.Configuration["Discord:ClientId"] ?? throw new InvalidOperationException("Discord:ClientId is not configured.");
+var discordClientSecret = builder.Configuration["Discord:ClientSecret"] ?? throw new InvalidOperationException("Discord:ClientSecret is not configured.");
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.ExpireTimeSpan = TimeSpan.FromHours(2);
+        options.Events.OnRedirectToLogin = ctx =>
+        {
+            ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
+        };
+    })
+    .AddDiscord(options =>
+    {
+        options.ClientId = discordClientId;
+        options.ClientSecret = discordClientSecret;
+        options.Scope.Add("guilds.members.read");
+    });
 
 builder.Services.AddHostedService<DiscordRetryWorker>();
 builder.Services.AddOpenApi();
@@ -68,7 +92,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
 });
 
@@ -88,6 +113,8 @@ if (app.Environment.IsDevelopment())
 app.UseForwardedHeaders();
 app.UseHttpsRedirection();
 app.UseCors("Frontend");
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseRateLimiter();
 app.MapControllers();
 

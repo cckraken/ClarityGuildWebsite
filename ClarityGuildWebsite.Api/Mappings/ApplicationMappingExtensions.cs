@@ -1,5 +1,6 @@
 ﻿using ClarityGuildWebsite.Api.DTOs;
 using ClarityGuildWebsite.Api.Models;
+using System.Security.Claims;
 
 namespace ClarityGuildWebsite.Api.Mappings
 {
@@ -8,8 +9,7 @@ namespace ClarityGuildWebsite.Api.Mappings
         public static OfficerResponseDTO ToOfficerResponse(this GuildApplication guildApplication)
         {
             return new OfficerResponseDTO
-            {      
-                DiscordId = guildApplication.DiscordId,
+            {   
                 Country = guildApplication.Country,
                 MainName = guildApplication.MainName,
                 MainRealm = guildApplication.MainRealm,
@@ -43,7 +43,6 @@ namespace ClarityGuildWebsite.Api.Mappings
         {
             return new GuildApplication
             {
-                DiscordId = dto.DiscordId,
                 Country = dto.Country,
                 MainName = dto.MainName,
                 MainRealm = dto.MainRealm,

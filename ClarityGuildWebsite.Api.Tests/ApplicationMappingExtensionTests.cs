@@ -13,7 +13,6 @@ public class ApplicationMappingExtensionTests
     {
         CreateApplicationDTO cDto = new CreateApplicationDTO
         {
-            DiscordId = "TestId",
             Country = "TestCountry",
             MainName = "TestName",
             MainRealm = "TestRealm",
@@ -31,7 +30,6 @@ public class ApplicationMappingExtensionTests
         var result = cDto.ToEntity();
         Assert.Multiple(() =>
         {
-            Assert.Equal(cDto.DiscordId, result.DiscordId);
             Assert.Equal(cDto.Country, result.Country);
             Assert.Equal(cDto.MainName, result.MainName);
             Assert.Equal(cDto.MainRealm, result.MainRealm);
@@ -53,7 +51,6 @@ public class ApplicationMappingExtensionTests
         GuildApplication application = new GuildApplication
         {
             PublicId = Guid.NewGuid(),
-            DiscordId = "testId",
             Country = "TestCountry",
             MainName = "TestName",
             MainRealm = "TestRealm",
@@ -75,7 +72,6 @@ public class ApplicationMappingExtensionTests
         var result = application.ToOfficerResponse();
         Assert.Multiple(() =>
         {
-            Assert.Equal(application.DiscordId, result.DiscordId);
             Assert.Equal(application.Country, result.Country);
             Assert.Equal(application.MainName, result.MainName);
             Assert.Equal(application.MainRealm, result.MainRealm);
