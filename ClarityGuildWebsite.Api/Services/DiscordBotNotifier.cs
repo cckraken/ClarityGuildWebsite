@@ -117,7 +117,7 @@ namespace ClarityGuildWebsite.Api.Services
                     .AddField("Alt Character", ApplicationHelpers.Combine(application.AltName, application.AltRealm, application.AltRole), true)
                     .AddField("Links", $"[Warcraft Logs]({altLinks.wlogs}) · [Raider.IO]({altLinks.rio})", true)
                     .AddField("Personal Info", "⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯")
-                    .AddField("Discord ID", application.DiscordId, true)
+                    .AddField("Discord Name", application.DiscordName, true)
                     .AddField("Country", application.Country, true)
                     .AddField("Tech", application.Tech, false)
                     .AddField("About", ApplicationHelpers.Truncate(application.About, 1024), false)

@@ -1,11 +1,6 @@
 ﻿using ClarityGuildWebsite.Api.Helpers;
 using ClarityGuildWebsite.Api.Models;
 using System.Text.Json;
-using Microsoft.AspNetCore.Components.Routing;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
 
 namespace ClarityGuildWebsite.Api.Services
 {
@@ -40,7 +35,7 @@ namespace ClarityGuildWebsite.Api.Services
                    new("UI Screenshot", application.Screenshot, true),
                    new("\u200B", "\u200B"),
                    new("Personal Info", "⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"),
-                   new("Discord ID", application.DiscordId, true),
+                   new("Discord Name", application.DiscordName, true),
                    new("Country", application.Country, true),
                    new("Tech", application.Tech, false),
                    new("About", ApplicationHelpers.Truncate(application.About, 1024), false),

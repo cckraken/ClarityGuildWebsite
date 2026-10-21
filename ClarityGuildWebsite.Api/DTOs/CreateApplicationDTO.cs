@@ -6,10 +6,6 @@ namespace ClarityGuildWebsite.Api.DTOs
     {
         [Required]
         [StringLength(50)]
-        public string DiscordId { get; set; } = string.Empty;
-
-        [Required]
-        [StringLength(50)]
         public string Country {  get; set; } = string.Empty;
 
         [Required]

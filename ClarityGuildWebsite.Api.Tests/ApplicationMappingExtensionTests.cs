@@ -1,8 +1,6 @@
 ﻿using ClarityGuildWebsite.Api.DTOs;
 using ClarityGuildWebsite.Api.Mappings;
 using ClarityGuildWebsite.Api.Models;
-using Microsoft.AspNetCore.Components;
-using System.ComponentModel.DataAnnotations;
 
 namespace ClarityGuildWebsite.Api.Tests;
 
@@ -11,9 +9,10 @@ public class ApplicationMappingExtensionTests
     [Fact]
     public void ToEntity_CopiesAllFormFields()
     {
-        CreateApplicationDTO cDto = new CreateApplicationDTO
+        string testDiscordId = "123456";
+        string testDiscordName = "TestDiscName";
+        CreateApplicationDTO cDto = new CreateApplicationDTO()
         {
-            DiscordId = "TestId",
             Country = "TestCountry",
             MainName = "TestName",
             MainRealm = "TestRealm",
@@ -28,10 +27,9 @@ public class ApplicationMappingExtensionTests
             Extra = "TestExtra",
         };
 
-        var result = cDto.ToEntity();
+        var result = cDto.ToEntity(testDiscordId, testDiscordName);
         Assert.Multiple(() =>
         {
-            Assert.Equal(cDto.DiscordId, result.DiscordId);
             Assert.Equal(cDto.Country, result.Country);
             Assert.Equal(cDto.MainName, result.MainName);
             Assert.Equal(cDto.MainRealm, result.MainRealm);
@@ -52,8 +50,9 @@ public class ApplicationMappingExtensionTests
     {
         GuildApplication application = new GuildApplication
         {
+            DiscordId = "discordId",
+            DiscordName = "TestDiscName",
             PublicId = Guid.NewGuid(),
-            DiscordId = "testId",
             Country = "TestCountry",
             MainName = "TestName",
             MainRealm = "TestRealm",
@@ -76,6 +75,7 @@ public class ApplicationMappingExtensionTests
         Assert.Multiple(() =>
         {
             Assert.Equal(application.DiscordId, result.DiscordId);
+            Assert.Equal(application.DiscordName, result.DiscordName);
             Assert.Equal(application.Country, result.Country);
             Assert.Equal(application.MainName, result.MainName);
             Assert.Equal(application.MainRealm, result.MainRealm);

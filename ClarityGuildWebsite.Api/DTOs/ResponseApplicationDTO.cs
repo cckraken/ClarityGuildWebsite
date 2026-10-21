@@ -11,6 +11,7 @@
     public class OfficerResponseDTO : ApplicantResponseDTO
     {
         public string DiscordId { get; set; } = string.Empty;
+        public string DiscordName { get; set; } = string.Empty;
         public string Country { get; set; } = string.Empty;
         public string MainName { get; set; } = string.Empty;
         public string MainRealm { get; set; } = string.Empty;

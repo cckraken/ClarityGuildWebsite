@@ -1,14 +1,16 @@
 import { useForm, type SubmitHandler, type DefaultValues } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from "zod";
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { AppFormSubmitDialogue } from "../components/AppForm/AppFormSubmitDialogue";
-import { cardClass, fieldInputClass, fieldTitleClass, fieldSubTitleClass, fieldHintClass, appFormButtonClass, resizeTabsClass } from "../components/styles/applicationClasses";
+import { cardClass, fieldInputClass, textAreaInputClass, fieldTitleClass, fieldSubTitleClass, fieldHintClass, appFormButtonClass, appFormButtonDiscordClass } from "../components/styles/applicationClasses";
+import discordLogo from "../assets/discord_PNG7.png";
+import { useCurrentUser } from "../hooks/useCurrentUser";
+
 
 const roles = ["Tank", "Healer", "DPS"] as const;
 
 const schema = z.object({
-  discordId: z.string().trim().min(1, { error: "Discord ID is required" }).max(50, {error: "50 characters or less"}),
   country: z.string().trim().min(1, { error: "Country is required" }).max(50, {error: "50 characters or less"}),
   mainName: z.string().trim().min(1, { error: "Main is required" }).max(20, {error: "20 characters or less"}),
   mainRealm: z.string().trim().min(1, { error: "Realm is required" }).max(25, {error: "25 characters or less"}),
@@ -25,7 +27,6 @@ const schema = z.object({
 
 const DRAFT_KEY = "guildApplicationDraft";
 const emptyForm: DefaultValues<z.input<typeof schema>> = {
-  discordId: "",
   country: "",
   mainName: "",
   mainRealm: "",
@@ -76,20 +77,21 @@ export function AppForm() {
         try {
           sessionStorage.setItem(DRAFT_KEY, JSON.stringify(values));
         } catch {
-          // storage unavailable: the form still works, just without a saved draft
+          // storage unavailable: cannot save draft
         }
       },
     });
     return unsubscribe;
   }, [subscribe]);
 
-        const [isEnlarged, setIsEnlarged] = useState(false);
-        const textAreaGridClasses = isEnlarged
-        ? "grid grid-cols-1 gap-4 md:col-span-2"
-        : "grid grid-cols-1 gap-12.5"
-
-const [status, setStatus] = useState<"success" | "error" | "servererror" | "errorTooManyRequests" | null>(null);
+const [status, setStatus] = useState<"success" | "error" | "serverError" | "signInTimeOut" | "errorTooManyRequests" | null>(null);
 const [submissionDate, setSubmissionDate] = useState<string | null>(null);
+const { state, signOut, signOutError, markSignedOut } = useCurrentUser();
+const submitDisabled = state.status !== "signedIn" || isSubmitting;
+const submitHint =
+  state.status === "signedOut"
+    ? "Sign in with Discord to submit your application."
+    : undefined;
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async (data) => { 
   try {
@@ -99,6 +101,7 @@ const [submissionDate, setSubmissionDate] = useState<string | null>(null);
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
+        credentials: 'include'
       }
     );
     if (response.ok) {
@@ -110,21 +113,28 @@ const [submissionDate, setSubmissionDate] = useState<string | null>(null);
     } else if (response.status === 429) {
       setStatus("errorTooManyRequests");
     } else if (response.status === 404) {
-      setStatus("servererror");
-    } else {
+      setStatus("serverError");
+    }
+      else if (response.status === 401){
+        setStatus("signInTimeOut")
+        markSignedOut();
+    }
+     else {
       setStatus("error");
     }
   } catch {
     setStatus("error");
   }
-
   };
 
-  const textAreasRef = useRef<HTMLDivElement>(null);
+ function handleDiscordSignIn() {
+  const returnUrl = encodeURIComponent(window.location.href);
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
+  window.location.href = `${baseUrl}/api/auth/login?returnUrl=${returnUrl}`;
+}
+
 
   return (
-
-    
 
 <form className="grid grid-cols-1 gap-6 font-light md:grid-cols-2" onSubmit={handleSubmit(onSubmit)}>
   <AppFormSubmitDialogue
@@ -133,23 +143,59 @@ const [submissionDate, setSubmissionDate] = useState<string | null>(null);
   onClose={() => { setStatus(null); setSubmissionDate(null); }}
 />
 
- <div className={`self-start ${cardClass}`}>
+ <div className={cardClass}>
 
-    <div className="flex flex-col gap-1">
-    <h1 className={fieldTitleClass}>Your Details</h1>
-    <p className={fieldHintClass}>The basics we need to find you in-game and check you out.</p>
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1">
+    <h2 className={fieldTitleClass}>Your Details</h2>
+    <p className={fieldHintClass}>The basics we need to find you in-game and check you out</p>
+    </div>
     </div>
 
-      <div className="flex flex-col gap-1">
-        <label className={fieldSubTitleClass} htmlFor="discordId">Discord ID</label>
-        <p className={fieldHintClass}>Our primary way to contact you</p>
-        <input className={fieldInputClass}
-          {...register('discordId') }
-          type="text"
-          id="discordId"
-          />
-      {errors.discordId && (<div className="text-xs text-error">{errors.discordId.message}</div>)}
-      </div>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-col gap-1">
+            <span className={fieldSubTitleClass}>
+              Discord
+              {state.status === "signedIn" && (
+                <>: <strong>{state.user.discordName}</strong></>
+              )}
+            </span>
+            <p className={fieldHintClass}>We use this to contact you</p>
+          </div>
+
+          {state.status === "signedOut" && (
+            <button
+              type="button"
+              onClick={handleDiscordSignIn}
+              className={appFormButtonDiscordClass}
+            >
+              <img src={discordLogo} alt="" className="h-5 w-5" />
+              Sign in with Discord
+            </button>
+          )}
+
+          {state.status === "signedIn" && (
+            <div className="flex flex-col items-start gap-1">
+              <button
+                type="button"
+                onClick={signOut}
+                className={appFormButtonDiscordClass}
+              >
+                <img src={discordLogo} alt="" className="h-5 w-5" />
+                Not you? Sign out
+              </button>
+
+              {signOutError && (
+                <p role="alert" className="text-xs text-error">
+                  {signOutError}
+                </p>
+              )}
+            </div>
+          )}
+
+          {state.status === "loading" && <p>Loading…</p>}
+          {state.status === "error" && <p>Couldn&apos;t check sign-in. Please refresh.</p>}
+        </div>
 
       <div className="flex flex-col gap-1">
         <label className={fieldSubTitleClass} htmlFor="country">Country</label>
@@ -158,8 +204,10 @@ const [submissionDate, setSubmissionDate] = useState<string | null>(null);
           {...register('country') }
           type="text"
           id="country"
+          aria-invalid={!!errors.country}
+          aria-describedby={errors.country ? "country-error" : undefined}
           />
-      {errors.country && (<div className="text-xs text-error">{errors.country.message}</div>)}
+      {errors.country && (<div id="country-error" className="text-xs text-error">{errors.country.message}</div>)}
       </div>
 
 <div className="flex flex-col gap-1">
@@ -172,8 +220,10 @@ const [submissionDate, setSubmissionDate] = useState<string | null>(null);
               {...register('mainName')}
               type="text"
               id="mainName"
+              aria-invalid={!!errors.mainName}
+              aria-describedby={errors.mainName ? "mainName-error" : undefined}
               />
-          {errors.mainName && (<div className="text-xs text-error" aria-invalid={errors.mainName ? true : undefined}>{errors.mainName.message}</div>)}
+          {errors.mainName && (<div id="mainName-error" className="text-xs text-error">{errors.mainName.message}</div>)}
         </div>
         
           <div className="flex flex-col gap-1">
@@ -182,8 +232,10 @@ const [submissionDate, setSubmissionDate] = useState<string | null>(null);
                 {...register("mainRealm")}
                 type="text"
                 id="mainRealm"
+                aria-invalid={!!errors.mainRealm}
+                aria-describedby={errors.mainRealm ? "mainRealm-error" : undefined}
               />
-              {errors.mainRealm && (<div className="text-xs text-error">{errors.mainRealm.message}</div>)}
+              {errors.mainRealm && (<div id="mainRealm-error" className="text-xs text-error">{errors.mainRealm.message}</div>)}
           </div>
 
           <div className="flex flex-col gap-1">
@@ -191,11 +243,13 @@ const [submissionDate, setSubmissionDate] = useState<string | null>(null);
               <select className={fieldInputClass}
                 {...register("mainRole")}
                 id="mainRole"
+                aria-invalid={!!errors.mainRole}
+                aria-describedby={errors.mainRole ? "mainRole-error" : undefined}
               >
                 <option value="">Select a role</option>
                 {roles.map((role) => <option key={role} value={role}>{role}</option>)}
               </select>
-              {errors.mainRole && (<div className="text-xs text-error">{errors.mainRole.message}</div>)}
+              {errors.mainRole && (<div id="mainRole-error" className="text-xs text-error">{errors.mainRole.message}</div>)}
           </div>
 
         </div>
@@ -211,8 +265,10 @@ const [submissionDate, setSubmissionDate] = useState<string | null>(null);
               {...register('altName')}
               type="text"
               id="altName"
+              aria-invalid={!!errors.altName}
+              aria-describedby={errors.altName ? "altName-error" : undefined}
               />
-          {errors.altName && (<div className="text-xs text-error">{errors.altName.message}</div>)}
+          {errors.altName && (<div id="altName-error" className="text-xs text-error">{errors.altName.message}</div>)}
         </div>
         
           <div className="flex flex-col gap-1">
@@ -221,8 +277,10 @@ const [submissionDate, setSubmissionDate] = useState<string | null>(null);
                 {...register("altRealm")}
                 type="text"
                 id="altRealm"
+                aria-invalid={!!errors.altRealm}
+                aria-describedby={errors.altRealm ? "altRealm-error" : undefined}
               />
-              {errors.altRealm && (<div className="text-xs text-error">{errors.altRealm.message}</div>)}
+              {errors.altRealm && (<div id="altRealm-error" className="text-xs text-error">{errors.altRealm.message}</div>)}
           </div>
 
           <div className="flex flex-col gap-1">
@@ -230,106 +288,90 @@ const [submissionDate, setSubmissionDate] = useState<string | null>(null);
               <select className={fieldInputClass}
                 {...register("altRole")}
                 id="altRole"
+                aria-invalid={!!errors.altRole}
+                aria-describedby={errors.altRole ? "altRole-error" : undefined}
               >
                 <option value="">Select a role</option>
                 {roles.map((role) => <option key={role} value={role}>{role}</option>)}
               </select>
-              {errors.altRole && (<div className="text-xs text-error">{errors.altRole.message}</div>)}
+              {errors.altRole && (<div id="altRole-error" className="text-xs text-error">{errors.altRole.message}</div>)}
           </div>
 
         </div>
       </div>
 
         <div className="flex flex-col gap-1">
-        <label className={fieldTitleClass} htmlFor="screenshot">UI Screenshot</label>
+        <label className={fieldSubTitleClass} htmlFor="screenshot">UI Screenshot</label>
           <p className={fieldHintClass}>Preferably taken in combat</p>
         <input className={fieldInputClass}
           {...register("screenshot") }
           type="url"
           id="screenshot"
+          aria-invalid={!!errors.screenshot}
+          aria-describedby={errors.screenshot ? "screenshot-error" : undefined}
         />
-          {errors.screenshot && (<div className="text-xs text-error">{errors.screenshot.message}</div>)}
+          {errors.screenshot && (<div id="screenshot-error" className="text-xs text-error">{errors.screenshot.message}</div>)}
       </div> 
 
       <div className="flex flex-col gap-1">
-        <label className ={fieldTitleClass} htmlFor="tech">Tech</label>
+        <label className ={fieldSubTitleClass} htmlFor="tech">Tech</label>
         <p className={fieldHintClass}>System specs, internet etc</p>
           <textarea className ={fieldInputClass}
             {...register("tech")}
             id="tech"
+            aria-invalid={!!errors.tech}
+            aria-describedby={errors.tech ? "tech-error" : undefined}
           />
-          {errors.tech && (<div className="text-xs text-error">{errors.tech.message}</div>)}
+          {errors.tech && (<div id="tech-error" className="text-xs text-error">{errors.tech.message}</div>)}
          </div>
 
 </div>
 
 
-    <div className={`self-start ${cardClass}`}>
+    <div className={cardClass}>
 
     <div className="flex flex-col gap-1">
-    <h1 className={fieldTitleClass}>In your own words</h1>
+    <h2 className={fieldTitleClass}>In your own words</h2>
       <p className={fieldHintClass}>Let us get to know you</p>
-
-<div role="group" aria-label="Text box size" className="self-start inline-flex rounded-md border border-border p-0.5">
-          <button
-            type="button"
-            aria-pressed={!isEnlarged}
-            onClick={() => {
-            textAreasRef.current?.querySelectorAll("textarea").forEach((t) => {t.style.height = ""; t.style.width = ""});
-            setIsEnlarged(false);
-            }}
-            className={resizeTabsClass}
-          >
-            Normal
-          </button>
-          <button
-          type="button"
-          aria-pressed={isEnlarged}
-          onClick={() => {
-          textAreasRef.current?.querySelectorAll("textarea").forEach((t) => {t.style.height = ""; t.style.width = ""});
-          setIsEnlarged(true);
-          }}
-          className={resizeTabsClass}
-          >
-            Large
-          </button>      
-      </div>
 
     </div>
       
-        <div ref={textAreasRef} className={textAreaGridClasses}>
+        <div className="flex flex-col gap-4">
           
           <div className="flex flex-col gap-1">
-        <label className ={fieldTitleClass} htmlFor="about">About you</label>
+        <label className ={fieldSubTitleClass} htmlFor="about">About you</label>
         <p className={fieldHintClass}>Job, hobbies etc. Whatever you like</p>
-          <textarea className ={fieldInputClass}
-            rows={isEnlarged ? 12 : 3}
+          <textarea className ={textAreaInputClass}
             {...register("about")}
             id="about"
+            aria-invalid={!!errors.about}
+            aria-describedby={errors.about ? "about-error" : undefined}
           />
-          {errors.about && (<div className="text-xs text-error">{errors.about.message}</div>)}
+          {errors.about && (<div id="about-error" className="text-xs text-error">{errors.about.message}</div>)}
           </div>         
 
          <div className="flex flex-col gap-1">
-        <label className={fieldTitleClass} htmlFor="history">History</label>
+        <label className={fieldSubTitleClass} htmlFor="history">History</label>
         <p className={fieldHintClass}>Ex guilds, why you left, etc</p>
-        <textarea className={fieldInputClass}
-        rows={isEnlarged ? 12 : 3}
+        <textarea className={textAreaInputClass}
           {...register("history")}
           id="history"
+          aria-invalid={!!errors.history}
+          aria-describedby={errors.history ? "history-error" : undefined}
         />
-        {errors.history && (<div className="text-xs text-error">{errors.history.message}</div>)}
+        {errors.history && (<div id="history-error" className="text-xs text-error">{errors.history.message}</div>)}
       </div>
    
         <div className="flex flex-col gap-1">
-        <label className={fieldTitleClass} htmlFor="extra">Extra</label>
+        <label className={fieldSubTitleClass} htmlFor="extra">Extra</label>
         <p className={fieldHintClass}>Anything extra? If you play other alts, here&apos;s the place</p>
-          <textarea className ={fieldInputClass}
-          rows={isEnlarged ? 12 : 3}
+          <textarea className={textAreaInputClass}
           {...register("extra")}
           id="extra"
+          aria-invalid={!!errors.extra}
+          aria-describedby={errors.extra ? "extra-error" : undefined}
         />
-          {errors.extra && (<div className="text-xs text-error">{errors.extra.message}</div>)}
+          {errors.extra && (<div id="extra-error" className="text-xs text-error">{errors.extra.message}</div>)}
       </div>    
 
     </div>
@@ -338,17 +380,20 @@ const [submissionDate, setSubmissionDate] = useState<string | null>(null);
   </div>
 
 <>
-<div className={"md:col-span-2 flex justify-center"}>
-    <button className={appFormButtonClass} disabled={isSubmitting} type="submit">
-        {isSubmitting ? "Submitting..." : "Submit"}
-    </button>
-    </div>
+<div className="md:col-span-2 flex justify-center"
+>
+<span title={submitHint}>
 
+  <button
+    className={appFormButtonClass}
+    disabled={submitDisabled}
+    type="submit"
+  >
+    {isSubmitting ? "Submitting..." : "Submit"}
+  </button>
+  </span>
+</div>
 </>
   </form>
   )
 }
-
-
-
-

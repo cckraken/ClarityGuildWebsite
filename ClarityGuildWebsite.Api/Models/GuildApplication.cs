@@ -11,6 +11,9 @@ namespace ClarityGuildWebsite.Api.Models
         public required string DiscordId { get; set; }
 
         [MaxLength(50)]
+        public required string DiscordName { get; set; }
+
+        [MaxLength(50)]
         public required string Country { get; set; }
 
         [MaxLength(50)]

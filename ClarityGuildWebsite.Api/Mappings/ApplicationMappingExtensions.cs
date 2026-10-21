@@ -8,8 +8,9 @@ namespace ClarityGuildWebsite.Api.Mappings
         public static OfficerResponseDTO ToOfficerResponse(this GuildApplication guildApplication)
         {
             return new OfficerResponseDTO
-            {      
+            {   
                 DiscordId = guildApplication.DiscordId,
+                DiscordName = guildApplication.DiscordName,
                 Country = guildApplication.Country,
                 MainName = guildApplication.MainName,
                 MainRealm = guildApplication.MainRealm,
@@ -39,11 +40,12 @@ namespace ClarityGuildWebsite.Api.Mappings
         }
 
 
-        public static GuildApplication ToEntity(this CreateApplicationDTO dto)
+        public static GuildApplication ToEntity(this CreateApplicationDTO dto, string discordId, string discordName)
         {
             return new GuildApplication
             {
-                DiscordId = dto.DiscordId,
+                DiscordId = discordId,
+                DiscordName = discordName,
                 Country = dto.Country,
                 MainName = dto.MainName,
                 MainRealm = dto.MainRealm,
