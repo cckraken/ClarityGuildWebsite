@@ -1,4 +1,5 @@
 using ClarityGuildWebsite.Api.Data;
+using ClarityGuildWebsite.Api.Middleware;
 using ClarityGuildWebsite.Api.Services;
 using Discord.Rest;
 using Microsoft.AspNetCore.Authentication.Cookies;
