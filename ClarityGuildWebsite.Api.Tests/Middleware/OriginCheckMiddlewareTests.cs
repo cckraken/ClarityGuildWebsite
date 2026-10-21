@@ -1,4 +1,5 @@
 ﻿using ClarityGuildWebsite.Api.Middleware;
+using Discord;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -123,6 +124,18 @@ public class OriginCheckMiddlewareTests
         var context = CreateRequest("GET", "https://evil.com");
 
         await middleware.InvokeAsync(context);
+
+        Assert.True(next.Called);
+    }
+
+    [Fact]
+    public async Task InvokeAsync_AllowDiscordInteractionsOrigin_CallsNext()
+    {
+        var (middleware, next) = CreateMiddleware();
+        var context = CreateRequest("GET", "/api/discord/interactions");
+
+        await middleware.InvokeAsync(context);
+
 
         Assert.True(next.Called);
     }

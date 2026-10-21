@@ -15,7 +15,8 @@ export function PrivacyNotice() {
                 We do not share your personal information with third parties without your consent, except as required by law.
             </p>
             <p className={textBodyFullClass}>
-                We delete your information manually after 3 months, but if you would like this deleted sooner, please contact cckraken17 on Discord.
+                Your data stored in our database is automatically deleted 90 days after submitting the form. This data is posted to our applications hub 
+                on our discord and then archived once a decision has been reached. If you would like this to be deleted as well, contact cckraken17 on Discord.
             </p>           
         </div>
         <button className={appFormButtonClass} type="button" onClick={() => navigate(-1)}>

@@ -41,6 +41,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 
 builder.Services.AddHostedService<DiscordRetryWorker>();
+builder.Services.AddHostedService<PersonalDataDeleteWorker>();
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 
