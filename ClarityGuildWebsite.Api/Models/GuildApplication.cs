@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace ClarityGuildWebsite.Api.Models
 {
     [Index(nameof(PublicId), IsUnique = true)]
+    [Index(nameof(DiscordThreadId), IsUnique = true)]
     public class GuildApplication
     {
         //form facing fields
@@ -55,6 +56,8 @@ namespace ClarityGuildWebsite.Api.Models
         public DateTime TimestampUtc { get; set; }
         [MaxLength(50)]
         public string? DiscordMessageId { get; set; }
+        [MaxLength(50)]
+        public string? DiscordThreadId { get; set; }
         [MaxLength(250)]
         public string? LastPostError { get; set; }
         public DateTime? LastAttemptedUtc { get; set; }
