@@ -1,4 +1,5 @@
 ﻿using ClarityGuildWebsite.Api.Middleware;
+using Discord;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -91,7 +92,42 @@ public class OriginCheckMiddlewareTests
         Assert.False(next.Called);
     }
 
+    [Fact]
+    public async Task InvokeAsync_PostToLookalikeInteractionsPath_Returns403AndSkipsNext()
+    {
+        var (middleware, next) = CreateMiddleware();
+        var context = CreateRequest("POST", null);
+        context.Request.Path = "/api/discord/interactions-evil";
+        await middleware.InvokeAsync(context);
+
+        Assert.Equal(StatusCodes.Status403Forbidden, context.Response.StatusCode);
+        Assert.False(next.Called);
+    }
+
+    [Fact]
+    public async Task InvokeAsync_PostToDoubleSlashInteractionsPath_Returns403AndSkipsNext()
+    {
+        var (middleware, next) = CreateMiddleware();
+        var context = CreateRequest("POST", null);
+        context.Request.Path = "//api/discord/interactions";
+        await middleware.InvokeAsync(context);
+
+        Assert.Equal(StatusCodes.Status403Forbidden, context.Response.StatusCode);
+        Assert.False(next.Called);
+    }
+
     // ---------- Allowed requests ----------
+
+    [Fact]
+    public async Task InvokeAsync_PostToDiscordInteractionsWithNoOrigin_CallsNext()
+    {
+        var (middleware, next) = CreateMiddleware();
+        var context = CreateRequest("POST", null);
+        context.Request.Path = "/api/discord/interactions";
+        await middleware.InvokeAsync(context);
+
+        Assert.True(next.Called);
+    }
 
     [Fact]
     public async Task InvokeAsync_PostFromAllowedOrigin_CallsNext()

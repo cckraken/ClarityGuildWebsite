@@ -26,6 +26,7 @@ namespace ClarityGuildWebsite.Api.Services
                 application.PostStatus = PostStatus.Delivered;
                 application.DiscordMessageId = result.MessageId;
                 application.LastPostError = null;
+                application.DiscordThreadId = result.ThreadId;
                 _logger.LogInformation("Post successful for {PublicId} : {DiscordMessageId}", application.PublicId, application.DiscordMessageId);
             }
             else

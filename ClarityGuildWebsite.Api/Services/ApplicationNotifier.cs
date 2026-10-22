@@ -58,29 +58,32 @@ namespace ClarityGuildWebsite.Api.Services
                 if (!response.IsSuccessStatusCode)
                 {
                     var body = await response.Content.ReadAsStringAsync(ctoken);
-                    return new NotificationResult(false, null, $"{(int)response.StatusCode}: {body}");
+                    return NotificationResult.Failed($"{(int)response.StatusCode}: {body}");
                 }
                 else
                 {
                     var message = await response.Content.ReadFromJsonAsync<DiscordMessageResponse>(ctoken);
-                    return new NotificationResult(true, message?.Id, null);
+                    if (string.IsNullOrEmpty(message?.Id))
+                        return NotificationResult.Failed("Discord accepted the post but returned no message ID");
+
+                    return NotificationResult.Delivered(message.Id, null);
                 }
             }
             catch (HttpRequestException ex)
             {
-                return new NotificationResult(false, null, $"Discord cannot be reached: {ex.Message}");
+                return NotificationResult.Failed($"Discord cannot be reached: {ex.Message}");
             }
             catch (TaskCanceledException ex)
             {
                 if(ctoken.IsCancellationRequested)
                 {
-                    return new NotificationResult(false, null, $"User canceled operation: {ex.Message}");
+                    return NotificationResult.Failed($"User canceled operation: {ex.Message}");
                 }
-                else return new NotificationResult(false, null, $"Request timed out: {ex.Message}");
+                else return NotificationResult.Failed($"Request timed out: {ex.Message}");
             }
             catch (JsonException ex)
             {
-                return new NotificationResult(false, null, $"Discord's reponse was not valid JSON: {ex.Message}");
+                return NotificationResult.Failed($"Discord's reponse was not valid JSON: {ex.Message}");
             }
         }
     }

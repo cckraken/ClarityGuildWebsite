@@ -36,17 +36,19 @@ namespace ClarityGuildWebsite.Api.Services
                 if (channel is not ITextChannel textChannel)
                 {
                     _logger.LogError("Channel {ChannelId} not found or is not a text channel", _channelId);
-                    return new NotificationResult(false, null, "ChannelId not fond or is not a text channel");
+                    return NotificationResult.Failed("ChannelId not found or is not a text channel");
                 }
 
 
                 var embed = ConstructEmbed(application);
                 var message = await textChannel.SendMessageAsync(embed: embed, options: options);
                 _logger.LogInformation("Application posted with message ID: {MessageId}", message.Id);
+
+                IThreadChannel? thread = null;
                 try
                 {
                     var threadName = $"New Application - {application.MainName}";
-                    var thread = await textChannel.CreateThreadAsync(
+                        thread = await textChannel.CreateThreadAsync(
                         name: threadName, message: message,
                         options: options,
                         autoArchiveDuration: ThreadArchiveDuration.OneWeek);
@@ -55,30 +57,31 @@ namespace ClarityGuildWebsite.Api.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "Posted {PublicId} but failed to create its thread", application.PublicId);
+                    var httpCode = (ex as Discord.Net.HttpException)?.HttpCode.ToString() ?? "Unknown";
+                    _logger.LogWarning(ex, $"Discord returned an error: {httpCode}", application.PublicId);
                 }
 
-                return new NotificationResult(true, message.Id.ToString(), null);
+                return NotificationResult.Delivered(message.Id.ToString(), thread?.Id.ToString());
             }
             catch (HttpRequestException ex)
             {
                 _logger.LogError(ex, "Discord API unreachable");
-                return new NotificationResult(false, null, $"Discord unreachable: {ex.Message}");
+                return NotificationResult.Failed("Discord API unreachable");
             }
             catch (TaskCanceledException ex)
             {
                 _logger.LogWarning(ex, "Request timeout");
-                return new NotificationResult(false, null, "Request timed out");
+                return NotificationResult.Failed("Request timed out");
             }
             catch (Discord.Net.HttpException ex)
             {
                 _logger.LogWarning(ex, "Required permissions missing on discord");
-                return new NotificationResult(false, null, $"Required permissions missing on discord: {ex.Message}");
+                return NotificationResult.Failed("Required permissions missing on discord");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error posting application to Discord");
-                return new NotificationResult(false, null, $"Error: {ex.Message}");
+                return NotificationResult.Failed("Error posting application to Discord");
             }
         }
 
