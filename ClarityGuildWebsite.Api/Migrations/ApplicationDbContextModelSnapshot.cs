@@ -69,6 +69,10 @@ namespace ClarityGuildWebsite.Api.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("DiscordThreadId")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<string>("Extra")
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
@@ -126,6 +130,10 @@ namespace ClarityGuildWebsite.Api.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DiscordThreadId")
+                        .IsUnique()
+                        .HasFilter("[DiscordThreadId] IS NOT NULL");
 
                     b.HasIndex("PublicId")
                         .IsUnique();
