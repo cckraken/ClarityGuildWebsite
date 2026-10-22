@@ -118,11 +118,11 @@ public class OriginCheckMiddlewareTests
     // ---------- Allowed requests ----------
 
     [Fact]
-    public async Task InvokeAsync_PostToDiscordInteractionsWithNoOrigin_CallsNext()
+    public async Task InvokeAsync_PostFromAllowedOrigin_CallsNext()
     {
         var (middleware, next) = CreateMiddleware();
-        var context = CreateRequest("POST", null);
-        context.Request.Path = "/api/discord/interactions";
+        var context = CreateRequest("POST", AllowedOrigin);
+
         await middleware.InvokeAsync(context);
 
         Assert.True(next.Called);
@@ -147,18 +147,6 @@ public class OriginCheckMiddlewareTests
         var context = CreateRequest("GET", "https://evil.com");
 
         await middleware.InvokeAsync(context);
-
-        Assert.True(next.Called);
-    }
-
-    [Fact]
-    public async Task InvokeAsync_AllowDiscordInteractionsOrigin_CallsNext()
-    {
-        var (middleware, next) = CreateMiddleware();
-        var context = CreateRequest("GET", "/api/discord/interactions");
-
-        await middleware.InvokeAsync(context);
-
 
         Assert.True(next.Called);
     }
