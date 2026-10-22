@@ -1,5 +1,4 @@
 ﻿using ClarityGuildWebsite.Api.Middleware;
-using Discord;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;

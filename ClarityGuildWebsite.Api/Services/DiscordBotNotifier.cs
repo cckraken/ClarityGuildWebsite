@@ -57,8 +57,7 @@ namespace ClarityGuildWebsite.Api.Services
                 }
                 catch (Exception ex)
                 {
-                    var httpCode = (ex as Discord.Net.HttpException)?.HttpCode.ToString() ?? "Unknown";
-                    _logger.LogWarning(ex, $"Discord returned an error: {httpCode}", application.PublicId);
+                    _logger.LogWarning(ex, "Posted {PublicId} but failed to create its thread", application.PublicId);
                 }
 
                 return NotificationResult.Delivered(message.Id.ToString(), thread?.Id.ToString());
