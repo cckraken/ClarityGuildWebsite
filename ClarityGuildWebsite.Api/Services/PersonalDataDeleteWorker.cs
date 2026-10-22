@@ -1,5 +1,4 @@
 ﻿using ClarityGuildWebsite.Api.Data;
-using Discord.Rest;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClarityGuildWebsite.Api.Services
