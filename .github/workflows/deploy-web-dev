@@ -1,0 +1,39 @@
+name: Deploy frontend (dev)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Build and deploy to dev
+    runs-on: ubuntu-latest
+    environment: dev
+
+    defaults:
+      run:
+        working-directory: ClarityGuildWebsite.Web
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '26'
+        cache: 'npm'
+        cache-dependency-path: ClarityGuildWebsite.Web/package-lock.json
+
+    - run: npm ci
+    - run: npm run build
+      env:
+        VITE_API_BASE_URL: ${{ vars.___ }}
+
+    - name: Deploy
+      uses: Azure/static-web-apps-deploy@v1
+      with:
+        azure_static_web_apps_api_token: ${{ secrets.___ }}
+        action: upload
+        app_location: ClarityGuildWebsite.Web/dist
+        skip_app_build: true
