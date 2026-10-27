@@ -1,4 +1,5 @@
 ﻿using ClarityGuildWebsite.Api.Helpers;
+using ClarityGuildWebsite.Api.Migrations;
 using ClarityGuildWebsite.Api.Models;
 using Discord;
 using Discord.Rest;
@@ -53,6 +54,9 @@ namespace ClarityGuildWebsite.Api.Services
                         options: options,
                         autoArchiveDuration: ThreadArchiveDuration.OneWeek);
                     _logger.LogInformation("Thread {ThreadId} created for {PublicId}", thread.Id, application.PublicId);
+                    var components = await DiscordApplicationButtonBuilder();
+                    await thread.SendMessageAsync(
+                        components: components.Build());
                     await NotifyOfficersAsync(thread, options);
                 }
                 catch (Exception ex)
@@ -131,6 +135,45 @@ namespace ClarityGuildWebsite.Api.Services
                 embed.AddField("Extra", ApplicationHelpers.Truncate(application.Extra, 1024));
 
             return embed.Build();
+        }
+
+        public async Task<ComponentBuilder> DiscordApplicationButtonBuilder()
+        {
+            //null/empty check later
+            try
+            {
+                ButtonBuilder buttonMessage = new ButtonBuilder();
+                {
+                    buttonMessage.Label = "Message Applicant";
+                    buttonMessage.CustomId = "discordButtonMessageApplicant";
+                    buttonMessage.Style = ButtonStyle.Primary;
+                }
+
+                ButtonBuilder buttonApprove = new ButtonBuilder();
+                {
+                    buttonApprove.Label = "Approve";
+                    buttonApprove.CustomId = "discordButtonAccept";
+                    buttonApprove.Style = ButtonStyle.Success;
+                }
+
+                ButtonBuilder buttonDecline = new ButtonBuilder();
+                {
+                    buttonDecline.Label = "Decline";
+                    buttonDecline.CustomId = "discordButtonDecline";
+                    buttonDecline.Style = ButtonStyle.Danger;
+                }
+
+                return new ComponentBuilder()
+                    .WithButton(buttonMessage, row: 0)
+                    .WithButton(buttonApprove, row: 1)
+                    .WithButton(buttonDecline, row: 1);
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogWarning(ex, "Button failed to build");
+                return new ComponentBuilder();
+            }
         }
     }
 }

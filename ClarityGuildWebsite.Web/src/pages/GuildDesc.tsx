@@ -93,7 +93,7 @@ export function GuildDesc() {
               className={`${dataTableClass}`}
             >
               <dt className="font-medium text-clarity-blue">Current tier</dt>
-              <dd className="text-clarity-blue">7/8M VA</dd>
+              <dd className="text-clarity-blue">8/8M VA WR 328</dd>
               <dt className="font-medium">MDN S1</dt>
               <dd>9/9M WR 381</dd>
               <dt className="font-medium">TWW S3</dt>
