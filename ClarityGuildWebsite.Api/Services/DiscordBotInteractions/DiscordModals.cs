@@ -1,61 +1,34 @@
-﻿using ClarityGuildWebsite.Api.Models;
+﻿using ClarityGuildWebsite.Api.Helpers;
 using Discord;
+using Discord.WebSocket;
+using static ClarityGuildWebsite.Api.Services.DiscordBotInteractions.DiscordModals;
 
 namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 {
-    public class DiscordModals
+    public static class DiscordModals
     {
-
-        public DiscordModals()
-        {
-        }
-        public Modal BuildOfficerMessageModalAsync(string discordId, string discordName)
+        public static Modal BuildOfficerMessage(Guid publicId, string discordName)
         {
             var input = new TextInputBuilder()
-                .WithCustomId("sendMessageToApplicantText")
+                .WithCustomId(OfficerMessageModal.MessageFieldId)
                 .WithStyle(TextInputStyle.Paragraph)
                 .WithRequired(true)
-                .WithMaxLength(250);
+                .WithMaxLength(OfficerMessageModal.MessageMaxLength);
 
             return new ModalBuilder()
-                .WithCustomId($"applicantMessageModal:{discordId}")
-                .WithTitle("Send message to: " + discordName)
-                .AddLabel($"Message:", input)
+                .WithTitle($"Message {discordName}")
+                .WithCustomId($"{OfficerMessageModal.Type}:{publicId}")
+                .AddLabel("Message", input)
                 .Build();
         }
 
-        public Modal BuildApplicantMessageModalAsync()
+        public static Modal BuildDeclineApplicant(Guid publicId, string discordName)
         {
-            var input = new TextInputBuilder()
-                .WithCustomId("Sent message to")
-                .WithStyle(TextInputStyle.Paragraph)
-                .WithRequired(true)
-                .WithMaxLength(250);
-
-            return new ModalBuilder()
-                .WithTitle("Message Clarity")
-                .WithCustomId("btnMsgClarity")
-                .AddLabel("Reply to Clarity", input)
-                .Build();
-        }
-
-        public Modal BuildDeclineApplicant(string discordName, string discordId)
-        {
-            var options = new List<SelectMenuOptionBuilder>
-            { 
-        new SelectMenuOptionBuilder()
-            .WithLabel("Class closed")
-            .WithValue(DeclineReasons.ClassClosed)
-            .WithDescription("We're not recruiting this class at the moment."),
-        new SelectMenuOptionBuilder()
-            .WithLabel("Not enough experience")
-            .WithValue(DeclineReasons.LowExperience)
-            .WithDescription("Not enough current raiding experience."),
-        new SelectMenuOptionBuilder()
-            .WithLabel("Other")
-            .WithValue(DeclineReasons.Other)
-            .WithDescription("Explain in the note below."),
-            };
+            var options = DeclineReasons.OfficerLabels
+                .Select(r => new SelectMenuOptionBuilder()
+                    .WithLabel(r.Value)
+                    .WithValue(r.Key))
+                .ToList();
 
             var note = new TextInputBuilder()
                 .WithCustomId(DeclineModal.NoteFieldId)
@@ -64,9 +37,8 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 .WithMaxLength(DeclineModal.NoteMaxLength);
 
             return new ModalBuilder()
-                // "Decline " (8) + a username (max 32) stays under Discord's 45-character title limit
                 .WithTitle($"Decline {discordName}")
-                .WithCustomId($"{DeclineModal.CustomIdPrefix}{discordId}")
+                .WithCustomId($"{DeclineModal.Type}:{publicId}")
                 .AddSelectMenu(
                     label: "Reason",
                     customId: DeclineModal.ReasonFieldId,
@@ -79,15 +51,53 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 .Build();
         }
 
+        public static Modal BuildAcceptApplicant(Guid publicId, string discordName)
+        {
+
+            var note = new TextInputBuilder()
+                .WithCustomId(AcceptModal.WelcomeMessageFieldId)
+                .WithValue("Welcome to Clarity, {member}! Have a look at {channels} to get started.")
+                .WithStyle(TextInputStyle.Paragraph)
+                .WithRequired(false)
+                .WithMaxLength(AcceptModal.MessageMaxLength);
+
+            return new ModalBuilder()
+                .WithTitle($"Accept {discordName}")
+                .WithCustomId($"{AcceptModal.Type}:{publicId}")
+                .AddLabel("Welcome message", note)
+                .AddSelectMenu(
+            label: "Channels to highlight",
+            customId: AcceptModal.ChannelsFieldId,
+            type: ComponentType.ChannelSelect,
+            channelTypes: new[] { ChannelType.Text },
+            minValues: 0,
+            maxValues: 4,
+            required: false,
+            placeholder: "Select one or more channels")
+                .Build();
+        }
+
+        public static class OfficerMessageModal
+        {
+            public const string Type = "applicantMessageModal";
+            public const string MessageFieldId = "message";
+            public const int MessageMaxLength = 1000;
+        }
+
+        public static class AcceptModal
+        {
+            public const string Type = "accept";
+            public const string WelcomeMessageFieldId = "welcomeMessage";
+            public const string ChannelsFieldId = "channels";
+            public const string DefaultWelcomeMessage = "Welcome to the team! Feel free to take a look around our server. The most important channels to get to know are: ";
+            public const int MessageMaxLength = 1000;
+        }
+
         public static class DeclineModal
         {
-            // Custom ID prefix for the modal; the router matches on this
-            public const string CustomIdPrefix = "decline:";
-
-            // Field IDs, read back in the submit handler
+            public const string Type = "decline";
             public const string ReasonFieldId = "reason";
             public const string NoteFieldId = "note";
-
             public const int NoteMaxLength = 250;
         }
 
@@ -97,9 +107,19 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             public const string LowExperience = "low_experience";
             public const string Other = "other";
 
-            // For validating the value Discord sends back
-            public static readonly IReadOnlySet<string> All =
-                new HashSet<string> { ClassClosed, LowExperience, Other };
+            public static readonly IReadOnlyDictionary<string, string> OfficerLabels = new Dictionary<string, string>
+            {
+                [ClassClosed] = "Class closed",
+                [LowExperience] = "Not enough experience",
+                [Other] = "Other (explain in the note)",
+            };
+
+            public static readonly IReadOnlyDictionary<string, string> ApplicantText = new Dictionary<string, string>
+            {
+                [ClassClosed] = "We're not recruiting your class at the moment.",
+                [LowExperience] = "We're looking for a bit more current raiding experience at the moment.",
+            };
         }
     }
 }
+    

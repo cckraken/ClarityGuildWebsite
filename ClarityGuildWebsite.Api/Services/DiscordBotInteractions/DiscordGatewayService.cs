@@ -2,6 +2,7 @@
 using Discord;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 {
@@ -36,6 +37,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
         public async Task StopAsync(CancellationToken ctoken)
         {
             _socketClient.ButtonExecuted -= OnButtonExecutedAsync;
+            _socketClient.ModalSubmitted -= OnModalSubmittedAsync;
             _socketClient.Log -= OnLogAsync;
 
             await _socketClient.StopAsync();
@@ -62,7 +64,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             {
                 using var scope = _scopeFactory.CreateScope();
                 var router = scope.ServiceProvider.GetRequiredService<DiscordInteractionRouter>();
-                await router.HandleModalSubmitted(modal, modal.User);
+                await router.HandleModalSubmittedAsync(modal);
             }
             catch (Exception ex)
             {

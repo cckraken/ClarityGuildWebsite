@@ -39,7 +39,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.ClientId = discordClientId;
         options.ClientSecret = discordClientSecret;
-        options.Scope.Add("guilds.members.read");
     });
 
 builder.Services.AddHostedService<DiscordRetryWorker>();
@@ -84,7 +83,6 @@ if (notifierMode == "Bot")
 
     builder.Services.AddSingleton<DiscordRestClient>();
     builder.Services.AddSingleton<DiscordBotConnectionService>();
-    builder.Services.AddSingleton<DiscordModals>();
     builder.Services.AddHostedService<DiscordGatewayService>();
     builder.Services.AddScoped<DiscordInteractionRouter>();
     builder.Services.AddScoped<ApplicantMessagingService>();
