@@ -1,6 +1,4 @@
 ﻿using Discord;
-using Discord.LibDave;
-
 
 namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 {

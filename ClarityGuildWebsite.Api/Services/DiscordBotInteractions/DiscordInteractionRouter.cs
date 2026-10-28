@@ -19,7 +19,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
         private readonly ulong _officerRoleId;
         private readonly ulong _raidersChatId;
         private readonly ulong _trialRoleId;
-        private readonly List<ulong> _defaultWelcomeChannelIds;
+        private readonly ulong[] _defaultWelcomeChannelIds;
 
         public DiscordInteractionRouter(ApplicationDbContext context, DiscordSocketClient socketClient, ILogger<DiscordInteractionRouter> logger, IConfiguration config)
         {
@@ -35,9 +35,10 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             if (_trialRoleId == 0)
                 throw new InvalidOperationException("Discord:TrialRoleId is not configured.");
 
-            _defaultWelcomeChannelIds = config.GetSection("Discord:DefaultWelcomeChannelIds").Get<ulong[]>().ToList();
-            if (_defaultWelcomeChannelIds == null)
-                throw new InvalidOperationException("Discord:DefaultWelcomeChannelIds is not configured");
+            _defaultWelcomeChannelIds = config.GetSection("Discord:DefaultWelcomeChannelIds").Get<ulong[]>()
+                 ?? throw new InvalidOperationException("Discord:DefaultWelcomeChannelIds is not configured.");
+
+
 
             _context = context;
             _socketClient = socketClient;
@@ -213,9 +214,8 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
         private async Task AcceptAsync(SocketModal modal, SocketGuildUser officer, GuildApplication application)
         {
             if (!ulong.TryParse(application.DiscordId, out var memberId))
-            if (memberId == 0)
             {
-                _logger.LogWarning("Unable to get user using {DiscordId}", application.DiscordId);
+                _logger.LogWarning("Unable to get user using {PublicId}", application.PublicId);
                 await modal.FollowupAsync("Unable to find user associated with this application.", ephemeral: true);
                 return;
             }
@@ -253,7 +253,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             var welcomed = await PostWelcomeToRaiderChatAsync(modal, text, memberId);
 
             var problems = new List<String>();
-            if (!roleAdded) problems.Add("Trial role couldn't be added");
+            if (!roleAdded) problems.Add("the Trial role couldn't be added");
             if (!welcomed) problems.Add("the welcome message couldn't be posted");
 
             var summary = problems.Count == 0
@@ -371,8 +371,8 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             }
             catch (HttpException ex) when (ex.DiscordCode is DiscordErrorCode.MissingPermissions or DiscordErrorCode.InsufficientPermissions)
             {
-                _logger.LogWarning("Unable to post to {_raidersChatId}: ", channel);
-                await modal.FollowupAsync($"Unable to post to Raiders Chat with error code: {ex.DiscordCode} ", ephemeral: true);
+                _logger.LogWarning("Couldn't post welcome to {ChannelId}: {DiscordCode}", _raidersChatId, ex.DiscordCode);
+                await modal.FollowupAsync($"Unable to post to Raiders Chat with error code: {ex.DiscordCode}", ephemeral: true);
                 return false;
             }
         }
@@ -398,7 +398,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to apply trial role for {PublicId}.", memberId);
+                _logger.LogError(ex, "Failed to apply trial role for {MemberId}.", memberId);
                 return false;
             }
         }
