@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.LibDave;
 
 
 namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
@@ -54,7 +55,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
             var note = new TextInputBuilder()
                 .WithCustomId(AcceptModal.WelcomeMessageFieldId)
-                .WithValue("Welcome to Clarity, {member}! Have a look at {channels} to get started.")
+                .WithValue(AcceptModal.DefaultWelcomeMessage)
                 .WithStyle(TextInputStyle.Paragraph)
                 .WithRequired(false)
                 .WithMaxLength(AcceptModal.MessageMaxLength);
@@ -87,7 +88,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             public const string Type = "accept";
             public const string WelcomeMessageFieldId = "welcomeMessage";
             public const string ChannelsFieldId = "channels";
-            public const string DefaultWelcomeMessage = "Welcome to the team! Feel free to take a look around our server. The most important channels to get to know are: ";
+            public const string DefaultWelcomeMessage = "Welcome to Clarity, {member}! Have a look at {channels} to get started and whisper anyone for a guild invite.";
             public const int MessageMaxLength = 1000;
         }
 

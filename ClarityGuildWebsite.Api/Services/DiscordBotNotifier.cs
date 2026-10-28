@@ -1,6 +1,7 @@
 ﻿using ClarityGuildWebsite.Api.Helpers;
 using ClarityGuildWebsite.Api.Migrations;
 using ClarityGuildWebsite.Api.Models;
+using ClarityGuildWebsite.Api.Services.DiscordBotInteractions;
 using Discord;
 using Discord.Rest;
 using System.Linq.Expressions;
@@ -54,7 +55,7 @@ namespace ClarityGuildWebsite.Api.Services
                         options: options,
                         autoArchiveDuration: ThreadArchiveDuration.OneWeek);
                     _logger.LogInformation("Thread {ThreadId} created for {PublicId}", thread.Id, application.PublicId);
-                    var components = await DiscordApplicationButtonBuilder();
+                    var components = BuildApplicationButtons();
                     await thread.SendMessageAsync(
                         components: components.Build());
                     await NotifyOfficersAsync(thread, options);
@@ -137,43 +138,10 @@ namespace ClarityGuildWebsite.Api.Services
             return embed.Build();
         }
 
-        public async Task<ComponentBuilder> DiscordApplicationButtonBuilder()
-        {
-            //null/empty check later
-            try
-            {
-                ButtonBuilder buttonMessage = new ButtonBuilder();
-                {
-                    buttonMessage.Label = "Message Applicant";
-                    buttonMessage.CustomId = "discordButtonMessageApplicant";
-                    buttonMessage.Style = ButtonStyle.Primary;
-                }
-
-                ButtonBuilder buttonApprove = new ButtonBuilder();
-                {
-                    buttonApprove.Label = "Approve";
-                    buttonApprove.CustomId = "discordButtonAccept";
-                    buttonApprove.Style = ButtonStyle.Success;
-                }
-
-                ButtonBuilder buttonDecline = new ButtonBuilder();
-                {
-                    buttonDecline.Label = "Decline";
-                    buttonDecline.CustomId = "discordButtonDecline";
-                    buttonDecline.Style = ButtonStyle.Danger;
-                }
-
-                return new ComponentBuilder()
-                    .WithButton(buttonMessage, row: 0)
-                    .WithButton(buttonApprove, row: 1)
-                    .WithButton(buttonDecline, row: 1);
-
-            }
-            catch(Exception ex)
-            {
-                _logger.LogWarning(ex, "Button failed to build");
-                return new ComponentBuilder();
-            }
-        }
+        private static ComponentBuilder BuildApplicationButtons() =>
+         new ComponentBuilder()
+        .WithButton("Message Applicant", DiscordCustomIds.MessageApplicantButton, ButtonStyle.Primary, row: 0)
+        .WithButton("Approve", DiscordCustomIds.AcceptButton, ButtonStyle.Success, row: 1)
+        .WithButton("Decline", DiscordCustomIds.DeclineButton, ButtonStyle.Danger, row: 1);
     }
 }
