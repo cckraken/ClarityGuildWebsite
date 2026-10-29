@@ -55,10 +55,6 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 case DiscordCustomIds.DeclineButton:
                     await OpenDeclineModalAsync(component);
                     break;
-
-                case DiscordCustomIds.MessageClarityButton:
-                    await component.RespondAsync("Not available yet", ephemeral: true);
-                    break;
                 case DiscordCustomIds.AcceptButton:
                     await OpenAcceptModalAsync(component);
                     break;

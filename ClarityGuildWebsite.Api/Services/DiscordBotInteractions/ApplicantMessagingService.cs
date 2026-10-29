@@ -3,6 +3,7 @@ using Discord;
 using Discord.Net;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 {
@@ -11,6 +12,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
         private readonly DiscordSocketClient _socketClient;
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
+        private const string unknownErrorMsg = "Sorry, I couldn’t pass that on. Please contact an officer.";
         public ApplicantMessagingService(ILogger<ApplicantMessagingService> logger, DiscordSocketClient socketClient, ApplicationDbContext context)
         {
             _logger = logger;
@@ -25,7 +27,6 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             if (message is not SocketUserMessage) return;
 
             var channel = message.Channel;
-            string discordUserName = null;
 
             var authorId = message.Author.Id.ToString();
             var application = await _context.GuildApplications
@@ -42,15 +43,8 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
             if (application?.DiscordThreadId == null)
             {
-                _logger.LogWarning("Unable to find application for user {AuthorId}", authorId);
+                _logger.LogInformation("DM received from a user with no application");
                 await channel.SendMessageAsync("I don’t have an application from you. You can apply at www.clarityguild.co.uk");
-                return;
-            }
-
-            if (!ulong.TryParse(authorId, out var discordUserId))
-            {
-                _logger.LogWarning("Unable to get {DiscordId} from sender author property", application.DiscordId);
-                await channel.SendMessageAsync("Unable to find user using your discord account from our application database. Please contact cckraken17 for assistance.");
                 return;
             }
 
@@ -61,16 +55,11 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 return;
             }
 
-            if (!string.IsNullOrWhiteSpace(application.DiscordName))
-            {
-                discordUserName = application.DiscordName;
-            }
-
             var thread = discordThreadId;
 
             if (string.IsNullOrWhiteSpace(message.Content) && message.Attachments.Count < 1)
             {
-                _logger.LogWarning("Empty message sent to CCK from {authorId}", authorId);
+                _logger.LogInformation("Empty message sent to CCK");
                 await channel.SendMessageAsync("Did you mean to send any text? Please try again.");
                 return;
             }
@@ -86,9 +75,9 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
                 var embed = new EmbedBuilder()
                 {
-                    Title = $"Message received from: {discordUserName}",
+                    Title = $"Message received from: {message.Author.Username}",
                     Color = Color.Blue,
-                    Description = message.Content,
+                    Description = applicantDm,
                     ImageUrl = message.Attachments.FirstOrDefault()?.Url,
                     Timestamp = message.Timestamp
                 }.Build();
@@ -97,28 +86,24 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 if (threadChannel is null)
                 {
                     _logger.LogWarning("Thread not found: {ThreadId}", discordThreadId);
-                    await channel.SendMessageAsync("Sorry, I couldn’t pass that on. Please contact an officer.");
+                    await channel.SendMessageAsync(unknownErrorMsg);
                     return;
                 }
                 try
                 {
-                    IUserMessage messageSent = await threadChannel.SendMessageAsync(embed: embed, allowedMentions: AllowedMentions.None);
+                    await threadChannel.SendMessageAsync(embed: embed, allowedMentions: AllowedMentions.None);
                     await message.AddReactionAsync(new Emoji("✅"));
                 }
                 catch (HttpException ex) when (ex.DiscordCode is DiscordErrorCode.MissingPermissions or DiscordErrorCode.UnknownChannel)
                 {
                     _logger.LogWarning("Failed to send applicant message to thread with error: {DiscordCode}", ex.DiscordCode);
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning("Failed to send applicant message: {ex.Message}", ex.Message);
-
-                }
+                
             }
             catch (Exception ex)
             {
                 _logger.LogWarning("Failed to send applicant message: {ex.Message}", ex.Message);
-                await channel.SendMessageAsync($"Failed to send message due to error: {ex.Message}");
+                await channel.SendMessageAsync(unknownErrorMsg);
 
             }
         }
