@@ -1,8 +1,6 @@
-﻿using ClarityGuildWebsite.Api.Data;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
-using Microsoft.EntityFrameworkCore;
-using System.Globalization;
+
 
 namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 {
@@ -29,6 +27,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             _socketClient.Log += OnLogAsync;
             _socketClient.ButtonExecuted += OnButtonExecutedAsync;
             _socketClient.ModalSubmitted += OnModalSubmittedAsync;
+            _socketClient.MessageReceived += OnApplicantMessageReceivedAsync;
 
             await _socketClient.LoginAsync(TokenType.Bot, _token);
             await _socketClient.StartAsync();
@@ -38,6 +37,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
         {
             _socketClient.ButtonExecuted -= OnButtonExecutedAsync;
             _socketClient.ModalSubmitted -= OnModalSubmittedAsync;
+            _socketClient.MessageReceived -= OnApplicantMessageReceivedAsync;
             _socketClient.Log -= OnLogAsync;
 
             await _socketClient.StopAsync();
@@ -69,6 +69,20 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Modal {CustomId} failed. Intended recipient does not share a server with you or is not accepting DMs", modal.Data.CustomId);
+            }
+        }
+
+        private async Task OnApplicantMessageReceivedAsync(IMessage message)
+        {
+            try
+            {
+                using var scope = _scopeFactory.CreateScope();
+                var service = scope.ServiceProvider.GetRequiredService<ApplicantMessagingService>();
+                await service.HandleApplicantMessageAsync(message, message.Channel);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occured when trying to send a message to an applicants thread.");
             }
         }
 

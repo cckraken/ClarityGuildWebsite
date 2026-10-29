@@ -52,7 +52,6 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 case DiscordCustomIds.MessageApplicantButton:
                     await OpenOfficerMessageModalAsync(component);
                     break;
-
                 case DiscordCustomIds.DeclineButton:
                     await OpenDeclineModalAsync(component);
                     break;
@@ -203,7 +202,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 return;
             }
 
-            var delivered = await TryDmApplicantAsync(application, $"**Message from the Clarity officers:**\n{text}");
+            var delivered = await TryDmApplicantAsync(application, $"**Message from the Clarity officers:**\nReply in this DM and I'll send it to your application. If successfully sent, I'll react to the message.\n{text}");
 
             await PostToThreadAsync(modal,
                 $"✉️ {officer.DisplayName} messaged the applicant{(delivered ? "" : " (DM failed)")}:\n{text}");

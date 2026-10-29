@@ -85,7 +85,7 @@ if (notifierMode == "Bot")
     builder.Services.AddSingleton<DiscordBotConnectionService>();
     builder.Services.AddHostedService<DiscordGatewayService>();
     builder.Services.AddScoped<DiscordInteractionRouter>();
-    builder.Services.AddScoped<ApplicantMessagingService>();
+    builder.Services.AddScoped<IApplicantMessagingService, ApplicantMessagingService>();
     builder.Services.AddScoped<IApplicationNotifier, DiscordBotNotifier>();
 }
 else if (notifierMode == "Webhook")
