@@ -13,13 +13,14 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
         public DiscordGatewayService(IConfiguration config, DiscordSocketClient client, IServiceScopeFactory scopeFactory, ILogger<DiscordGatewayService> logger)
         {
-            _token = config.GetValue<string>("Discord:BotToken")!;
-            if (string.IsNullOrWhiteSpace(_token))
+            var token = config.GetValue<string>("Discord:BotToken");
+            if (string.IsNullOrWhiteSpace(token))
                 throw new InvalidOperationException("Discord:BotToken is missing or invalid.");
 
             _socketClient = client;
             _scopeFactory = scopeFactory;
             _logger = logger;
+            _token = token;
         }
 
         public async Task StartAsync(CancellationToken ctoken)
