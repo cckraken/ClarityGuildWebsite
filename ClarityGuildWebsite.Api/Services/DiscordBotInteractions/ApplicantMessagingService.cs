@@ -89,7 +89,14 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 try
                 {
                     await threadChannel.SendMessageAsync(embed: embed, allowedMentions: AllowedMentions.None);
-                    await message.AddReactionAsync(new Emoji("✅"));
+                    try
+                    {
+                        await message.AddReactionAsync(new Emoji("✅"));
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Applicant message {MessageId} was relayed, but its confirmation reaction failed", message.Id);
+                    }
                 }
                 catch (HttpException ex) when (ex.DiscordCode is DiscordErrorCode.MissingPermissions or DiscordErrorCode.UnknownChannel)
                 {
