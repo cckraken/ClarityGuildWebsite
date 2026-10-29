@@ -11,19 +11,20 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
         private readonly DiscordSocketClient _socketClient;
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
-        public ApplicantMessagingService(ILogger<ApplicantMessagingService> logger, DiscordSocketClient socketClient, IConfiguration config, ApplicationDbContext context)
+        public ApplicantMessagingService(ILogger<ApplicantMessagingService> logger, DiscordSocketClient socketClient, ApplicationDbContext context)
         {
             _logger = logger;
             _socketClient = socketClient;
             _context = context;
         }
 
-        public async Task HandleApplicantMessageAsync(IMessage message, IMessageChannel channel)
+        public async Task HandleApplicantMessageAsync(IMessage message)
         {
             if (message.Author.IsBot) return;
             if (message.Channel is not IDMChannel) return;
             if (message is not SocketUserMessage) return;
 
+            var channel = message.Channel;
             string discordUserName = null;
 
             var authorId = message.Author.Id.ToString();
@@ -42,7 +43,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             if (application?.DiscordThreadId == null)
             {
                 _logger.LogWarning("Unable to find application for user {AuthorId}", authorId);
-                await channel.SendMessageAsync("Unable to find user from our application database. Please contact cckraken17 for assistance.");
+                await channel.SendMessageAsync("I don’t have an application from you. You can apply at www.clarityguild.co.uk");
                 return;
             }
 
@@ -65,23 +66,14 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 discordUserName = application.DiscordName;
             }
 
-            var applicant = discordUserId;
             var thread = discordThreadId;
 
             if (string.IsNullOrWhiteSpace(message.Content) && message.Attachments.Count < 1)
             {
                 _logger.LogWarning("Empty message sent to CCK from {authorId}", authorId);
-                await channel.SendMessageAsync("Did you mean to send any text? Please try again."); //can be done better?
+                await channel.SendMessageAsync("Did you mean to send any text? Please try again.");
                 return;
             }
-
-            if (message.Content.Length > 2000)
-            {
-                _logger.LogWarning("Message sent exceeds Discords API limit of 2000");
-                await channel.SendMessageAsync("Less than 2000 characters, please!");
-            }
-
-            //add channel checks if bot is expanded to read dm's from somewhere other than a direct message channel one day
 
             try
             {
@@ -98,10 +90,16 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                     Color = Color.Blue,
                     Description = message.Content,
                     ImageUrl = message.Attachments.FirstOrDefault()?.Url,
-                    Timestamp = DateTime.UtcNow,
+                    Timestamp = message.Timestamp
                 }.Build();
 
                 var threadChannel = await _socketClient.GetChannelAsync(thread) as IThreadChannel;
+                if (threadChannel is null)
+                {
+                    _logger.LogWarning("Thread not found: {ThreadId}", discordThreadId);
+                    await channel.SendMessageAsync("Sorry, I couldn’t pass that on. Please contact an officer.");
+                    return;
+                }
                 try
                 {
                     IUserMessage messageSent = await threadChannel.SendMessageAsync(embed: embed, allowedMentions: AllowedMentions.None);
@@ -110,11 +108,6 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 catch (HttpException ex) when (ex.DiscordCode is DiscordErrorCode.MissingPermissions or DiscordErrorCode.UnknownChannel)
                 {
                     _logger.LogWarning("Failed to send applicant message to thread with error: {DiscordCode}", ex.DiscordCode);
-                }
-                catch (NullReferenceException ex)
-                {
-                    _logger.LogWarning("Thread does not exist: {thread} with message: {ex.Message}", thread, ex.Message);
-                    await channel.SendMessageAsync("Unable to find application thread");
                 }
                 catch (Exception ex)
                 {
@@ -125,6 +118,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             catch (Exception ex)
             {
                 _logger.LogWarning("Failed to send applicant message: {ex.Message}", ex.Message);
+                await channel.SendMessageAsync($"Failed to send message due to error: {ex.Message}");
 
             }
         }

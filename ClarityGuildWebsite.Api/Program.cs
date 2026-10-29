@@ -77,7 +77,7 @@ if (notifierMode == "Bot")
     builder.Services.AddSingleton(_ => new DiscordSocketClient(new DiscordSocketConfig
     {
         ConnectionTimeout = 15000,
-        GatewayIntents = Discord.GatewayIntents.AllUnprivileged | Discord.GatewayIntents.MessageContent,
+        GatewayIntents = Discord.GatewayIntents.Guilds | Discord.GatewayIntents.DirectMessages,
         UseInteractionSnowflakeDate = false
     }));
 

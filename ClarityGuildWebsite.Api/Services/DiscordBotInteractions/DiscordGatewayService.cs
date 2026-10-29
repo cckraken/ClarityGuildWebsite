@@ -77,8 +77,8 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             try
             {
                 using var scope = _scopeFactory.CreateScope();
-                var service = scope.ServiceProvider.GetRequiredService<ApplicantMessagingService>();
-                await service.HandleApplicantMessageAsync(message, message.Channel);
+                var service = scope.ServiceProvider.GetRequiredService<IApplicantMessagingService>();
+                await service.HandleApplicantMessageAsync(message);
             }
             catch (Exception ex)
             {
@@ -88,7 +88,18 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
         private Task OnLogAsync(LogMessage msg)
         {
-            _logger.LogError(msg.Exception, "Discord log: {Source} - {Message}", msg.Source, msg.Message);
+            var level = msg.Severity switch
+            {
+                LogSeverity.Critical => LogLevel.Critical,
+                LogSeverity.Error => LogLevel.Error,
+                LogSeverity.Warning => LogLevel.Warning,
+                LogSeverity.Info => LogLevel.Information,
+                LogSeverity.Verbose => LogLevel.Debug,
+                LogSeverity.Debug => LogLevel.Trace,
+                _ => LogLevel.Information
+            };
+
+            _logger.Log(level, msg.Exception, "Discord {Source}: {Message}", msg.Source, msg.Message);
             return Task.CompletedTask;
         }
     }

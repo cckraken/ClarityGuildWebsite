@@ -21,12 +21,6 @@
 
         public async Task InvokeAsync(HttpContext context)
         {
-            if (context.Request.Path.StartsWithSegments("/api/discord/interactions"))
-            {
-                await _next(context);
-                return;
-            }
-
             var method = context.Request.Method;
             if (HttpMethods.IsGet(method) || HttpMethods.IsHead(method) || HttpMethods.IsOptions(method))
             {

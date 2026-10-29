@@ -202,7 +202,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 return;
             }
 
-            var delivered = await TryDmApplicantAsync(application, $"**Message from the Clarity officers:**\nReply in this DM and I'll send it to your application. If successfully sent, I'll react to the message.\n{text}");
+            var delivered = await TryDmApplicantAsync(application, $"**Message from the Clarity officers:**\n{text}\nReply in this DM and I'll send it to your application. If successfully sent, I'll react to the message.");
 
             await PostToThreadAsync(modal,
                 $"✉️ {officer.DisplayName} messaged the applicant{(delivered ? "" : " (DM failed)")}:\n{text}");
