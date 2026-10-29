@@ -3,7 +3,6 @@ using Discord;
 using Discord.Net;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 {
@@ -12,7 +11,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
         private readonly DiscordSocketClient _socketClient;
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
-        private const string unknownErrorMsg = "Sorry, I couldn’t pass that on. Please contact an officer.";
+        private const string UnknownErrorMsg = "Sorry, I couldn’t pass that on. Please contact an officer.";
         public ApplicantMessagingService(ILogger<ApplicantMessagingService> logger, DiscordSocketClient socketClient, ApplicationDbContext context)
         {
             _logger = logger;
@@ -51,11 +50,9 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             if (!ulong.TryParse(application.DiscordThreadId, out var discordThreadId))
             {
                 _logger.LogWarning("Unable to get {DiscordThreadId}", application.DiscordThreadId);
-                await channel.SendMessageAsync("Unable to find application on our server. To apply, please visit www.clarityguild.co.uk.");
+                await channel.SendMessageAsync(UnknownErrorMsg);
                 return;
             }
-
-            var thread = discordThreadId;
 
             if (string.IsNullOrWhiteSpace(message.Content) && message.Attachments.Count < 1)
             {
@@ -82,11 +79,11 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                     Timestamp = message.Timestamp
                 }.Build();
 
-                var threadChannel = await _socketClient.GetChannelAsync(thread) as IThreadChannel;
+                var threadChannel = await _socketClient.GetChannelAsync(discordThreadId) as IThreadChannel;
                 if (threadChannel is null)
                 {
                     _logger.LogWarning("Thread not found: {ThreadId}", discordThreadId);
-                    await channel.SendMessageAsync(unknownErrorMsg);
+                    await channel.SendMessageAsync(UnknownErrorMsg);
                     return;
                 }
                 try
@@ -97,13 +94,14 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 catch (HttpException ex) when (ex.DiscordCode is DiscordErrorCode.MissingPermissions or DiscordErrorCode.UnknownChannel)
                 {
                     _logger.LogWarning("Failed to send applicant message to thread with error: {DiscordCode}", ex.DiscordCode);
+                    await channel.SendMessageAsync(UnknownErrorMsg);
                 }
                 
             }
             catch (Exception ex)
             {
-                _logger.LogWarning("Failed to send applicant message: {ex.Message}", ex.Message);
-                await channel.SendMessageAsync(unknownErrorMsg);
+                _logger.LogError(ex, "Failed to relay applicant message");
+                await channel.SendMessageAsync(UnknownErrorMsg);
 
             }
         }
