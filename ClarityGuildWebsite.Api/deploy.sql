@@ -855,3 +855,24 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030183402_RenameLastOfficerMessaged'
+)
+BEGIN
+    EXEC sp_rename N'[GuildApplications].[LastOfficerMessagedUtc]', N'LastRecruitmentTeamMessagedUtc', 'COLUMN';
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261030183402_RenameLastOfficerMessaged'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261030183402_RenameLastOfficerMessaged', N'10.0.13');
+END;
+
+COMMIT;
+GO
+

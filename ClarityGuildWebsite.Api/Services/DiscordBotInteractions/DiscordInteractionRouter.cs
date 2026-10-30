@@ -16,16 +16,17 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
         private readonly ApplicationDbContext _context;
         private readonly DiscordSocketClient _socketClient;
         private readonly ILogger<DiscordInteractionRouter> _logger;
-        private readonly ulong _officerRoleId;
+        private readonly ulong[] _recruitmentTeamRoleIds;
         private readonly ulong _raidersChatId;
         private readonly ulong _trialRoleId;
         private readonly ulong[] _defaultWelcomeChannelIds;
 
         public DiscordInteractionRouter(ApplicationDbContext context, DiscordSocketClient socketClient, ILogger<DiscordInteractionRouter> logger, IConfiguration config)
         {
-            _officerRoleId = config.GetValue<ulong>("Discord:OfficerRoleId");
-            if (_officerRoleId == 0)
-                throw new InvalidOperationException("Discord:OfficerRoleId is not configured.");
+            _recruitmentTeamRoleIds = config.GetSection("Discord:RecruitmentTeamRoleIds").Get<ulong[]>()
+    ?? throw new InvalidOperationException("Discord:RecruitmentTeamRoleIds is not configured.");
+            if (_recruitmentTeamRoleIds.Length == 0)
+                throw new InvalidOperationException("Discord:RecruitmentTeamRoleIds must contain at least one role ID.");
 
             _raidersChatId = config.GetValue<ulong>("Discord:RaidersChatId");
             if (_raidersChatId == 0)
@@ -50,7 +51,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             switch (component.Data.CustomId)
             {
                 case DiscordCustomIds.MessageApplicantButton:
-                    await OpenOfficerMessageModalAsync(component);
+                    await OpenRecruitmentManagerMessageModalAsync(component);
                     break;
                 case DiscordCustomIds.DeclineButton:
                     await OpenDeclineModalAsync(component);
@@ -66,19 +67,19 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             }
         }
 
-        private async Task OpenOfficerMessageModalAsync(SocketMessageComponent component)
+        private async Task OpenRecruitmentManagerMessageModalAsync(SocketMessageComponent component)
         {
-            var application = await GetApplicationForOfficerButtonAsync(component);
+            var application = await GetApplicationForRecruitmentManagerButtonAsync(component);
             if (application is null)
                 return;
 
             await component.RespondWithModalAsync(
-                DiscordModals.BuildOfficerMessage(application.PublicId, application.DiscordName));
+                DiscordModals.BuildRecruitmentManagerMessage(application.PublicId, application.DiscordName));
         }
 
         private async Task OpenDeclineModalAsync(SocketMessageComponent component)
         {
-            var application = await GetApplicationForOfficerButtonAsync(component);
+            var application = await GetApplicationForRecruitmentManagerButtonAsync(component);
             if (application is null)
                 return;
 
@@ -94,7 +95,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
         private async Task OpenAcceptModalAsync(SocketMessageComponent component)
         {
-            var application = await GetApplicationForOfficerButtonAsync(component);
+            var application = await GetApplicationForRecruitmentManagerButtonAsync(component);
             if (application is null)
                 return;
 
@@ -108,12 +109,12 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 DiscordModals.BuildAcceptApplicant(application.PublicId, application.DiscordName));
         }
 
-        private async Task<GuildApplication?> GetApplicationForOfficerButtonAsync(SocketMessageComponent component)
+        private async Task<GuildApplication?> GetApplicationForRecruitmentManagerButtonAsync(SocketMessageComponent component)
         {
-            if (component.User is not SocketGuildUser officer || !IsOfficer(officer))
+            if (component.User is not SocketGuildUser manager || !CanManageApplications(manager))
             {
-                _logger.LogWarning("Non-officer {UserId} clicked {CustomId}", component.User.Id, component.Data.CustomId);
-                await component.RespondAsync("Only officers can use this.", ephemeral: true);
+                _logger.LogWarning("Non-recruitment manager {UserId} clicked {CustomId}", component.User.Id, component.Data.CustomId);
+                await component.RespondAsync("Only recruitment managers can use this.", ephemeral: true);
                 return null;
             }
 
@@ -140,10 +141,10 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
             try
             {
-                if (modal.User is not SocketGuildUser officer || !IsOfficer(officer))
+                if (modal.User is not SocketGuildUser manager || !CanManageApplications(manager))
                 {
-                    _logger.LogWarning("Non-officer {UserId} submitted {CustomId}", modal.User.Id, modal.Data.CustomId);
-                    await modal.FollowupAsync("Only officers can use this.", ephemeral: true);
+                    _logger.LogWarning("Non-recruitment manager {UserId} submitted {CustomId}", modal.User.Id, modal.Data.CustomId);
+                    await modal.FollowupAsync("Only recruitment managers can use this.", ephemeral: true);
                     return;
                 }
 
@@ -166,14 +167,14 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
                 switch (parts[0])
                 {
-                    case OfficerMessageModal.Type:
-                        await SendOfficerMessageAsync(modal, officer, application);
+                    case RecruitmentTeamMessageModal.Type:
+                        await SendRecruitmentManagerMessageAsync(modal, manager, application);
                         break;
                     case AcceptModal.Type:
-                        await AcceptAsync(modal, officer, application);
+                        await AcceptAsync(modal, manager, application);
                         break;
                     case DeclineModal.Type:
-                        await DeclineAsync(modal, officer, application);
+                        await DeclineAsync(modal, manager, application);
                         break;
 
                     default:
@@ -189,21 +190,21 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             }
         }
 
-        private async Task SendOfficerMessageAsync(SocketModal modal, SocketGuildUser officer, GuildApplication application)
+        private async Task SendRecruitmentManagerMessageAsync(SocketModal modal, SocketGuildUser manager, GuildApplication application)
         {
-            var text = GetTextValue(modal, OfficerMessageModal.MessageFieldId);
+            var text = GetTextValue(modal, RecruitmentTeamMessageModal.MessageFieldId);
             if (string.IsNullOrWhiteSpace(text))
             {
                 await modal.FollowupAsync("The message can't be empty.", ephemeral: true);
                 return;
             }
 
-            application.LastOfficerMessagedUtc = DateTime.UtcNow;
+            application.LastRecruitmentTeamMessagedUtc = DateTime.UtcNow;
             await _context.SaveChangesAsync();
-            var delivered = await TryDmApplicantAsync(application, $"**Message from the Clarity officers:**\n{text}\nReply in this DM and I'll send it to your application. If successfully sent, I'll react to the message.");
+            var delivered = await TryDmApplicantAsync(application, $"**Message from the Clarity Recruitment Team:**\n{text}\nReply in this DM and I'll send it to your application. If successfully sent, I'll react to the message.");
 
             await PostToThreadAsync(modal,
-                $"✉️ {officer.DisplayName} messaged the applicant{(delivered ? "" : " (DM failed)")}:\n{text}");
+                $"✉️ {manager.DisplayName} messaged the applicant{(delivered ? "" : " (DM failed)")}:\n{text}");
 
             await modal.FollowupAsync(delivered ? "Message sent." : CouldNotDmMessage, ephemeral: true);
         }
@@ -261,14 +262,14 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             await modal.FollowupAsync(summary, ephemeral: true);
         }
 
-        private async Task DeclineAsync(SocketModal modal, SocketGuildUser officer, GuildApplication application)
+        private async Task DeclineAsync(SocketModal modal, SocketGuildUser manager, GuildApplication application)
         {
             var reason = modal.Data.Components
                 .FirstOrDefault(c => c.CustomId == DeclineModal.ReasonFieldId)
                 ?.Values.FirstOrDefault();
             var note = GetTextValue(modal, DeclineModal.NoteFieldId);
 
-            if (reason is null || !DeclineReasons.OfficerLabels.ContainsKey(reason))
+            if (reason is null || !DeclineReasons.RecruitmentTeamLabels.ContainsKey(reason))
             {
                 await modal.FollowupAsync("Please select a reason.", ephemeral: true);
                 return;
@@ -287,11 +288,11 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             }
 
             var delivered = await TryDmApplicantAsync(application, BuildDeclineMessage(reason, note));
-            application.LastOfficerMessagedUtc = DateTime.UtcNow;
+            application.LastRecruitmentTeamMessagedUtc = DateTime.UtcNow;
             application.Status = ApplicationStatus.Declined;
             await _context.SaveChangesAsync();
 
-            var record = new StringBuilder($"❌ Declined by {officer.DisplayName}: {DeclineReasons.OfficerLabels[reason]}");
+            var record = new StringBuilder($"❌ Declined by {manager.DisplayName}: {DeclineReasons.RecruitmentTeamLabels[reason]}");
             if (!string.IsNullOrWhiteSpace(note))
                 record.Append($"\nNote: {note}");
             if (!delivered)
@@ -317,8 +318,8 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             return message.ToString();
         }
 
-        private bool IsOfficer(SocketGuildUser user) =>
-            user.Roles.Any(r => r.Id == _officerRoleId);
+        private bool CanManageApplications(SocketGuildUser user) =>
+    user.Roles.Any(r => _recruitmentTeamRoleIds.Contains(r.Id));
         private static string GetTextValue(SocketModal modal, string fieldId) =>
             modal.Data.Components
                 .FirstOrDefault(c => c.CustomId == fieldId)

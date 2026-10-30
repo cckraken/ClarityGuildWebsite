@@ -12,7 +12,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
         private readonly DiscordSocketClient _socketClient;
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
-        private const string UnknownErrorMsg = "Sorry, I couldn’t pass that on. Please contact an officer.";
+        private const string UnknownErrorMsg = "Sorry, I couldn’t pass that on. Please contact a member of the Recruitment Team.";
         public ApplicantMessagingService(ILogger<ApplicantMessagingService> logger, DiscordSocketClient socketClient, ApplicationDbContext context)
         {
             _logger = logger;
@@ -28,13 +28,13 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
             var channel = message.Channel;
 
-            // Route the reply to the application with the most recent activity: the last officer DM, or submission if never messaged
+            // Route the reply to the application with the most recent activity: the last recruitment team member DM, or submission if never messaged
             // Applicants can have several applications (re-applying after a decline), so "newest" alone could pick the wrong thread
             // Very unlikely scenario given the 3 month auto deletion, but worth covering
             var authorId = message.Author.Id.ToString();
             var application = await _context.GuildApplications
                 .Where(s => s.DiscordId == authorId && s.DiscordThreadId != null)
-                .OrderByDescending(s => s.LastOfficerMessagedUtc ?? s.TimestampUtc)
+                .OrderByDescending(s => s.LastRecruitmentTeamMessagedUtc ?? s.TimestampUtc)
                 .Select(s => new
                 {
                     s.DiscordThreadId

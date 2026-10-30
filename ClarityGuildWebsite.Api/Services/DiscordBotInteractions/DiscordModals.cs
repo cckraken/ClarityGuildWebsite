@@ -4,24 +4,24 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 {
     public static class DiscordModals
     {
-        public static Modal BuildOfficerMessage(Guid publicId, string discordName)
+        public static Modal BuildRecruitmentManagerMessage(Guid publicId, string discordName)
         {
             var input = new TextInputBuilder()
-                .WithCustomId(OfficerMessageModal.MessageFieldId)
+                .WithCustomId(RecruitmentTeamMessageModal.MessageFieldId)
                 .WithStyle(TextInputStyle.Paragraph)
                 .WithRequired(true)
-                .WithMaxLength(OfficerMessageModal.MessageMaxLength);
+                .WithMaxLength(RecruitmentTeamMessageModal.MessageMaxLength);
 
             return new ModalBuilder()
                 .WithTitle($"Message {discordName}")
-                .WithCustomId($"{OfficerMessageModal.Type}:{publicId}")
+                .WithCustomId($"{RecruitmentTeamMessageModal.Type}:{publicId}")
                 .AddLabel("Message", input)
                 .Build();
         }
 
         public static Modal BuildDeclineApplicant(Guid publicId, string discordName)
         {
-            var options = DeclineReasons.OfficerLabels
+            var options = DeclineReasons.RecruitmentTeamLabels
                 .Select(r => new SelectMenuOptionBuilder()
                     .WithLabel(r.Value)
                     .WithValue(r.Key))
@@ -74,7 +74,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 .Build();
         }
 
-        public static class OfficerMessageModal
+        public static class RecruitmentTeamMessageModal
         {
             public const string Type = "applicantMessageModal";
             public const string MessageFieldId = "message";
@@ -104,7 +104,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             public const string LowExperience = "low_experience";
             public const string Other = "other";
 
-            public static readonly IReadOnlyDictionary<string, string> OfficerLabels = new Dictionary<string, string>
+            public static readonly IReadOnlyDictionary<string, string> RecruitmentTeamLabels = new Dictionary<string, string>
             {
                 [ClassClosed] = "Class closed",
                 [LowExperience] = "Not enough experience",
@@ -113,7 +113,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
             public static readonly IReadOnlyDictionary<string, string> ApplicantText = new Dictionary<string, string>
             {
-                [ClassClosed] = "We're not recruiting your class at the moment.",
+                [ClassClosed] = "We're not recruiting your class at the moment. This may change in the future though, so do keep an eye on our website!",
                 [LowExperience] = "We're looking for a bit more current raiding experience at the moment.",
             };
         }
