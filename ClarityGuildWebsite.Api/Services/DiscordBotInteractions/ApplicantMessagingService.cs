@@ -1,4 +1,5 @@
 ﻿using ClarityGuildWebsite.Api.Data;
+using ClarityGuildWebsite.Api.Helpers;
 using Discord;
 using Discord.Net;
 using Discord.WebSocket;
@@ -27,16 +28,16 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
             var channel = message.Channel;
 
+            // Route the reply to the application with the most recent activity: the last officer DM, or submission if never messaged
+            // Applicants can have several applications (re-applying after a decline), so "newest" alone could pick the wrong thread
+            // Very unlikely scenario given the 3 month auto deletion, but worth covering
             var authorId = message.Author.Id.ToString();
             var application = await _context.GuildApplications
-                .AsNoTracking()
-                .Where(s => s.DiscordId == authorId && s.DiscordId != null)
-                .OrderByDescending(s => s.TimestampUtc)
+                .Where(s => s.DiscordId == authorId && s.DiscordThreadId != null)
+                .OrderByDescending(s => s.LastOfficerMessagedUtc ?? s.TimestampUtc)
                 .Select(s => new
                 {
-                    s.DiscordId,
-                    s.DiscordThreadId,
-                    s.DiscordName
+                    s.DiscordThreadId
                 })
                 .FirstOrDefaultAsync();
 
@@ -63,19 +64,12 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
             try
             {
-
-                var applicantDm = message.Content;
-                if (message.Attachments.Count > 0)
-                {
-                    applicantDm += "\n" + string.Join("\n", message.Attachments.Select(s => s.Url));
-                }
-
                 var embed = new EmbedBuilder()
                 {
                     Title = $"Message received from: {message.Author.Username}",
                     Color = Color.Blue,
-                    Description = applicantDm,
-                    ImageUrl = message.Attachments.FirstOrDefault()?.Url,
+                    Description = string.IsNullOrWhiteSpace(message.Content) ? "(sent attachments)" : message.Content,
+                    ImageUrl = message.Attachments.FirstOrDefault(a => a.ContentType?.StartsWith("image/") == true)?.Url,
                     Timestamp = message.Timestamp
                 }.Build();
 
@@ -89,6 +83,11 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 try
                 {
                     await threadChannel.SendMessageAsync(embed: embed, allowedMentions: AllowedMentions.None);
+                    foreach (var chunk in DiscordMessageChunker.ChunkLines(message.Attachments.Select(a => a.Url)))
+                    {
+                        await threadChannel.SendMessageAsync(chunk, allowedMentions: AllowedMentions.None);
+                    }
+                    
                     try
                     {
                         await message.AddReactionAsync(new Emoji("✅"));

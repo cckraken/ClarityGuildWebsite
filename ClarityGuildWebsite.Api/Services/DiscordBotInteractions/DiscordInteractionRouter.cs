@@ -198,6 +198,8 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 return;
             }
 
+            application.LastOfficerMessagedUtc = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
             var delivered = await TryDmApplicantAsync(application, $"**Message from the Clarity officers:**\n{text}\nReply in this DM and I'll send it to your application. If successfully sent, I'll react to the message.");
 
             await PostToThreadAsync(modal,
@@ -284,10 +286,10 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 return;
             }
 
+            var delivered = await TryDmApplicantAsync(application, BuildDeclineMessage(reason, note));
+            application.LastOfficerMessagedUtc = DateTime.UtcNow;
             application.Status = ApplicationStatus.Declined;
             await _context.SaveChangesAsync();
-
-            var delivered = await TryDmApplicantAsync(application, BuildDeclineMessage(reason, note));
 
             var record = new StringBuilder($"❌ Declined by {officer.DisplayName}: {DeclineReasons.OfficerLabels[reason]}");
             if (!string.IsNullOrWhiteSpace(note))

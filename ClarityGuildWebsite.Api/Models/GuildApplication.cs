@@ -61,6 +61,7 @@ namespace ClarityGuildWebsite.Api.Models
         [MaxLength(250)]
         public string? LastPostError { get; set; }
         public DateTime? LastAttemptedUtc { get; set; }
+        public DateTime? LastOfficerMessagedUtc { get; set; }
         public int Retry {  get; set; }
         public ApplicationStatus Status { get; set; }
         public PostStatus PostStatus { get; set; }

@@ -34,6 +34,26 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             await _socketClient.StartAsync();
         }
 
+        // Runs the work off Discord.Net's gateway task, so a slow handler can't delay other events.
+        private Task RunInBackground(string eventName, Func<IServiceProvider, Task> work)
+        {
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    using var scope = _scopeFactory.CreateScope();
+                    await work(scope.ServiceProvider);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "{Event} handler failed", eventName);
+                }
+            });
+
+            return Task.CompletedTask;
+        }
+
+
         public async Task StopAsync(CancellationToken ctoken)
         {
             _socketClient.ButtonExecuted -= OnButtonExecutedAsync;
@@ -45,47 +65,14 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             await _socketClient.LogoutAsync();
         }
 
-        private async Task OnButtonExecutedAsync(SocketMessageComponent component)
-        {
-            try
-            {
-                using var scope = _scopeFactory.CreateScope();
-                var router = scope.ServiceProvider.GetRequiredService<DiscordInteractionRouter>();
-                await router.HandleButtonInteractionAsync(component);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Button {CustomId} failed", component.Data.CustomId);
-            }
-        }
+        private Task OnButtonExecutedAsync(SocketMessageComponent component) =>
+                RunInBackground("Button", sp => sp.GetRequiredService<DiscordInteractionRouter>().HandleButtonInteractionAsync(component));
 
-        private async Task OnModalSubmittedAsync(SocketModal modal)
-        {
-            try
-            {
-                using var scope = _scopeFactory.CreateScope();
-                var router = scope.ServiceProvider.GetRequiredService<DiscordInteractionRouter>();
-                await router.HandleModalSubmittedAsync(modal);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Modal {CustomId} failed. Intended recipient does not share a server with you or is not accepting DMs", modal.Data.CustomId);
-            }
-        }
+        private Task OnModalSubmittedAsync(SocketModal modal) =>
+                RunInBackground("Modal", sp => sp.GetRequiredService<DiscordInteractionRouter>().HandleModalSubmittedAsync(modal));
 
-        private async Task OnApplicantMessageReceivedAsync(IMessage message)
-        {
-            try
-            {
-                using var scope = _scopeFactory.CreateScope();
-                var service = scope.ServiceProvider.GetRequiredService<IApplicantMessagingService>();
-                await service.HandleApplicantMessageAsync(message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occured when trying to send a message to an applicants thread.");
-            }
-        }
+        private Task OnApplicantMessageReceivedAsync(SocketMessage message) =>
+                RunInBackground("DM", sp => sp.GetRequiredService<IApplicantMessagingService>().HandleApplicantMessageAsync(message));
 
         private Task OnLogAsync(LogMessage msg)
         {

@@ -50,22 +50,35 @@ namespace ClarityGuildWebsite.Api.Services
                 try
                 {
                     var threadName = $"New Application - {application.MainName}";
-                        thread = await textChannel.CreateThreadAsync(
-                        name: threadName, message: message,
-                        options: options,
-                        autoArchiveDuration: ThreadArchiveDuration.OneWeek);
+                    thread = await textChannel.CreateThreadAsync(
+                    name: threadName, message: message,
+                    options: options,
+                    autoArchiveDuration: ThreadArchiveDuration.OneWeek);
                     _logger.LogInformation("Thread {ThreadId} created for {PublicId}", thread.Id, application.PublicId);
-                    var components = BuildApplicationButtons();
-                    await thread.SendMessageAsync(
-                        components: components.Build());
-                    await NotifyOfficersAsync(thread, options);
+
                 }
                 catch (Exception ex)
                 {
                     _logger.LogWarning(ex, "Posted {PublicId} but failed to create its thread", application.PublicId);
                 }
 
+                if (thread is not null)
+                {
+                    try
+                    {
+                        var components = BuildApplicationButtons();
+                        await thread.SendMessageAsync(options: options,
+                            components: components.Build());
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Buttons not posted in thread {ThreadId} for {PublicId}", thread.Id, application.PublicId);
+                    }
+
+                    await NotifyOfficersAsync(thread, options);
+                }
                 return NotificationResult.Delivered(message.Id.ToString(), thread?.Id.ToString());
+
             }
             catch (HttpRequestException ex)
             {

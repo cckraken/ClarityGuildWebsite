@@ -85,6 +85,9 @@ namespace ClarityGuildWebsite.Api.Migrations
                     b.Property<DateTime?>("LastAttemptedUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("LastOfficerMessagedUtc")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("LastPostError")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
