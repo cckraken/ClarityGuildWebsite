@@ -1,4 +1,6 @@
-﻿namespace ClarityGuildWebsite.Api.Services
+﻿using System.Net.NetworkInformation;
+
+namespace ClarityGuildWebsite.Api.Services
 {
     public record NotificationResult(bool Success, string? MessageId, string? ThreadId, string? Error)
     {
@@ -7,5 +9,8 @@
 
         public static NotificationResult Failed(string error) =>
             new(false, null, null, error);
+
+        public static NotificationResult MessageSent(string discordId, string? threadId) =>
+            new(true, discordId, threadId, null);
     }
 }

@@ -89,6 +89,9 @@ namespace ClarityGuildWebsite.Api.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<DateTime?>("LastRecruitmentTeamMessagedUtc")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("MainName")
                         .IsRequired()
                         .HasMaxLength(50)

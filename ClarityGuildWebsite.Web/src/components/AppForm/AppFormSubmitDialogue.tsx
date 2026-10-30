@@ -1,12 +1,15 @@
 import { Description, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
-import { dialogClass, textBodyFullClass, appFormButtonClass, fieldTitleClass } from '../styles/applicationClasses';
+import { dialogClass, textBodyFullClass, appFormButtonClass, fieldTitleClass, fieldHintClass } from '../styles/applicationClasses';
+import { DiscordContactNotice } from '../DiscordContactNotice';
 
-type Props = { status: "success" | "error" | "serverError" | "signInTimeOut" | "errorTooManyRequests" | null; submissionDate: string | null; onClose: () => void };
-const content = {
+type Status = "success" | "error" | "serverError" | "signInTimeOut" | "errorTooManyRequests";
+type Props = { status: Status | null; submissionDate: string | null; onClose: () => void };
+type DialogContent = { title: string; message: string; disclaimer?: string };
+
+const content: Record<Status, DialogContent> = {
   success: {
-    title: "Application submitted",
-    message: "We will review your application as soon as possible. If you don't hear from us within a few days, please assume it has been declined.",
-    disclaimer: "In the near future we will have functionality for tracking the status of your application. In the meantime, please contact cckraken17 on Discord with any questions."
+    title: "Application submitted!",
+    message: "We will review your application as soon as possible."
   },
   error: {
     title: "Something went wrong",
@@ -37,17 +40,22 @@ const current = status ? content[status] : null;
       <Dialog open={status !== null} onClose={onClose} className="relative z-50">
        <div className="fixed inset-0 bg-black/70" aria-hidden="true"/>
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogPanel className={`w-full max-w-md ${dialogClass}`}>
+          <DialogPanel className={`w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto ${dialogClass}`}>
             <DialogTitle className={fieldTitleClass}>{current?.title}</DialogTitle>
             <Description className={textBodyFullClass}>{current?.message}</Description>
             {current?.disclaimer && <Description className={textBodyFullClass}>{current?.disclaimer}</Description>}
             {status === "success" && submissionDate && (
-              <Description className={textBodyFullClass}> {`Submitted: ${new Date(submissionDate).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })}`}</Description>
+              <Description className={fieldHintClass}>
+                {`Submitted: ${new Date(submissionDate).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })}`}
+              </Description>
             )}
-            <div className="flex gap-4">
-               <button onClick={onClose} className={appFormButtonClass}
-               type="button"
-               >Finish</button>
+            {status === "success" && (
+              <DiscordContactNotice inviteUrl={import.meta.env.VITE_DISCORD_INVITE_URL} />
+            )}
+            <div className="flex justify-end pt-2">
+              <button onClick={onClose} className={`w-full sm:w-auto ${appFormButtonClass}`} type="button">
+                Finish
+              </button>
             </div>
           </DialogPanel>
         </div>

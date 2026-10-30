@@ -1,37 +1,38 @@
 ﻿using Discord;
+using Discord.Net.Rest;
 using Discord.Rest;
+using Discord.WebSocket;
 
 namespace ClarityGuildWebsite.Api.Services
 {
     public sealed class DiscordBotConnectionService
     {
-        private readonly DiscordRestClient _client;
+        private readonly DiscordRestClient _restClient;
         private readonly string _token;
         private readonly SemaphoreSlim _loginLock = new(1, 1);
 
-        public DiscordBotConnectionService(DiscordRestClient client, IConfiguration config)
+        public DiscordBotConnectionService(DiscordRestClient restClient, IConfiguration config)
         {
-            _client = client;
-
+            _restClient = restClient;
             _token = config.GetValue<string>("Discord:BotToken") ?? throw new InvalidOperationException("Discord token is not configured/provided");
         }
 
-        public async Task<DiscordRestClient> GetClientAsync()
+        public async Task<DiscordRestClient> GetClientAsync(CancellationToken ctoken = default)
         {
-            if (_client.LoginState == LoginState.LoggedIn)
-                return _client;
+            if (_restClient.LoginState == LoginState.LoggedIn)
+                return _restClient;
 
-            await _loginLock.WaitAsync();
+            await _loginLock.WaitAsync(ctoken);
             try
             {
-                if (_client.LoginState != LoginState.LoggedIn)
-                    await _client.LoginAsync(TokenType.Bot, _token);
+                if (_restClient.LoginState != LoginState.LoggedIn)
+                    await _restClient.LoginAsync(TokenType.Bot, _token);
             }
             finally
             {
                 _loginLock.Release();
             }
-            return _client;
+            return _restClient;
         }
     }
 }

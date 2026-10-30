@@ -1,7 +1,9 @@
 using ClarityGuildWebsite.Api.Data;
 using ClarityGuildWebsite.Api.Middleware;
 using ClarityGuildWebsite.Api.Services;
+using ClarityGuildWebsite.Api.Services.DiscordBotInteractions;
 using Discord.Rest;
+using Discord.WebSocket;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
@@ -37,7 +39,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.ClientId = discordClientId;
         options.ClientSecret = discordClientSecret;
-        options.Scope.Add("guilds.members.read");
     });
 
 builder.Services.AddHostedService<DiscordRetryWorker>();
@@ -73,8 +74,18 @@ var notifierMode = builder.Configuration["Discord:NotifierMode"]
     ?? throw new InvalidOperationException("Discord:NotifierMode is not configured.");
 if (notifierMode == "Bot")
 {
+    builder.Services.AddSingleton(_ => new DiscordSocketClient(new DiscordSocketConfig
+    {
+        ConnectionTimeout = 15000,
+        GatewayIntents = Discord.GatewayIntents.Guilds | Discord.GatewayIntents.DirectMessages,
+        UseInteractionSnowflakeDate = false
+    }));
+
     builder.Services.AddSingleton<DiscordRestClient>();
     builder.Services.AddSingleton<DiscordBotConnectionService>();
+    builder.Services.AddHostedService<DiscordGatewayService>();
+    builder.Services.AddScoped<DiscordInteractionRouter>();
+    builder.Services.AddScoped<IApplicantMessagingService, ApplicantMessagingService>();
     builder.Services.AddScoped<IApplicationNotifier, DiscordBotNotifier>();
 }
 else if (notifierMode == "Webhook")

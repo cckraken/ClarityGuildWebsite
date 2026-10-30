@@ -13,4 +13,5 @@ export const dataTableClass = `${textBodyFullClass} grid grid-cols-[auto_1fr] ga
 export const dialogClass = "flex flex-col gap-2 rounded-3xl border-3 border-clarity-blue/60 bg-background p-6 shadow-lg";
 export const footerContainerClass = "flex flex-wrap justify-center gap-3 border-t border-clarity-blue/20 pt-2 mt-8";
 export const footerItemClass = "text-titles/60";
-export const footerLinkClass = `${footerItemClass} hover:text-titles underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-clarity-blue outline-offset-2`;
+export const textLinkClass = "rounded-sm font-medium text-clarity-blue underline underline-offset-2 hover:text-titles focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clarity-blue";
+export const footerLinkClass =`${footerItemClass} hover:text-titles underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-clarity-blue outline-offset-2`;

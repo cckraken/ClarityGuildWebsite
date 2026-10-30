@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Newtonsoft.Json.Linq;
-
-namespace ClarityGuildWebsite.Api.Helpers
+﻿namespace ClarityGuildWebsite.Api.Helpers
 {
     public static class ApplicationHelpers
     {
