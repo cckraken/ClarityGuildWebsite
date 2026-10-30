@@ -200,8 +200,8 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             }
 
             application.LastRecruitmentTeamMessagedUtc = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
             var delivered = await TryDmApplicantAsync(application, $"**Message from the Clarity Recruitment Team:**\n{text}\nReply in this DM and I'll send it to your application. If successfully sent, I'll react to the message.");
+            await _context.SaveChangesAsync();
 
             await PostToThreadAsync(modal,
                 $"✉️ {manager.DisplayName} messaged the applicant{(delivered ? "" : " (DM failed)")}:\n{text}");

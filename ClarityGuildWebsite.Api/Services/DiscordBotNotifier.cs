@@ -20,9 +20,9 @@ namespace ClarityGuildWebsite.Api.Services
         {
             _connection = connection;
             _logger = logger;
-            _channelId = config.GetValue<ulong>("Discord:RecruitmentTeamRoleIds");
+            _channelId = config.GetValue<ulong>("Discord:ApplicationsChannelId");
             if (_channelId == 0)
-                throw new InvalidOperationException("Discord:RecruitmentTeamRoleIds is missing or invalid.");
+                throw new InvalidOperationException("Discord:ApplicationsChannelId is missing or invalid.");
             _recruitmentTeamRoleIds = config.GetSection("Discord:RecruitmentTeamRoleIds").Get<ulong[]>()
     ?? throw new InvalidOperationException("Discord:RecruitmentTeamRoleIds is not configured.");
             if (_recruitmentTeamRoleIds.Length == 0)

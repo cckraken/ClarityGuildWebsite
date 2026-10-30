@@ -17,7 +17,7 @@ namespace ClarityGuildWebsite.Api.Helpers
                     chunks.Add(current.ToString());
                     current.Clear();
                 }
-                current.AppendLine(line).Append('\n');
+                current.Append(line).Append('\n');
             }
 
             if (current.Length > 0) chunks.Add(current.ToString());
