@@ -20,13 +20,13 @@ namespace ClarityGuildWebsite.Api.Services
         {
             _connection = connection;
             _logger = logger;
-            _channelId = config.GetValue<ulong>("Discord:ApplicationsChannelId");
+            _channelId = config.GetValue<ulong>("Discord:RecruitmentTeamRoleIds");
             if (_channelId == 0)
-                throw new InvalidOperationException("Discord:ApplicationsChannelId is missing or invalid.");
-            _recruitmentTeamRoleIds = config.GetSection("Discord:ApplicationManagerRoleIds").Get<ulong[]>()
-    ?? throw new InvalidOperationException("Discord:ApplicationManagerRoleIds is not configured.");
+                throw new InvalidOperationException("Discord:RecruitmentTeamRoleIds is missing or invalid.");
+            _recruitmentTeamRoleIds = config.GetSection("Discord:RecruitmentTeamRoleIds").Get<ulong[]>()
+    ?? throw new InvalidOperationException("Discord:RecruitmentTeamRoleIds is not configured.");
             if (_recruitmentTeamRoleIds.Length == 0)
-                throw new InvalidOperationException("Discord:ApplicationManagerRoleIds must contain at least one role ID.");
+                throw new InvalidOperationException("Discord:RecruitmentTeamRoleIds must contain at least one role ID.");
         }
 
         public async Task<NotificationResult> PostAndRecordAsync(GuildApplication application, CancellationToken ctoken)
