@@ -200,8 +200,9 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             }
 
             application.LastRecruitmentTeamMessagedUtc = DateTime.UtcNow;
-            var delivered = await TryDmApplicantAsync(application, $"**Message from the Clarity Recruitment Team:**\n{text}\nReply in this DM and I'll send it to your application. If successfully sent, I'll react to the message.");
             await _context.SaveChangesAsync();
+
+            var delivered = await TryDmApplicantAsync(application, $"**Message from the Clarity Recruitment Team:**\n{text}\nReply in this DM and I'll send it to your application. If successfully sent, I'll react to the message.");
 
             await PostToThreadAsync(modal,
                 $"✉️ {manager.DisplayName} messaged the applicant{(delivered ? "" : " (DM failed)")}:\n{text}");
@@ -287,10 +288,11 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 return;
             }
 
-            var delivered = await TryDmApplicantAsync(application, BuildDeclineMessage(reason, note));
             application.LastRecruitmentTeamMessagedUtc = DateTime.UtcNow;
             application.Status = ApplicationStatus.Declined;
             await _context.SaveChangesAsync();
+
+            var delivered = await TryDmApplicantAsync(application, BuildDeclineMessage(reason, note));
 
             var record = new StringBuilder($"❌ Declined by {manager.DisplayName}: {DeclineReasons.RecruitmentTeamLabels[reason]}");
             if (!string.IsNullOrWhiteSpace(note))
