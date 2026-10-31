@@ -2,6 +2,7 @@
 using ClarityGuildWebsite.Api.Models;
 using ClarityGuildWebsite.Api.Services.DiscordBotInteractions;
 using Discord;
+using static DiscordModalNameHelpers;
 
 namespace ClarityGuildWebsite.Api.Services
 {
@@ -47,7 +48,7 @@ namespace ClarityGuildWebsite.Api.Services
                 IThreadChannel? thread = null;
                 try
                 {
-                    var threadName = $"New Application - {application.MainName}";
+                    var threadName = $"{DiscordNames.ApplicationThreadPrefix}{application.MainName}";
                     thread = await textChannel.CreateThreadAsync(
                     name: threadName, message: message,
                     options: options,

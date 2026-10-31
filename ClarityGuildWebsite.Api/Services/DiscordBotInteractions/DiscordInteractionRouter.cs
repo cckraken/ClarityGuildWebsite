@@ -1,4 +1,5 @@
 ﻿using ClarityGuildWebsite.Api.Data;
+using ClarityGuildWebsite.Api.Helpers;
 using ClarityGuildWebsite.Api.Models;
 using Discord;
 using Discord.Net;
@@ -6,6 +7,7 @@ using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using static ClarityGuildWebsite.Api.Services.DiscordBotInteractions.DiscordModals;
+using static DiscordModalNameHelpers;
 
 namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 {
@@ -39,8 +41,6 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             _defaultWelcomeChannelIds = config.GetSection("Discord:DefaultWelcomeChannelIds").Get<ulong[]>()
                  ?? throw new InvalidOperationException("Discord:DefaultWelcomeChannelIds is not configured.");
 
-
-
             _context = context;
             _socketClient = socketClient;
             _logger = logger;
@@ -71,21 +71,21 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
         {
             var threadId = await GetThreadForRecruitmentManagerButtonAsync(component);
             if (threadId is null) return;
-            await component.RespondWithModalAsync(DiscordModals.BuildRecruitmentManagerMessage(threadId.Value));
+            await component.RespondWithModalAsync(DiscordModals.BuildRecruitmentManagerMessage(threadId.Value, DiscordNameTitle(component, "Message")));
         }
 
         private async Task OpenDeclineModalAsync(SocketMessageComponent component)
         {
             var threadId = await GetThreadForRecruitmentManagerButtonAsync(component);
             if (threadId is null) return;
-            await component.RespondWithModalAsync(DiscordModals.BuildDeclineApplicant(threadId.Value));
+            await component.RespondWithModalAsync(DiscordModals.BuildDeclineApplicant(threadId.Value, DiscordNameTitle(component, "Decline")));
         }
 
         private async Task OpenAcceptModalAsync(SocketMessageComponent component)
         {
             var threadId = await GetThreadForRecruitmentManagerButtonAsync(component);
             if (threadId is null) return;
-            await component.RespondWithModalAsync(DiscordModals.BuildAcceptApplicant(threadId.Value));
+            await component.RespondWithModalAsync(DiscordModals.BuildAcceptApplicant(threadId.Value, DiscordNameTitle(component, "Accept")));
         }
 
         private async Task<ulong?> GetThreadForRecruitmentManagerButtonAsync(SocketMessageComponent component)
@@ -133,7 +133,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                     .SingleOrDefaultAsync(a => a.DiscordThreadId == threadIdText);
                 if (application is null)
                 {
-                    _logger.LogWarning("Modal submitted for missing application {threadId}", threadId);
+                    _logger.LogWarning("Modal submitted for missing application {ThreadId}", threadId);
                     await modal.FollowupAsync("Couldn't find this application. It may have been deleted.", ephemeral: true);
                     return;
                 }

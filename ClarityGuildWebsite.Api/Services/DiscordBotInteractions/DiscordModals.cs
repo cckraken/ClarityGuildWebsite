@@ -4,7 +4,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 {
     public static class DiscordModals
     {
-        public static Modal BuildRecruitmentManagerMessage(ulong threadId)
+        public static Modal BuildRecruitmentManagerMessage(ulong threadId, string title)
         {
             var input = new TextInputBuilder()
                 .WithCustomId(RecruitmentTeamMessageModal.MessageFieldId)
@@ -13,13 +13,13 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 .WithMaxLength(RecruitmentTeamMessageModal.MessageMaxLength);
 
             return new ModalBuilder()
-                .WithTitle("Message Applicant")
+                .WithTitle(title)
                 .WithCustomId($"{RecruitmentTeamMessageModal.Type}:{threadId}")
                 .AddLabel("Message", input)
                 .Build();
         }
 
-        public static Modal BuildDeclineApplicant(ulong threadId)
+        public static Modal BuildDeclineApplicant(ulong threadId, string title)
         {
             var options = DeclineReasons.RecruitmentTeamLabels
                 .Select(r => new SelectMenuOptionBuilder()
@@ -34,7 +34,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 .WithMaxLength(DeclineModal.NoteMaxLength);
 
             return new ModalBuilder()
-                .WithTitle("Decline Applicant")
+                .WithTitle(title)
                 .WithCustomId($"{DeclineModal.Type}:{threadId}")
                 .AddSelectMenu(
                     label: "Reason",
@@ -48,7 +48,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 .Build();
         }
 
-        public static Modal BuildAcceptApplicant(ulong threadId)
+        public static Modal BuildAcceptApplicant(ulong threadId, string title)
         {
 
             var note = new TextInputBuilder()
@@ -59,7 +59,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 .WithMaxLength(AcceptModal.MessageMaxLength);
 
             return new ModalBuilder()
-                .WithTitle("Accept Applicant")
+                .WithTitle(title)
                 .WithCustomId($"{AcceptModal.Type}:{threadId}")
                 .AddLabel("Welcome message", note)
                 .AddSelectMenu(
