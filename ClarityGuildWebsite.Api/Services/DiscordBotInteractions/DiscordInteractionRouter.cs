@@ -6,7 +6,6 @@ using Discord.Net;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
-using ClarityGuildWebsite.Api.Services.DiscordBotInteractions;
 using static ClarityGuildWebsite.Api.Services.DiscordBotInteractions.DiscordModals;
 
 
@@ -70,25 +69,25 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
         private async Task OpenRecruitmentManagerMessageModalAsync(SocketMessageComponent component)
         {
-            var title = DiscordModalNameHelpers.BuildModalTitle(component, "Message");
             var threadId = await GetThreadForRecruitmentManagerButtonAsync(component);
             if (threadId is null) return;
+            var title = DiscordModalNameHelpers.BuildModalTitle(component, "Message");
             await component.RespondWithModalAsync(DiscordModals.BuildRecruitmentManagerMessage(threadId.Value, title));
         }
 
         private async Task OpenDeclineModalAsync(SocketMessageComponent component)
         {
-            var title = DiscordModalNameHelpers.BuildModalTitle(component, "Decline");
             var threadId = await GetThreadForRecruitmentManagerButtonAsync(component);
             if (threadId is null) return;
+            var title = DiscordModalNameHelpers.BuildModalTitle(component, "Decline");
             await component.RespondWithModalAsync(DiscordModals.BuildDeclineApplicant(threadId.Value, title));
         }
 
         private async Task OpenAcceptModalAsync(SocketMessageComponent component)
         {
-            var title = DiscordModalNameHelpers.BuildModalTitle(component, "Accept");
             var threadId = await GetThreadForRecruitmentManagerButtonAsync(component);
             if (threadId is null) return;
+            var title = DiscordModalNameHelpers.BuildModalTitle(component, "Accept");
             await component.RespondWithModalAsync(DiscordModals.BuildAcceptApplicant(threadId.Value, title));
         }
 
