@@ -185,7 +185,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             await modal.FollowupAsync(delivered ? "Message sent." : CouldNotDmMessage, ephemeral: true);
         }
 
-        private async Task AcceptAsync(SocketModal modal, SocketGuildUser officer, GuildApplication application)
+        private async Task AcceptAsync(SocketModal modal, SocketGuildUser manager, GuildApplication application)
         {
             if (!ulong.TryParse(application.DiscordId, out var memberId))
             {
@@ -223,7 +223,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 .Replace("{member}", $"<@{application.DiscordId}>")
                 .Replace("{channels}", mentions);
 
-            var roleAdded = await ApplyTrialRoles(modal, officer, memberId);
+            var roleAdded = await ApplyTrialRoles(modal, manager, memberId);
             var welcomed = await PostWelcomeToRaiderChatAsync(modal, text, memberId);
 
             var problems = new List<String>();
@@ -234,7 +234,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 ? "Application accepted: trial role added and welcome posted."
                 : $"Application accepted, but {string.Join(" and ", problems)}.";
 
-            await PostToThreadAsync(modal, $"✅ Accepted by {officer.DisplayName}. {summary}");
+            await PostToThreadAsync(modal, $"✅ Accepted by {manager.DisplayName}. {summary}");
             await modal.FollowupAsync(summary, ephemeral: true);
         }
 
@@ -357,16 +357,16 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to post welcome for applicant with Modal: {Modal.Data.CustomId}", modal.Data.CustomId);
+                _logger.LogError(ex, "Failed to post welcome for applicant with Modal: {CustomId}", modal.Data.CustomId);
                 return false;
             }
         }
 
-        private async Task<bool> ApplyTrialRoles(SocketModal modal, SocketGuildUser officer, ulong memberId)
+        private async Task<bool> ApplyTrialRoles(SocketModal modal, SocketGuildUser manager, ulong memberId)
         {
             try
             {
-                await _socketClient.Rest.AddRoleAsync(officer.Guild.Id, memberId, _trialRoleId);
+                await _socketClient.Rest.AddRoleAsync(manager.Guild.Id, memberId, _trialRoleId);
                 return true;
             }
             catch (HttpException ex) when (ex.DiscordCode is DiscordErrorCode.MissingPermissions or DiscordErrorCode.InsufficientPermissions)
