@@ -1,7 +1,6 @@
 ﻿using ClarityGuildWebsite.Api.Data;
 using ClarityGuildWebsite.Api.Helpers;
 using ClarityGuildWebsite.Api.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace ClarityGuildWebsite.Api.Services
 {

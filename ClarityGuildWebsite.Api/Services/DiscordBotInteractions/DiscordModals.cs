@@ -13,7 +13,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 .WithMaxLength(RecruitmentTeamMessageModal.MessageMaxLength);
 
             return new ModalBuilder()
-                .WithTitle($"Message Applicant")
+                .WithTitle("Message Applicant")
                 .WithCustomId($"{RecruitmentTeamMessageModal.Type}:{threadId}")
                 .AddLabel("Message", input)
                 .Build();
@@ -34,7 +34,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 .WithMaxLength(DeclineModal.NoteMaxLength);
 
             return new ModalBuilder()
-                .WithTitle($"Decline Applicant")
+                .WithTitle("Decline Applicant")
                 .WithCustomId($"{DeclineModal.Type}:{threadId}")
                 .AddSelectMenu(
                     label: "Reason",
@@ -59,7 +59,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 .WithMaxLength(AcceptModal.MessageMaxLength);
 
             return new ModalBuilder()
-                .WithTitle($"Accept Applicant")
+                .WithTitle("Accept Applicant")
                 .WithCustomId($"{AcceptModal.Type}:{threadId}")
                 .AddLabel("Welcome message", note)
                 .AddSelectMenu(

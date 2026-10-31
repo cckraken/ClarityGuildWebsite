@@ -100,11 +100,11 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             if (component.ChannelId is not ulong threadId)
             {
                 _logger.LogWarning("Button {CustomId} clicked outside a channel", component.Data.CustomId);
-                await component.RespondAsync("Button clicked outside a channel", ephemeral: true);
+                await component.RespondAsync("This button only works inside an application thread.", ephemeral: true);
                 return null;
             }
 
-            return component.ChannelId;
+            return threadId;
         }
 
         public async Task HandleModalSubmittedAsync(SocketModal modal)
@@ -121,18 +121,19 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 }
 
                 var parts = modal.Data.CustomId.Split(':', 2);
-                if (parts.Length < 2 || !Guid.TryParse(parts[1], out var publicId))
+                if (parts.Length < 2 || !ulong.TryParse(parts[1], out var threadId))
                 {
                     _logger.LogWarning("Modal had an invalid custom ID {CustomId}", modal.Data.CustomId);
                     await modal.FollowupAsync("Something went wrong with this form. Please try again.", ephemeral: true);
                     return;
                 }
 
+                var threadIdText = threadId.ToString();
                 var application = await _context.GuildApplications
-                    .SingleOrDefaultAsync(a => a.PublicId == publicId);
+                    .SingleOrDefaultAsync(a => a.DiscordThreadId == threadIdText);
                 if (application is null)
                 {
-                    _logger.LogWarning("Modal submitted for missing application {PublicId}", publicId);
+                    _logger.LogWarning("Modal submitted for missing application {threadId}", threadId);
                     await modal.FollowupAsync("Couldn't find this application. It may have been deleted.", ephemeral: true);
                     return;
                 }
@@ -301,18 +302,18 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
         private async Task<bool> TryDmApplicantAsync(GuildApplication application, string text)
         {
-                if (!ulong.TryParse(application.DiscordId, out var discordId))
-                {
-                    _logger.LogWarning("Application {PublicId} has an invalid Discord ID", application.PublicId);
-                    return false;
-                }
+            if (!ulong.TryParse(application.DiscordId, out var discordId))
+            {
+                _logger.LogWarning("Application {PublicId} has an invalid Discord ID", application.PublicId);
+                return false;
+            }
 
-                var user = await _socketClient.GetUserAsync(discordId);
-                if (user is null)
-                {
-                    _logger.LogWarning("Discord user for application {PublicId} not found", application.PublicId);
-                    return false;
-                }
+            var user = await _socketClient.GetUserAsync(discordId);
+            if (user is null)
+            {
+                _logger.LogWarning("Discord user for application {PublicId} not found", application.PublicId);
+                return false;
+            }
             try
             {
                 var dm = await user.CreateDMChannelAsync();
@@ -328,7 +329,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
         private async Task<bool> PostWelcomeToRaiderChatAsync(SocketModal modal, string text, ulong mentionUser)
         {
-            var channel =  await _socketClient.GetChannelAsync(_raidersChatId) as IMessageChannel;
+            var channel = await _socketClient.GetChannelAsync(_raidersChatId) as IMessageChannel;
             if (channel is null)
             {
                 _logger.LogWarning("Couldn't post welcome message for {CustomId}: channel not available", modal.Data.CustomId);
@@ -337,7 +338,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
             try
             {
-                await channel.SendMessageAsync(text, allowedMentions: new AllowedMentions { UserIds = new List<ulong> { mentionUser} });
+                await channel.SendMessageAsync(text, allowedMentions: new AllowedMentions { UserIds = new List<ulong> { mentionUser } });
                 return true;
             }
             catch (HttpException ex) when (ex.DiscordCode is DiscordErrorCode.MissingPermissions or DiscordErrorCode.InsufficientPermissions)
