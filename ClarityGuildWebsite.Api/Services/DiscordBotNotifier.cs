@@ -64,9 +64,8 @@ namespace ClarityGuildWebsite.Api.Services
                 {
                     try
                     {
-                        var components = BuildApplicationButtons();
                         await thread.SendMessageAsync(options: options,
-                            components: components.Build());
+                            components: DiscordButtons.BuildApplicationButtons());
                     }
                     catch (Exception ex)
                     {
@@ -99,6 +98,8 @@ namespace ClarityGuildWebsite.Api.Services
                 return NotificationResult.Failed("Error posting application to Discord");
             }
         }
+
+
 
         private async Task NotifyRecruitmentTeamAsync(IThreadChannel thread, RequestOptions options)
         {
@@ -149,11 +150,5 @@ namespace ClarityGuildWebsite.Api.Services
 
             return embed.Build();
         }
-
-        private static ComponentBuilder BuildApplicationButtons() =>
-         new ComponentBuilder()
-        .WithButton("Message Applicant", DiscordCustomIds.MessageApplicantButton, ButtonStyle.Primary, row: 0)
-        .WithButton("Accept", DiscordCustomIds.AcceptButton, ButtonStyle.Success, row: 1)
-        .WithButton("Decline", DiscordCustomIds.DeclineButton, ButtonStyle.Danger, row: 1);
     }
 }
