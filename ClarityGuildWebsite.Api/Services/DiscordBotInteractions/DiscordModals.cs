@@ -4,7 +4,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 {
     public static class DiscordModals
     {
-        public static Modal BuildRecruitmentManagerMessage(Guid publicId, string discordName)
+        public static Modal BuildRecruitmentManagerMessage(ulong threadId)
         {
             var input = new TextInputBuilder()
                 .WithCustomId(RecruitmentTeamMessageModal.MessageFieldId)
@@ -13,13 +13,13 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 .WithMaxLength(RecruitmentTeamMessageModal.MessageMaxLength);
 
             return new ModalBuilder()
-                .WithTitle($"Message {discordName}")
-                .WithCustomId($"{RecruitmentTeamMessageModal.Type}:{publicId}")
+                .WithTitle($"Message Applicant")
+                .WithCustomId($"{RecruitmentTeamMessageModal.Type}:{threadId}")
                 .AddLabel("Message", input)
                 .Build();
         }
 
-        public static Modal BuildDeclineApplicant(Guid publicId, string discordName)
+        public static Modal BuildDeclineApplicant(ulong threadId)
         {
             var options = DeclineReasons.RecruitmentTeamLabels
                 .Select(r => new SelectMenuOptionBuilder()
@@ -34,8 +34,8 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 .WithMaxLength(DeclineModal.NoteMaxLength);
 
             return new ModalBuilder()
-                .WithTitle($"Decline {discordName}")
-                .WithCustomId($"{DeclineModal.Type}:{publicId}")
+                .WithTitle($"Decline Applicant")
+                .WithCustomId($"{DeclineModal.Type}:{threadId}")
                 .AddSelectMenu(
                     label: "Reason",
                     customId: DeclineModal.ReasonFieldId,
@@ -48,7 +48,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 .Build();
         }
 
-        public static Modal BuildAcceptApplicant(Guid publicId, string discordName)
+        public static Modal BuildAcceptApplicant(ulong threadId)
         {
 
             var note = new TextInputBuilder()
@@ -59,8 +59,8 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 .WithMaxLength(AcceptModal.MessageMaxLength);
 
             return new ModalBuilder()
-                .WithTitle($"Accept {discordName}")
-                .WithCustomId($"{AcceptModal.Type}:{publicId}")
+                .WithTitle($"Accept Applicant")
+                .WithCustomId($"{AcceptModal.Type}:{threadId}")
                 .AddLabel("Welcome message", note)
                 .AddSelectMenu(
             label: "Channels to highlight",

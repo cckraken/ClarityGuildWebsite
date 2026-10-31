@@ -69,47 +69,26 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
         private async Task OpenRecruitmentManagerMessageModalAsync(SocketMessageComponent component)
         {
-            var application = await GetApplicationForRecruitmentManagerButtonAsync(component);
-            if (application is null)
-                return;
-
-            await component.RespondWithModalAsync(
-                DiscordModals.BuildRecruitmentManagerMessage(application.PublicId, application.DiscordName));
+            var threadId = await GetThreadForRecruitmentManagerButtonAsync(component);
+            if (threadId is null) return;
+            await component.RespondWithModalAsync(DiscordModals.BuildRecruitmentManagerMessage(threadId.Value));
         }
 
         private async Task OpenDeclineModalAsync(SocketMessageComponent component)
         {
-            var application = await GetApplicationForRecruitmentManagerButtonAsync(component);
-            if (application is null)
-                return;
-
-            if (application.Status == ApplicationStatus.Declined)
-            {
-                await component.RespondAsync("This application has already been declined.", ephemeral: true);
-                return;
-            }
-
-            await component.RespondWithModalAsync(
-                DiscordModals.BuildDeclineApplicant(application.PublicId, application.DiscordName));
+            var threadId = await GetThreadForRecruitmentManagerButtonAsync(component);
+            if (threadId is null) return;
+            await component.RespondWithModalAsync(DiscordModals.BuildDeclineApplicant(threadId.Value));
         }
 
         private async Task OpenAcceptModalAsync(SocketMessageComponent component)
         {
-            var application = await GetApplicationForRecruitmentManagerButtonAsync(component);
-            if (application is null)
-                return;
-
-            if (application.Status == ApplicationStatus.Accepted)
-            {
-                await component.RespondAsync("This application has already been accepted", ephemeral: true);
-                return;
-            }
-
-            await component.RespondWithModalAsync(
-                DiscordModals.BuildAcceptApplicant(application.PublicId, application.DiscordName));
+            var threadId = await GetThreadForRecruitmentManagerButtonAsync(component);
+            if (threadId is null) return;
+            await component.RespondWithModalAsync(DiscordModals.BuildAcceptApplicant(threadId.Value));
         }
 
-        private async Task<GuildApplication?> GetApplicationForRecruitmentManagerButtonAsync(SocketMessageComponent component)
+        private async Task<ulong?> GetThreadForRecruitmentManagerButtonAsync(SocketMessageComponent component)
         {
             if (component.User is not SocketGuildUser manager || !CanManageApplications(manager))
             {
@@ -118,21 +97,14 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 return null;
             }
 
-            var threadId = component.ChannelId?.ToString();
-            var application = threadId is null
-                ? null
-                : await _context.GuildApplications
-                    .AsNoTracking()
-                    .SingleOrDefaultAsync(a => a.DiscordThreadId == threadId);
-
-            if (application is null)
+            if (component.ChannelId is not ulong threadId)
             {
-                _logger.LogWarning("No application found for thread {ThreadId}", threadId);
-                await component.RespondAsync("Couldn't find the application for this thread. It may have been deleted.", ephemeral: true);
+                _logger.LogWarning("Button {CustomId} clicked outside a channel", component.Data.CustomId);
+                await component.RespondAsync("Button clicked outside a channel", ephemeral: true);
                 return null;
             }
 
-            return application;
+            return component.ChannelId;
         }
 
         public async Task HandleModalSubmittedAsync(SocketModal modal)
@@ -329,19 +301,18 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
         private async Task<bool> TryDmApplicantAsync(GuildApplication application, string text)
         {
-            if (!ulong.TryParse(application.DiscordId, out var discordId))
-            {
-                _logger.LogWarning("Application {PublicId} has an invalid Discord ID", application.PublicId);
-                return false;
-            }
+                if (!ulong.TryParse(application.DiscordId, out var discordId))
+                {
+                    _logger.LogWarning("Application {PublicId} has an invalid Discord ID", application.PublicId);
+                    return false;
+                }
 
-            var user = await _socketClient.GetUserAsync(discordId);
-            if (user is null)
-            {
-                _logger.LogWarning("Discord user for application {PublicId} not found", application.PublicId);
-                return false;
-            }
-
+                var user = await _socketClient.GetUserAsync(discordId);
+                if (user is null)
+                {
+                    _logger.LogWarning("Discord user for application {PublicId} not found", application.PublicId);
+                    return false;
+                }
             try
             {
                 var dm = await user.CreateDMChannelAsync();

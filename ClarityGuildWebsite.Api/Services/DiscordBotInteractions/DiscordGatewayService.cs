@@ -1,5 +1,7 @@
-﻿using Discord;
+﻿using ClarityGuildWebsite.Api.Data;
+using Discord;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
@@ -25,6 +27,18 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
         public async Task StartAsync(CancellationToken ctoken)
         {
+            // Cheap query on bot re-connect so a legit button click doesn't pay for the initial connection 
+            try
+            {
+                using var scope = _scopeFactory.CreateScope();
+                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                await context.GuildApplications.AnyAsync(ctoken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Database warm-up failed; continuing startup");
+            }
+
             _socketClient.Log += OnLogAsync;
             _socketClient.ButtonExecuted += OnButtonExecutedAsync;
             _socketClient.ModalSubmitted += OnModalSubmittedAsync;
@@ -34,7 +48,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             await _socketClient.StartAsync();
         }
 
-        // Runs the work off Discord.Net's gateway task, so a slow handler can't delay other events.
+        // Runs the work off Discord.Net's gateway task, so a slow handler can't delay other events
         private Task RunInBackground(string eventName, Func<IServiceProvider, Task> work)
         {
             _ = Task.Run(async () =>
