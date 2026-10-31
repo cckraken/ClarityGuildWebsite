@@ -8,13 +8,12 @@ using Microsoft.EntityFrameworkCore;
 using System.Text;
 using static ClarityGuildWebsite.Api.Services.DiscordBotInteractions.DiscordModals;
 
-
 namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 {
     public class DiscordInteractionRouter
     {
         private const string CouldNotDmMessage =
-            "Couldn't DM the applicant: they're not in the server or have DMs from server members turned off.";
+            "Couldn't DM the applicant. They may have left the server or turned off DMs, or Discord may be having problems.";
         private readonly ApplicationDbContext _context;
         private readonly DiscordSocketClient _socketClient;
         private readonly ILogger<DiscordInteractionRouter> _logger;
@@ -311,14 +310,15 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 return false;
             }
 
-            var user = await _socketClient.GetUserAsync(discordId);
-            if (user is null)
-            {
-                _logger.LogWarning("Discord user for application {PublicId} not found", application.PublicId);
-                return false;
-            }
             try
             {
+                var user = await _socketClient.GetUserAsync(discordId);
+                if (user is null)
+                {
+                    _logger.LogWarning("Discord user for application {PublicId} not found", application.PublicId);
+                    return false;
+                }
+
                 var dm = await user.CreateDMChannelAsync();
                 await dm.SendMessageAsync(text);
                 return true;
@@ -328,19 +328,24 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 _logger.LogInformation("Couldn't DM applicant for {PublicId}: DMs refused", application.PublicId);
                 return false;
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to DM applicant for {PublicId}", application.PublicId);
+                return false;
+            }
         }
 
         private async Task<bool> PostWelcomeToRaiderChatAsync(SocketModal modal, string text, ulong mentionUser)
         {
-            var channel = await _socketClient.GetChannelAsync(_raidersChatId) as IMessageChannel;
-            if (channel is null)
-            {
-                _logger.LogWarning("Couldn't post welcome message for {CustomId}: channel not available", modal.Data.CustomId);
-                return false;
-            }
-
             try
             {
+                var channel = await _socketClient.GetChannelAsync(_raidersChatId) as IMessageChannel;
+                if (channel is null)
+                {
+                    _logger.LogWarning("Couldn't post welcome message for {CustomId}: channel not available", modal.Data.CustomId);
+                    return false;
+                }
+
                 await channel.SendMessageAsync(text, allowedMentions: new AllowedMentions { UserIds = new List<ulong> { mentionUser } });
                 return true;
             }
@@ -348,6 +353,11 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             {
                 _logger.LogWarning("Couldn't post welcome to {ChannelId}: {DiscordCode}", _raidersChatId, ex.DiscordCode);
                 await modal.FollowupAsync($"Unable to post to Raiders Chat with error code: {ex.DiscordCode}", ephemeral: true);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to post welcome for applicant with Modal: {Modal.Data.CustomId}", modal.Data.CustomId);
                 return false;
             }
         }
@@ -380,14 +390,22 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
         private async Task PostToThreadAsync(SocketModal modal, string text)
         {
-            var channel = await modal.GetChannelAsync();
-            if (channel is null)
+            try
             {
-                _logger.LogWarning("Couldn't post thread record for {CustomId}: channel not available", modal.Data.CustomId);
+                var channel = await modal.GetChannelAsync();
+                if (channel is null)
+                {
+                    _logger.LogWarning("Couldn't post thread record for {CustomId}: channel not available", modal.Data.CustomId);
+                    return;
+                }
+
+                await channel.SendMessageAsync(text, allowedMentions: AllowedMentions.None);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Couldn't post thread record for {CustomId}", modal.Data.CustomId);
                 return;
             }
-
-            await channel.SendMessageAsync(text, allowedMentions: AllowedMentions.None);
         }
     }
 }

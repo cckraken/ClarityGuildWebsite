@@ -27,18 +27,6 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
         public async Task StartAsync(CancellationToken ctoken)
         {
-            // Cheap query on bot re-connect so a legit button click doesn't pay for the initial connection 
-            try
-            {
-                using var scope = _scopeFactory.CreateScope();
-                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                await context.GuildApplications.AnyAsync(ctoken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Database warm-up failed; continuing startup");
-            }
-
             _socketClient.Log += OnLogAsync;
             _socketClient.ButtonExecuted += OnButtonExecutedAsync;
             _socketClient.ModalSubmitted += OnModalSubmittedAsync;
