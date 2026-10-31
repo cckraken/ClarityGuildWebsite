@@ -1,5 +1,7 @@
-﻿using Discord;
+﻿using ClarityGuildWebsite.Api.Data;
+using Discord;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
@@ -34,7 +36,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             await _socketClient.StartAsync();
         }
 
-        // Runs the work off Discord.Net's gateway task, so a slow handler can't delay other events.
+        // Runs the work off Discord.Net's gateway task, so a slow handler can't delay other events
         private Task RunInBackground(string eventName, Func<IServiceProvider, Task> work)
         {
             _ = Task.Run(async () =>

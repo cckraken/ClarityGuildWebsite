@@ -1,10 +1,7 @@
 ﻿using ClarityGuildWebsite.Api.Helpers;
-using ClarityGuildWebsite.Api.Migrations;
 using ClarityGuildWebsite.Api.Models;
 using ClarityGuildWebsite.Api.Services.DiscordBotInteractions;
 using Discord;
-using Discord.Rest;
-using System.Linq.Expressions;
 
 namespace ClarityGuildWebsite.Api.Services
 {
@@ -50,7 +47,7 @@ namespace ClarityGuildWebsite.Api.Services
                 IThreadChannel? thread = null;
                 try
                 {
-                    var threadName = $"New Application - {application.MainName}";
+                    var threadName = $"{DiscordNames.ApplicationThreadPrefix}{application.MainName}";
                     thread = await textChannel.CreateThreadAsync(
                     name: threadName, message: message,
                     options: options,
@@ -156,7 +153,7 @@ namespace ClarityGuildWebsite.Api.Services
         private static ComponentBuilder BuildApplicationButtons() =>
          new ComponentBuilder()
         .WithButton("Message Applicant", DiscordCustomIds.MessageApplicantButton, ButtonStyle.Primary, row: 0)
-        .WithButton("Approve", DiscordCustomIds.AcceptButton, ButtonStyle.Success, row: 1)
+        .WithButton("Accept", DiscordCustomIds.AcceptButton, ButtonStyle.Success, row: 1)
         .WithButton("Decline", DiscordCustomIds.DeclineButton, ButtonStyle.Danger, row: 1);
     }
 }

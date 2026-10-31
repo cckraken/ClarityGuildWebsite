@@ -1,4 +1,5 @@
 ﻿using ClarityGuildWebsite.Api.Data;
+using ClarityGuildWebsite.Api.Helpers;
 using ClarityGuildWebsite.Api.Models;
 using Discord;
 using Discord.Net;
@@ -12,7 +13,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
     public class DiscordInteractionRouter
     {
         private const string CouldNotDmMessage =
-            "Couldn't DM the applicant: they're not in the server or have DMs from server members turned off.";
+            "Couldn't DM the applicant. They may have left the server or turned off DMs, or Discord may be having problems.";
         private readonly ApplicationDbContext _context;
         private readonly DiscordSocketClient _socketClient;
         private readonly ILogger<DiscordInteractionRouter> _logger;
@@ -38,8 +39,6 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
             _defaultWelcomeChannelIds = config.GetSection("Discord:DefaultWelcomeChannelIds").Get<ulong[]>()
                  ?? throw new InvalidOperationException("Discord:DefaultWelcomeChannelIds is not configured.");
-
-
 
             _context = context;
             _socketClient = socketClient;
@@ -69,47 +68,29 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
         private async Task OpenRecruitmentManagerMessageModalAsync(SocketMessageComponent component)
         {
-            var application = await GetApplicationForRecruitmentManagerButtonAsync(component);
-            if (application is null)
-                return;
-
-            await component.RespondWithModalAsync(
-                DiscordModals.BuildRecruitmentManagerMessage(application.PublicId, application.DiscordName));
+            var threadId = await GetThreadForRecruitmentManagerButtonAsync(component);
+            if (threadId is null) return;
+            var title = DiscordModalNameHelpers.BuildModalTitle(component, "Message");
+            await component.RespondWithModalAsync(DiscordModals.BuildRecruitmentManagerMessage(threadId.Value, title));
         }
 
         private async Task OpenDeclineModalAsync(SocketMessageComponent component)
         {
-            var application = await GetApplicationForRecruitmentManagerButtonAsync(component);
-            if (application is null)
-                return;
-
-            if (application.Status == ApplicationStatus.Declined)
-            {
-                await component.RespondAsync("This application has already been declined.", ephemeral: true);
-                return;
-            }
-
-            await component.RespondWithModalAsync(
-                DiscordModals.BuildDeclineApplicant(application.PublicId, application.DiscordName));
+            var threadId = await GetThreadForRecruitmentManagerButtonAsync(component);
+            if (threadId is null) return;
+            var title = DiscordModalNameHelpers.BuildModalTitle(component, "Decline");
+            await component.RespondWithModalAsync(DiscordModals.BuildDeclineApplicant(threadId.Value, title));
         }
 
         private async Task OpenAcceptModalAsync(SocketMessageComponent component)
         {
-            var application = await GetApplicationForRecruitmentManagerButtonAsync(component);
-            if (application is null)
-                return;
-
-            if (application.Status == ApplicationStatus.Accepted)
-            {
-                await component.RespondAsync("This application has already been accepted", ephemeral: true);
-                return;
-            }
-
-            await component.RespondWithModalAsync(
-                DiscordModals.BuildAcceptApplicant(application.PublicId, application.DiscordName));
+            var threadId = await GetThreadForRecruitmentManagerButtonAsync(component);
+            if (threadId is null) return;
+            var title = DiscordModalNameHelpers.BuildModalTitle(component, "Accept");
+            await component.RespondWithModalAsync(DiscordModals.BuildAcceptApplicant(threadId.Value, title));
         }
 
-        private async Task<GuildApplication?> GetApplicationForRecruitmentManagerButtonAsync(SocketMessageComponent component)
+        private async Task<ulong?> GetThreadForRecruitmentManagerButtonAsync(SocketMessageComponent component)
         {
             if (component.User is not SocketGuildUser manager || !CanManageApplications(manager))
             {
@@ -118,21 +99,14 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 return null;
             }
 
-            var threadId = component.ChannelId?.ToString();
-            var application = threadId is null
-                ? null
-                : await _context.GuildApplications
-                    .AsNoTracking()
-                    .SingleOrDefaultAsync(a => a.DiscordThreadId == threadId);
-
-            if (application is null)
+            if (component.ChannelId is not ulong threadId)
             {
-                _logger.LogWarning("No application found for thread {ThreadId}", threadId);
-                await component.RespondAsync("Couldn't find the application for this thread. It may have been deleted.", ephemeral: true);
+                _logger.LogWarning("Button {CustomId} clicked outside a channel", component.Data.CustomId);
+                await component.RespondAsync("This button only works inside an application thread.", ephemeral: true);
                 return null;
             }
 
-            return application;
+            return threadId;
         }
 
         public async Task HandleModalSubmittedAsync(SocketModal modal)
@@ -149,18 +123,19 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 }
 
                 var parts = modal.Data.CustomId.Split(':', 2);
-                if (parts.Length < 2 || !Guid.TryParse(parts[1], out var publicId))
+                if (parts.Length < 2 || !ulong.TryParse(parts[1], out var threadId))
                 {
                     _logger.LogWarning("Modal had an invalid custom ID {CustomId}", modal.Data.CustomId);
                     await modal.FollowupAsync("Something went wrong with this form. Please try again.", ephemeral: true);
                     return;
                 }
 
+                var threadIdText = threadId.ToString();
                 var application = await _context.GuildApplications
-                    .SingleOrDefaultAsync(a => a.PublicId == publicId);
+                    .SingleOrDefaultAsync(a => a.DiscordThreadId == threadIdText);
                 if (application is null)
                 {
-                    _logger.LogWarning("Modal submitted for missing application {PublicId}", publicId);
+                    _logger.LogWarning("Modal submitted for missing application {ThreadId}", threadId);
                     await modal.FollowupAsync("Couldn't find this application. It may have been deleted.", ephemeral: true);
                     return;
                 }
@@ -210,7 +185,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             await modal.FollowupAsync(delivered ? "Message sent." : CouldNotDmMessage, ephemeral: true);
         }
 
-        private async Task AcceptAsync(SocketModal modal, SocketGuildUser officer, GuildApplication application)
+        private async Task AcceptAsync(SocketModal modal, SocketGuildUser manager, GuildApplication application)
         {
             if (!ulong.TryParse(application.DiscordId, out var memberId))
             {
@@ -248,7 +223,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 .Replace("{member}", $"<@{application.DiscordId}>")
                 .Replace("{channels}", mentions);
 
-            var roleAdded = await ApplyTrialRoles(modal, officer, memberId);
+            var roleAdded = await ApplyTrialRoles(modal, manager, memberId);
             var welcomed = await PostWelcomeToRaiderChatAsync(modal, text, memberId);
 
             var problems = new List<String>();
@@ -259,7 +234,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 ? "Application accepted: trial role added and welcome posted."
                 : $"Application accepted, but {string.Join(" and ", problems)}.";
 
-            await PostToThreadAsync(modal, $"✅ Accepted by {officer.DisplayName}. {summary}");
+            await PostToThreadAsync(modal, $"✅ Accepted by {manager.DisplayName}. {summary}");
             await modal.FollowupAsync(summary, ephemeral: true);
         }
 
@@ -335,15 +310,15 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 return false;
             }
 
-            var user = await _socketClient.GetUserAsync(discordId);
-            if (user is null)
-            {
-                _logger.LogWarning("Discord user for application {PublicId} not found", application.PublicId);
-                return false;
-            }
-
             try
             {
+                var user = await _socketClient.GetUserAsync(discordId);
+                if (user is null)
+                {
+                    _logger.LogWarning("Discord user for application {PublicId} not found", application.PublicId);
+                    return false;
+                }
+
                 var dm = await user.CreateDMChannelAsync();
                 await dm.SendMessageAsync(text);
                 return true;
@@ -353,20 +328,25 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 _logger.LogInformation("Couldn't DM applicant for {PublicId}: DMs refused", application.PublicId);
                 return false;
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to DM applicant for {PublicId}", application.PublicId);
+                return false;
+            }
         }
 
         private async Task<bool> PostWelcomeToRaiderChatAsync(SocketModal modal, string text, ulong mentionUser)
         {
-            var channel =  await _socketClient.GetChannelAsync(_raidersChatId) as IMessageChannel;
-            if (channel is null)
-            {
-                _logger.LogWarning("Couldn't post welcome message for {CustomId}: channel not available", modal.Data.CustomId);
-                return false;
-            }
-
             try
             {
-                await channel.SendMessageAsync(text, allowedMentions: new AllowedMentions { UserIds = new List<ulong> { mentionUser} });
+                var channel = await _socketClient.GetChannelAsync(_raidersChatId) as IMessageChannel;
+                if (channel is null)
+                {
+                    _logger.LogWarning("Couldn't post welcome message for {CustomId}: channel not available", modal.Data.CustomId);
+                    return false;
+                }
+
+                await channel.SendMessageAsync(text, allowedMentions: new AllowedMentions { UserIds = new List<ulong> { mentionUser } });
                 return true;
             }
             catch (HttpException ex) when (ex.DiscordCode is DiscordErrorCode.MissingPermissions or DiscordErrorCode.InsufficientPermissions)
@@ -375,13 +355,18 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
                 await modal.FollowupAsync($"Unable to post to Raiders Chat with error code: {ex.DiscordCode}", ephemeral: true);
                 return false;
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to post welcome for applicant with Modal: {CustomId}", modal.Data.CustomId);
+                return false;
+            }
         }
 
-        private async Task<bool> ApplyTrialRoles(SocketModal modal, SocketGuildUser officer, ulong memberId)
+        private async Task<bool> ApplyTrialRoles(SocketModal modal, SocketGuildUser manager, ulong memberId)
         {
             try
             {
-                await _socketClient.Rest.AddRoleAsync(officer.Guild.Id, memberId, _trialRoleId);
+                await _socketClient.Rest.AddRoleAsync(manager.Guild.Id, memberId, _trialRoleId);
                 return true;
             }
             catch (HttpException ex) when (ex.DiscordCode is DiscordErrorCode.MissingPermissions or DiscordErrorCode.InsufficientPermissions)
@@ -405,14 +390,22 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
         private async Task PostToThreadAsync(SocketModal modal, string text)
         {
-            var channel = await modal.GetChannelAsync();
-            if (channel is null)
+            try
             {
-                _logger.LogWarning("Couldn't post thread record for {CustomId}: channel not available", modal.Data.CustomId);
+                var channel = await modal.GetChannelAsync();
+                if (channel is null)
+                {
+                    _logger.LogWarning("Couldn't post thread record for {CustomId}: channel not available", modal.Data.CustomId);
+                    return;
+                }
+
+                await channel.SendMessageAsync(text, allowedMentions: AllowedMentions.None);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Couldn't post thread record for {CustomId}", modal.Data.CustomId);
                 return;
             }
-
-            await channel.SendMessageAsync(text, allowedMentions: AllowedMentions.None);
         }
     }
 }
