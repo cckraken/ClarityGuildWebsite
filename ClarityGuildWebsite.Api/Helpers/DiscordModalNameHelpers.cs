@@ -1,23 +1,22 @@
 ﻿using Discord.WebSocket;
-
-public static class DiscordModalNameHelpers
+using ClarityGuildWebsite.Api.Services.DiscordBotInteractions;
+namespace ClarityGuildWebsite.Api.Helpers
 {
-    public static string DiscordNameTitle(SocketMessageComponent component, string verb)
+
+    public static class DiscordModalNameHelpers
     {
-        if (component.Channel is SocketThreadChannel thread
-            && thread.Name.StartsWith("New Application -", StringComparison.OrdinalIgnoreCase))
+        public static string BuildModalTitle(SocketMessageComponent component, string verb)
         {
-            var name = thread.Name[DiscordNames.ApplicationThreadPrefix.Length..].Trim();
-            var title = $"{verb} {name}";
-            return title.Length <= 45 ? title : $"{name} applicant";
+            if (component.Channel is SocketThreadChannel thread
+                && thread.Name.StartsWith(DiscordNames.ApplicationThreadPrefix, StringComparison.Ordinal))
+            {
+                var name = thread.Name[DiscordNames.ApplicationThreadPrefix.Length..].Trim();
+                var title = $"{verb} {name}";
+                return title.Length <= 45 ? title : $"{verb} applicant";
+            }
+
+            return $"{verb} applicant";
         }
 
-        return $"{verb} applicant"; ;
     }
-
-    public static class DiscordNames
-    {
-        public const string ApplicationThreadPrefix = "New Application - ";
-    }
-
 }

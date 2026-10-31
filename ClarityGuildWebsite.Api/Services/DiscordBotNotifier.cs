@@ -2,7 +2,6 @@
 using ClarityGuildWebsite.Api.Models;
 using ClarityGuildWebsite.Api.Services.DiscordBotInteractions;
 using Discord;
-using static DiscordModalNameHelpers;
 
 namespace ClarityGuildWebsite.Api.Services
 {
