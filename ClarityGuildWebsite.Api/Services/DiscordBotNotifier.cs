@@ -130,15 +130,16 @@ namespace ClarityGuildWebsite.Api.Services
             embed.AddField("Main", "⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯", false)
             .AddField("Main Character", ApplicationHelpers.Combine(application.MainName, application.MainRealm, application.MainRole), true)
             .AddField("Links", $"[Warcraft Logs]({mainLinks.wlogs}) · [Raider.IO]({mainLinks.rio})", true)
-            .AddField("UI Screenshot", application.Screenshot, false)
                     .AddField("Alt", "⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯")
                     .AddField("Alt Character", ApplicationHelpers.Combine(application.AltName, application.AltRealm, application.AltRole), true)
                     .AddField("Links", $"[Warcraft Logs]({altLinks.wlogs}) · [Raider.IO]({altLinks.rio})", true)
                     .AddField("Personal Info", "⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯")
                     .AddField("Discord Name", application.DiscordName, true)
                     .AddField("Country", application.Country, true)
+                    .AddField("Age", application.Age.ToString(), true)
                     .AddField("Tech", application.Tech, false)
                     .AddField("About", ApplicationHelpers.Truncate(application.About, 1024), false)
+                    .AddField("Preparation", ApplicationHelpers.Truncate(application.Preparation, 1024), false)
                     .AddField("History", ApplicationHelpers.Truncate(application.History, 1024), false);
 
             if (string.IsNullOrWhiteSpace(application.Extra))

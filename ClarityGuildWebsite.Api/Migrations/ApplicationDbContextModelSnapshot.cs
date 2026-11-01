@@ -17,7 +17,7 @@ namespace ClarityGuildWebsite.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.13")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -34,6 +34,9 @@ namespace ClarityGuildWebsite.Api.Migrations
                         .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int?>("Age")
+                        .HasColumnType("int");
 
                     b.Property<string>("AltName")
                         .IsRequired()
@@ -110,16 +113,15 @@ namespace ClarityGuildWebsite.Api.Migrations
                     b.Property<int>("PostStatus")
                         .HasColumnType("int");
 
+                    b.Property<string>("Preparation")
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
                     b.Property<Guid>("PublicId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Retry")
                         .HasColumnType("int");
-
-                    b.Property<string>("Screenshot")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
