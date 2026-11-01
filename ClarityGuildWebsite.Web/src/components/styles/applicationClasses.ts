@@ -5,6 +5,7 @@ export const fieldTitleClass = "text-xl mb-1 font-medium font-header text-titles
 export const fieldSubTitleClass = "mb-1 font-medium font-header text-titles";
 export const fieldHintClass = "text-sm text-hints";
 export const fieldInputClass = "w-full rounded-md border-input border-2 bg-field px-3 py-1.5 outline-none focus-visible:border-clarity-blue focus-visible:ring-3 focus-visible:ring-clarity-blue/20";
+export const fillTextAreaInputClass = `${fieldInputClass} min-h-35 flex-1 resize-none`;
 export const textAreaInputClass = "rounded-md w-full resize-y border-input border-2 bg-field px-3 py-1.5 h-35 outline-none focus-visible:border-clarity-blue focus-visible:ring-3 focus-visible:ring-clarity-blue/20"
 export const appFormButtonClass = "rounded-md bg-clarity-blue-deep px-6 py-2 font-medium text-white hover:bg-clarity-blue-darkest focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clarity-blue disabled:cursor-not-allowed disabled:opacity-50";
 export const appFormButtonDiscordClass = "inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-md border border-border px-3 py-2 font-medium text-titles hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clarity-blue"
