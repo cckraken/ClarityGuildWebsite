@@ -49,7 +49,7 @@ const schema = z.object({
     .pipe(
       z
         .number()
-        .min(15, { error: "A realistic age, please" })
+        .min(18, { error: "A realistic age, please" })
         .max(99, { error: "A realistic age, please" }),
     ),
   mainName: z

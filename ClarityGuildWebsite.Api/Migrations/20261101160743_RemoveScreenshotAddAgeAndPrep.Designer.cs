@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ClarityGuildWebsite.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20261101151405_RemoveScreenshotAddAgeandPrep")]
-    partial class RemoveScreenshotAddAgeandPrep
+    [Migration("20261101160743_RemoveScreenshotAddAgeAndPrep")]
+    partial class RemoveScreenshotAddAgeAndPrep
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.13")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -35,10 +35,10 @@ namespace ClarityGuildWebsite.Api.Migrations
 
                     b.Property<string>("About")
                         .IsRequired()
-                        .HasMaxLength(1024)
-                        .HasColumnType("nvarchar(1024)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
-                    b.Property<int>("Age")
+                    b.Property<int?>("Age")
                         .HasColumnType("int");
 
                     b.Property<string>("AltName")
@@ -80,13 +80,13 @@ namespace ClarityGuildWebsite.Api.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Extra")
-                        .HasMaxLength(1024)
-                        .HasColumnType("nvarchar(1024)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<string>("History")
                         .IsRequired()
-                        .HasMaxLength(1024)
-                        .HasColumnType("nvarchar(1024)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<DateTime?>("LastAttemptedUtc")
                         .HasColumnType("datetime2");
@@ -117,7 +117,6 @@ namespace ClarityGuildWebsite.Api.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Preparation")
-                        .IsRequired()
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
 
