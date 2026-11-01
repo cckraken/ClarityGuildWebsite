@@ -25,7 +25,7 @@ export function PrivacyNotice() {
         <h2 className={fieldSubTitleClass}>What we collect</h2>
         <ul className={listClass}>
           <li>Your Discord ID and username, taken from Discord when you sign in</li>
-          <li>Your application answers: country, characters, realms, roles, screenshot link and written answers</li>
+          <li>Your application answers: age, country, characters, realms, roles and written answers</li>
           <li>Messages you send to our bot, CCK, about your application</li>
         </ul>
         <p className={textBodyFullClass}>
@@ -37,7 +37,7 @@ export function PrivacyNotice() {
         <h2 className={fieldSubTitleClass}>Where it goes</h2>
         <ul className={listClass}>
           <li><strong className="text-titles">Microsoft Azure</strong> stores your application in our database.</li>
-          <li><strong className="text-titles">Discord</strong> receives a copy in a private, officers-only channel. Messages between you and CCK are posted to a thread under it.</li>
+          <li><strong className="text-titles">Discord</strong> receives a copy in a private, Recruitment Team-only channel. Messages between you and CCK are posted to a thread under it.</li>
         </ul>
         <p className={textBodyFullClass}>We don’t sell your data or share it with anyone else, except where the law requires it.</p>
       </section>
@@ -46,7 +46,7 @@ export function PrivacyNotice() {
         <h2 className={fieldSubTitleClass}>How long we keep it</h2>
         <ul className={listClass}>
           <li>Our database deletes your application automatically 3 months after you submit it.</li>
-          <li>Officers may keep the Discord copy and message thread for reference. Contact <strong className="text-titles">{CONTACT}</strong> to have them deleted.</li>
+          <li>The Recruitment Team may keep the Discord copy and message thread for reference. Contact <strong className="text-titles">{CONTACT}</strong> to have them deleted.</li>
           <li>Messages with CCK are not stored in our database.</li>
         </ul>
       </section>

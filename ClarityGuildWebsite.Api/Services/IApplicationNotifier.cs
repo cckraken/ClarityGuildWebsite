@@ -1,5 +1,4 @@
 ﻿using ClarityGuildWebsite.Api.Models;
-using Discord;
 
 namespace ClarityGuildWebsite.Api.Services
 {

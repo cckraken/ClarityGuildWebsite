@@ -1,6 +1,4 @@
-﻿using System.Net.NetworkInformation;
-
-namespace ClarityGuildWebsite.Api.Services
+﻿namespace ClarityGuildWebsite.Api.Services
 {
     public record NotificationResult(bool Success, string? MessageId, string? ThreadId, string? Error)
     {

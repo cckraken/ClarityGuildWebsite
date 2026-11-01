@@ -17,6 +17,9 @@ namespace ClarityGuildWebsite.Api.Models
         [MaxLength(50)]
         public required string Country { get; set; }
 
+        [Range(18, 99)]
+        public int? Age { get; set; }
+
         [MaxLength(50)]
         public required string MainName { get; set; }
 
@@ -35,8 +38,8 @@ namespace ClarityGuildWebsite.Api.Models
         [MaxLength(50)]
         public required string AltRole { get; set; }
 
-        [MaxLength(500)]
-        public required string Screenshot { get; set; }
+        [MaxLength(1024)]
+        public string? Preparation { get; set; }
 
         [MaxLength(2000)]
         public required string About { get; set; }

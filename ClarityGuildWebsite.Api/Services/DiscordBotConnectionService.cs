@@ -1,7 +1,5 @@
 ﻿using Discord;
-using Discord.Net.Rest;
 using Discord.Rest;
-using Discord.WebSocket;
 
 namespace ClarityGuildWebsite.Api.Services
 {
