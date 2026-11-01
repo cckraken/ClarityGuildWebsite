@@ -99,8 +99,6 @@ namespace ClarityGuildWebsite.Api.Services
             }
         }
 
-
-
         private async Task NotifyRecruitmentTeamAsync(IThreadChannel thread, RequestOptions options)
         {
             try

@@ -1,12 +1,6 @@
 ﻿using ClarityGuildWebsite.Api.Data;
-using ClarityGuildWebsite.Api.Helpers;
-using ClarityGuildWebsite.Api.Models;
-using Discord;
-using Discord.Net;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
-using System.Text;
-using ClarityGuildWebsite.Api.Services;
 
 namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 {

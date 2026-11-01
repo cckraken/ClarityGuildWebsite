@@ -1,5 +1,4 @@
 ﻿using Discord;
-using Discord.Interactions;
 using Discord.WebSocket;
 
 namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
@@ -8,7 +7,6 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
     {
         private readonly DiscordSocketClient _socketClient;
         public const string RepostButtonsCommand = "buttons";
-        public const string ListCommandsCommand = "commands";
         private readonly ulong _guildId;
         public DiscordSlashCommands(DiscordSocketClient socketClient, IConfiguration config)
         {

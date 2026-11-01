@@ -1,8 +1,5 @@
-﻿using ClarityGuildWebsite.Api.Data;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
-using Microsoft.EntityFrameworkCore;
-
 
 namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 {
@@ -56,7 +53,6 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
             return Task.CompletedTask;
         }
-
 
         public async Task StopAsync(CancellationToken ctoken)
         {
