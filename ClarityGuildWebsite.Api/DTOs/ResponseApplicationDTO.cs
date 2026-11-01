@@ -12,14 +12,15 @@
     {
         public string DiscordId { get; set; } = string.Empty;
         public string DiscordName { get; set; } = string.Empty;
-        public string Country { get; set; } = string.Empty;
+        public string Country {  get; set; } = string.Empty;
+        public int Age { get; set; }
         public string MainName { get; set; } = string.Empty;
         public string MainRealm { get; set; } = string.Empty;
         public string MainRole { get; set; } = string.Empty;
         public string AltName { get; set; } = string.Empty;
         public string AltRealm { get; set; } = string.Empty;
         public string AltRole { get; set; } = string.Empty;
-        public string Screenshot { get; set; } = string.Empty;
+        public string Preparation { get; set; } = string.Empty;
         public string About { get; set; } = string.Empty;
         public string Tech { get; set; } = string.Empty;
         public string History { get; set; } = string.Empty;

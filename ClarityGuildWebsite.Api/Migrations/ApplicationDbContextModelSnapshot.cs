@@ -32,8 +32,11 @@ namespace ClarityGuildWebsite.Api.Migrations
 
                     b.Property<string>("About")
                         .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.Property<int>("Age")
+                        .HasColumnType("int");
 
                     b.Property<string>("AltName")
                         .IsRequired()
@@ -74,13 +77,13 @@ namespace ClarityGuildWebsite.Api.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Extra")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
 
                     b.Property<string>("History")
                         .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
 
                     b.Property<DateTime?>("LastAttemptedUtc")
                         .HasColumnType("datetime2");
@@ -110,16 +113,16 @@ namespace ClarityGuildWebsite.Api.Migrations
                     b.Property<int>("PostStatus")
                         .HasColumnType("int");
 
+                    b.Property<string>("Preparation")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
                     b.Property<Guid>("PublicId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Retry")
                         .HasColumnType("int");
-
-                    b.Property<string>("Screenshot")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");

@@ -9,6 +9,10 @@ namespace ClarityGuildWebsite.Api.DTOs
         public string Country {  get; set; } = string.Empty;
 
         [Required]
+        [Range(13, 99)]
+        public int Age { get; set; }
+
+        [Required]
         [StringLength(50)]
         public string MainName { get; set; } = string.Empty;
 
@@ -33,11 +37,11 @@ namespace ClarityGuildWebsite.Api.DTOs
         public string AltRole { get; set; } = string.Empty;     
 
         [Required]
-        [StringLength(500)]
-        public string Screenshot { get; set; } = string.Empty;
+        [StringLength(1024)]
+        public string Preparation { get; set; } = string.Empty;
 
         [Required]
-        [StringLength(2000)]
+        [StringLength(1024)]
         public string About { get; set; } = string.Empty;
 
         [StringLength(500)]
@@ -45,10 +49,10 @@ namespace ClarityGuildWebsite.Api.DTOs
         public string Tech { get; set; } = string.Empty;
 
         [Required]
-        [StringLength(2000)]
+        [StringLength(1024)]
         public string History { get; set; } = string.Empty;
 
-        [StringLength(2000)]
+        [StringLength(1024)]
         public string? Extra { get; set; }
     }
 }
