@@ -9,7 +9,7 @@ namespace ClarityGuildWebsite.Api.DTOs
         public string Country {  get; set; } = string.Empty;
 
         [Required]
-        [Range(13, 99)]
+        [Range(18, 99)]
         public int? Age { get; set; }
 
         [Required]
@@ -38,7 +38,7 @@ namespace ClarityGuildWebsite.Api.DTOs
 
         [Required]
         [StringLength(1024)]
-        public string? Preparation { get; set; } = string.Empty;
+        public string Preparation { get; set; } = string.Empty;
 
         [Required]
         [StringLength(1024)]

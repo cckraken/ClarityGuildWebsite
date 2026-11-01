@@ -20,7 +20,7 @@
         public string AltName { get; set; } = string.Empty;
         public string AltRealm { get; set; } = string.Empty;
         public string AltRole { get; set; } = string.Empty;
-        public string? Preparation { get; set; } = string.Empty;
+        public string? Preparation { get; set; }
         public string About { get; set; } = string.Empty;
         public string Tech { get; set; } = string.Empty;
         public string History { get; set; } = string.Empty;
