@@ -7,6 +7,7 @@ using Discord.WebSocket;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -121,6 +122,10 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 
 var app = builder.Build();
 
+
+var version = typeof(Program).Assembly
+    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "unknown";
+app.Logger.LogWarning("Starting ClarityGuildWebsite.Api {Version}", version);
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

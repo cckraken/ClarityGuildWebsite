@@ -75,9 +75,13 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
         private Task OnApplicantMessageReceivedAsync(SocketMessage message) =>
                 RunInBackground("DM", sp => sp.GetRequiredService<IApplicantMessagingService>().HandleApplicantMessageAsync(message));
-
-        private Task OnSlashCommandExecutedAsync(SocketSlashCommand command) =>
-            RunInBackground("SlashCommands", sp => sp.GetRequiredService<DiscordSlashCommandsRouter>().HandleSlashCommandExecutedAsync(command));
+        private Task OnSlashCommandExecutedAsync(SocketSlashCommand command)
+        {
+            _logger.LogWarning("TEMP: slash command {CommandName} received by gateway", command.Data.Name);
+            return RunInBackground("SlashCommandExecuted", sp => sp.GetRequiredService<DiscordSlashCommandsRouter>().HandleSlashCommandExecutedAsync(command));
+        }
+        //private Task OnSlashCommandExecutedAsync(SocketSlashCommand command) =>
+        //    RunInBackground("SlashCommands", sp => sp.GetRequiredService<DiscordSlashCommandsRouter>().HandleSlashCommandExecutedAsync(command));
         private Task OnReadyAsync() =>
             RunInBackground("Ready", sp => sp.GetRequiredService<DiscordSlashCommands>().RegisterSlashCommandsAsync());
 

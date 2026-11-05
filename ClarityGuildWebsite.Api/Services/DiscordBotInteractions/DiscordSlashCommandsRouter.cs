@@ -22,6 +22,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
         public async Task HandleSlashCommandExecutedAsync(SocketSlashCommand command)
         {
+            _logger.LogWarning("TEMP: router handling {CommandName}", command.Data.Name);
             await command.DeferAsync(ephemeral: true);
 
             try
