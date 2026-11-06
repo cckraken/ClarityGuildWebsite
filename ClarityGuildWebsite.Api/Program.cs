@@ -88,10 +88,12 @@ if (notifierMode == "Bot")
     builder.Services.AddHostedService<DiscordGatewayService>();
     builder.Services.AddScoped<DiscordInteractionRouter>();
     builder.Services.AddScoped<DiscordSlashCommandsRouter>();
+    builder.Services.AddScoped<DiscordSlashCommands>();
     builder.Services.AddScoped<RecruitmentFeedHandler>();
     builder.Services.AddHttpClient<RecruitmentFeedHandler>();
-    builder.Services.AddHttpClient<WarcraftLogsTokenService>();
- 
+    builder.Services.AddHttpClient("WarcraftLogs", c => c.Timeout = TimeSpan.FromSeconds(10));
+    builder.Services.AddSingleton<WarcraftLogsTokenService>();
+
     builder.Services.AddScoped<IApplicantMessagingService, ApplicantMessagingService>();
     builder.Services.AddScoped<IApplicationNotifier, DiscordBotNotifier>();
 }

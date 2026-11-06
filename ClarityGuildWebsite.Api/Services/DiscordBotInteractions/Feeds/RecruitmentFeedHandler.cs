@@ -19,6 +19,8 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
         private readonly HttpClient _httpClient;
         private readonly ILogger _logger;
         private readonly WarcraftLogsTokenService _service;
+        private readonly BossConfig[] _bosses;
+        private readonly string _firstKillsQuery;
         private readonly ulong _incomingChannelId;
         private readonly ulong _outgoingChannelId;
 
@@ -28,6 +30,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
             _httpClient = httpClient;
             _logger = logger;
             _service = service;
+            
 
             _incomingChannelId = config.GetValue<ulong>("RecruitmentFeed:IncomingChannelId");
             if (_incomingChannelId == 0)
@@ -36,13 +39,18 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
             _outgoingChannelId = config.GetValue<ulong>("RecruitmentFeed:OutgoingChannelId");
             if (_outgoingChannelId == 0)
                 throw new InvalidOperationException("RecruitmentFeed:OutgoingChannelId is not configured.");
+
+            _bosses = config.GetSection("WarcraftLogs:Raids:VA:Bosses").Get<BossConfig[]>();
+            if (_bosses is null || _bosses.Length == 0)
+                throw new InvalidOperationException("WarcraftLogs:Bosses is not configured.");
+
+            _firstKillsQuery = Queries.FirstKills(_bosses);
         }
 
         public async Task HandleWebhookReceivedAsync(IMessage message)
         {
-            if (message is not IMessage) return;
+            if (message.Channel.Id != _incomingChannelId)
             if (message is null) return;
-            if (message.Channel is IDMChannel) return;
             if (message.Embeds.Count == 0) return;
             if (message.Source != MessageSource.Webhook) return;
 
@@ -61,61 +69,41 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
                     continue;
                 }
 
-                //enrich ToDo
                 var builder = embed.ToEmbedBuilder();
 
+                var character = await FetchParseData(candidate.WarcraftLogsId);
+                var summary = character is null ? null : FirstKillSummaryBuilder.Build(character, _bosses);
+
+                RecruitmentFeedEmbeds.AddLogs(builder, summary);
+
                 await outgoing.SendMessageAsync(embed: builder.Build(), allowedMentions: AllowedMentions.None);
-
-                
-                var raidStats = await FetchParseData(candidate.WarcraftLogsId);
-
-                var firstKills = await ParseFirstKills(candidate.WarcraftLogsId);
-
-                FirstKillSummary? summary = firstKills is null
-                    ? null
-                    : new FirstKillSummary(
-                        Bosses: firstKills
-                            .Select(kv => new FirstParse(
-                                BossName: kv.Key,
-                                BestParse: null,                    // not available from FirstKillParse
-                                FirstKillParse: kv.Value.RankPercent,
-                                FirstKillItemLevel: null,           // not available from FirstKillParse
-                                Kills: 1))                          // placeholder
-                            .ToList(),
-                        AverageBest: null);
-
-                var builderFirstParse = embed.ToEmbedBuilder();
-                RecruitmentFeedEmbeds.AddLogs(builderFirstParse, summary);
-
-                await outgoing.SendMessageAsync(embed: builderFirstParse.Build(), allowedMentions: AllowedMentions.None);
-
             }
         }
 
-        public async Task<Dictionary<string, FirstKillParse>?> ParseFirstKills(long id)
-        {
-            var character = await FetchParseData(id);
-            if (character is null) return null;
+        //public async Task<Dictionary<string, FirstKillParse>?> ParseFirstKills(long id)
+        //{
+        //    var character = await FetchParseData(id);
+        //    if (character is null) return null;
 
-            return character.BossFields
-                .Select(b => new { b.Key, Stats = b.Value.Deserialize<RaidStats>() })
-                .Where(b => b.Stats?.Ranks is { Count: > 0 })
-                .ToDictionary(
-                    b => b.Key,
-                    b =>
-                    {
-                        var first = b.Stats!.Ranks!.MinBy(r => r.StartTime)!;
-                        return new FirstKillParse(
-                            b.Key,
-                            DateTimeOffset.FromUnixTimeMilliseconds(first.StartTime),
-                            TimeSpan.FromMilliseconds(first.Duration),
-                            first.Spec,
-                            first.RankPercent,
-                            first.Amount,
-                            first.Report?.Code,
-                            first.Report?.FightID);
-                    });
-        }
+        //    return character.BossFields
+        //        .Select(b => new { b.Key, Stats = b.Value.Deserialize<RaidStats>() })
+        //        .Where(b => b.Stats?.Ranks is { Count: > 0 })
+        //        .ToDictionary(
+        //            b => b.Key,
+        //            b =>
+        //            {
+        //                var first = b.Stats!.Ranks!.MinBy(r => r.StartTime)!;
+        //                return new FirstKillParse(
+        //                    b.Key,
+        //                    DateTimeOffset.FromUnixTimeMilliseconds(first.StartTime),
+        //                    TimeSpan.FromMilliseconds(first.Duration),
+        //                    first.Spec,
+        //                    first.RankPercent,
+        //                    first.Amount,
+        //                    first.Report?.Code,
+        //                    first.Report?.FightID);
+        //            });
+        //}
 
         //public static CharacterObj? ParseMedian(CharacterObj raidStats)
         //{
@@ -137,8 +125,9 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
 
         public async Task<CharacterObj?> FetchParseData(long id)
         {
+            var ctoken = new CancellationToken();
 
-            string graphQLQuery = Queries.FirstKillsData;
+            string graphQLQuery = _firstKillsQuery;
             var payload = new
             {
                 query = graphQLQuery,
@@ -149,7 +138,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
             using HttpContent content = new StringContent(content: jsonRequestBody, encoding: Encoding.UTF8, "application/json");
             var request = new HttpRequestMessage(HttpMethod.Post, "https://www.warcraftlogs.com/api/v2/client");
             request.Content = content;
-            var token = await _service.GetValidTokenAsync();
+            var token = await _service.GetTokenAsync(ctoken);
             request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var response = await _httpClient.SendAsync(request);

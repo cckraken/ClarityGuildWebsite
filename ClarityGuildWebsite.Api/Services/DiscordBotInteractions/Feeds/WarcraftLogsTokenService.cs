@@ -1,70 +1,71 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
 namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
 {
-    public class WarcraftLogsTokenService
+
+    public sealed class WarcraftLogsTokenService
     {
-        private readonly HttpClient _client;
-        private DateTime _tokenExpiryTime = DateTime.Now;
-        private readonly string _wlApiUrl = "https://www.warcraftlogs.com/oauth/token";
-        private string _wlApiToken;
-        private readonly string _wlogsClientSecret;
-        private readonly string _wlogsClientId;
+        private const string TokenUrl = "https://www.warcraftlogs.com/oauth/token";
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly string _clientId;
+        private readonly string _clientSecret;
+        private readonly SemaphoreSlim _lock = new(1, 1);
+        private string? _wlApiToken;
+        private DateTimeOffset _expiresAt = DateTimeOffset.MinValue;
 
-        public WarcraftLogsTokenService(HttpClient client, IConfiguration config)
+        public WarcraftLogsTokenService(IHttpClientFactory httpClientFactory, IConfiguration config)
         {
-            _client = client;
+            _httpClientFactory = httpClientFactory;
 
+            _clientId = config["WarcraftLogs:ClientId"] ?? "";
+            if (string.IsNullOrWhiteSpace(_clientId))
+                throw new InvalidOperationException("WarcraftLogs:ClientId is not configured.");
 
-            _wlogsClientId = config.GetValue<string>("WarcraftLogs:ClientId");
-            if (string.IsNullOrWhiteSpace(_wlogsClientId))
-                throw new InvalidOperationException("WarcraftLogs:ClientId is not configuired or is invalid.");
-
-            _wlogsClientSecret = config.GetValue<string>("WarcraftLogs:ClientSecret");
-            if (string.IsNullOrWhiteSpace(_wlogsClientSecret))
-                throw new InvalidOperationException("WarcraftLogs:ClientSecret is not configuired or is invalid.");
-
-            _wlApiToken = config.GetValue<string>("WarcraftLogs:ApiToken");
-            if (string.IsNullOrWhiteSpace(_wlApiToken))
-                throw new InvalidOperationException("WarcraftLogs:ApiToken is not configuired or is invalid.");
+            _clientSecret = config["WarcraftLogs:ClientSecret"] ?? "";
+            if (string.IsNullOrWhiteSpace(_clientSecret))
+                throw new InvalidOperationException("WarcraftLogs:ClientSecret is not configured.");
         }
 
-        public async Task<string> GetValidTokenAsync()
+        public async Task<string> GetTokenAsync(CancellationToken ctoken)
         {
-            if (!string.IsNullOrEmpty(_wlApiToken) && DateTime.UtcNow < _tokenExpiryTime.AddMinutes(-5))
-            {
-                return _wlApiToken;
-            }
+            if (_wlApiToken is not null && DateTimeOffset.UtcNow < _expiresAt.AddMinutes(-5)) return _wlApiToken;
 
-            var requestData = new List<KeyValuePair<string, string>>
+            await _lock.WaitAsync(ctoken);
+            try
             {
-                new KeyValuePair<string, string>("grant_type", "client_credentials")
-            };
+                if (_wlApiToken is not null && DateTimeOffset.UtcNow < _expiresAt.AddMinutes(-5)) return _wlApiToken;
 
-            using (var request = new HttpRequestMessage(HttpMethod.Post, _wlApiUrl))
-            {
-                request.Content = new FormUrlEncodedContent(requestData);
-                var authString = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_wlogsClientId}:{_wlogsClientSecret}"));
-                request.Headers.Authorization = new AuthenticationHeaderValue("Basic", authString);
+                var client = _httpClientFactory.CreateClient("WarcraftLogs");
+                using var request = new HttpRequestMessage(HttpMethod.Post, TokenUrl)
+                {
+                    Content = new FormUrlEncodedContent([new("grant_type", "client_credentials")])
+                };
 
-                HttpResponseMessage response = await _client.SendAsync(request);
+                var credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{_clientId}:{_clientSecret}"));
+                request.Headers.Authorization = new AuthenticationHeaderValue("Basic", credentials);
+
+                using var response = await client.SendAsync(request, ctoken);
                 response.EnsureSuccessStatusCode();
 
                 string jsonContent = await response.Content.ReadAsStringAsync();
                 using (JsonDocument doc = JsonDocument.Parse(jsonContent))
                 {
                     _wlApiToken = doc.RootElement.GetProperty("access_token").GetString();
+                    if (string.IsNullOrEmpty(_wlApiToken))
+                        throw new InvalidOperationException("Warcraft Logs token response had no access_token.");
 
                     int expiresInSeconds = doc.RootElement.GetProperty("expires_in").GetInt32();
-                    _tokenExpiryTime = DateTime.UtcNow.AddSeconds(expiresInSeconds);
-
+                    _expiresAt = DateTime.UtcNow.AddSeconds(expiresInSeconds);
                     return _wlApiToken;
                 }
             }
-
+            finally
+            {
+                _lock.Release();
+            }
         }
     }
 }
