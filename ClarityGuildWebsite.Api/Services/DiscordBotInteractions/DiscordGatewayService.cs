@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds;
+using Discord;
 using Discord.WebSocket;
 
 namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
@@ -24,10 +25,11 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
         public async Task StartAsync(CancellationToken ctoken)
         {
+            _socketClient.MessageReceived += OnWebhookMessageReceivedAsync;
+            _socketClient.MessageReceived += OnApplicantMessageReceivedAsync;
             _socketClient.Log += OnLogAsync;
             _socketClient.ButtonExecuted += OnButtonExecutedAsync;
             _socketClient.ModalSubmitted += OnModalSubmittedAsync;
-            _socketClient.MessageReceived += OnApplicantMessageReceivedAsync;
             _socketClient.SlashCommandExecuted += OnSlashCommandExecutedAsync;
             _socketClient.Ready += OnReadyAsync;
 
@@ -56,6 +58,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
         public async Task StopAsync(CancellationToken ctoken)
         {
+            _socketClient.MessageReceived -= OnWebhookMessageReceivedAsync;
             _socketClient.ButtonExecuted -= OnButtonExecutedAsync;
             _socketClient.ModalSubmitted -= OnModalSubmittedAsync;
             _socketClient.MessageReceived -= OnApplicantMessageReceivedAsync;
@@ -80,6 +83,8 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
             RunInBackground("SlashCommands", sp => sp.GetRequiredService<DiscordSlashCommandsRouter>().HandleSlashCommandExecutedAsync(command));
         private Task OnReadyAsync() =>
             RunInBackground("Ready", sp => sp.GetRequiredService<DiscordSlashCommands>().RegisterSlashCommandsAsync());
+        private Task OnWebhookMessageReceivedAsync(SocketMessage message) =>
+            RunInBackground("RecruitmentFeed", sp => sp.GetRequiredService<RecruitmentFeedHandler>().HandleWebhookReceivedAsync(message));
 
         private Task OnLogAsync(LogMessage msg)
         {

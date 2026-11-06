@@ -1,5 +1,5 @@
 ﻿using ClarityGuildWebsite.Api.Helpers;
-using ClarityGuildWebsite.Api.Models;
+using ClarityGuildWebsite.Api.Models.Applications;
 using System.Text.Json;
 
 namespace ClarityGuildWebsite.Api.Services

@@ -2,11 +2,13 @@ using ClarityGuildWebsite.Api.Data;
 using ClarityGuildWebsite.Api.Middleware;
 using ClarityGuildWebsite.Api.Services;
 using ClarityGuildWebsite.Api.Services.DiscordBotInteractions;
+using ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds;
 using Discord.Rest;
 using Discord.WebSocket;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -77,7 +79,7 @@ if (notifierMode == "Bot")
     builder.Services.AddSingleton(_ => new DiscordSocketClient(new DiscordSocketConfig
     {
         ConnectionTimeout = 15000,
-        GatewayIntents = Discord.GatewayIntents.Guilds | Discord.GatewayIntents.DirectMessages,
+        GatewayIntents = Discord.GatewayIntents.Guilds | Discord.GatewayIntents.DirectMessages | Discord.GatewayIntents.GuildMessages | Discord.GatewayIntents.MessageContent,
         UseInteractionSnowflakeDate = false
     }));
 
@@ -86,7 +88,9 @@ if (notifierMode == "Bot")
     builder.Services.AddHostedService<DiscordGatewayService>();
     builder.Services.AddScoped<DiscordInteractionRouter>();
     builder.Services.AddScoped<DiscordSlashCommandsRouter>();
-    builder.Services.AddScoped<DiscordSlashCommands>();
+    builder.Services.AddScoped<RecruitmentFeedHandler>();
+    builder.Services.AddHttpClient<RecruitmentFeedHandler>();
+    builder.Services.AddHttpClient<WarcraftLogsTokenService>();
  
     builder.Services.AddScoped<IApplicantMessagingService, ApplicantMessagingService>();
     builder.Services.AddScoped<IApplicationNotifier, DiscordBotNotifier>();
@@ -120,6 +124,11 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 
 
 var app = builder.Build();
+
+// Log version
+var version = typeof(Program).Assembly
+    .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "unknown";
+app.Logger.LogWarning("Starting ClarityGuildWebsite.Api {Version}", version);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
