@@ -82,6 +82,11 @@ if (notifierMode == "Bot")
         GatewayIntents = Discord.GatewayIntents.Guilds | Discord.GatewayIntents.DirectMessages | Discord.GatewayIntents.GuildMessages | Discord.GatewayIntents.MessageContent,
         UseInteractionSnowflakeDate = false
     }));
+    builder.Services.AddHttpClient<WarcraftLogsClient>(c =>
+    {
+        c.BaseAddress = new Uri("https://www.warcraftlogs.com/api/v2/");
+        c.Timeout = TimeSpan.FromSeconds(100);
+    });
 
     builder.Services.AddSingleton<DiscordRestClient>();
     builder.Services.AddSingleton<DiscordBotConnectionService>();
@@ -89,10 +94,8 @@ if (notifierMode == "Bot")
     builder.Services.AddScoped<DiscordInteractionRouter>();
     builder.Services.AddScoped<DiscordSlashCommandsRouter>();
     builder.Services.AddScoped<DiscordSlashCommands>();
-    builder.Services.AddScoped<RecruitmentFeedHandler>();
-    builder.Services.AddHttpClient<RecruitmentFeedHandler>();
-    builder.Services.AddHttpClient("WarcraftLogs", c => c.Timeout = TimeSpan.FromSeconds(10));
     builder.Services.AddSingleton<WarcraftLogsTokenService>();
+    builder.Services.AddScoped<RecruitmentFeedHandler>();
 
     builder.Services.AddScoped<IApplicantMessagingService, ApplicantMessagingService>();
     builder.Services.AddScoped<IApplicationNotifier, DiscordBotNotifier>();

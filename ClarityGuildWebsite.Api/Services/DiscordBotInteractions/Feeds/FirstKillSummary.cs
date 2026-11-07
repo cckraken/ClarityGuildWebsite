@@ -2,4 +2,7 @@
 
 public sealed record FirstParse(
     string BossName,
-    double? FirstKillParse);
+    double? FirstKillParse,
+    int? FirstKillItemLevel,
+    double? BestParse,
+    int Kills);

@@ -18,12 +18,14 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
                 var ranks = stats?.Ranks ?? [];
                 if (ranks.Count == 0)
                 {
-                    rows.Add(new FirstParse(boss.Name, null));
+                    rows.Add(new FirstParse(boss.Name, null, null, null, 0));
                     continue;
                 }
 
                 var first = ranks.MinBy(s => s.StartTime);
-                rows.Add(new FirstParse(boss.Name, first.RankPercent));
+                var best = ranks.MaxBy(s => s.RankPercent);
+                rows.Add(new FirstParse(boss.DisplayName, null, null, null, 0));
+                rows.Add(new FirstParse(boss.Name, first.RankPercent, first.BracketData, best.RankPercent, stats!.TotalKills));
             }
 
             return new FirstKillSummary(rows);

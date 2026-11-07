@@ -16,21 +16,18 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
     public class RecruitmentFeedHandler
     {
         private readonly DiscordSocketClient _socketClient;
-        private readonly HttpClient _httpClient;
         private readonly ILogger _logger;
-        private readonly WarcraftLogsTokenService _service;
+        private readonly WarcraftLogsClient _warcraftLogsClient;
         private readonly BossConfig[] _bosses;
         private readonly string _firstKillsQuery;
         private readonly ulong _incomingChannelId;
         private readonly ulong _outgoingChannelId;
 
-        public RecruitmentFeedHandler(DiscordSocketClient socketClient, HttpClient httpClient, ILogger<RecruitmentFeedHandler> logger, WarcraftLogsTokenService service, IConfiguration config)
+        public RecruitmentFeedHandler(DiscordSocketClient socketClient, ILogger<RecruitmentFeedHandler> logger, WarcraftLogsClient warcraftLogsClient, IConfiguration config)
         {
             _socketClient = socketClient;
-            _httpClient = httpClient;
             _logger = logger;
-            _service = service;
-            
+            _warcraftLogsClient = warcraftLogsClient;
 
             _incomingChannelId = config.GetValue<ulong>("RecruitmentFeed:IncomingChannelId");
             if (_incomingChannelId == 0)
@@ -49,7 +46,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
 
         public async Task HandleWebhookReceivedAsync(IMessage message)
         {
-            if (message.Channel.Id != _incomingChannelId)
+            if (message.Channel.Id != _incomingChannelId) return;
             if (message is null) return;
             if (message.Embeds.Count == 0) return;
             if (message.Source != MessageSource.Webhook) return;
@@ -71,7 +68,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
 
                 var builder = embed.ToEmbedBuilder();
 
-                var character = await FetchParseData(candidate.WarcraftLogsId);
+                var character = await _warcraftLogsClient.GetCharacterRankingsAsync(candidate.WarcraftLogsId, candidate.Metric ?? "dps", _firstKillsQuery, CancellationToken.None);
                 var summary = character is null ? null : FirstKillSummaryBuilder.Build(character, _bosses);
 
                 RecruitmentFeedEmbeds.AddLogs(builder, summary);
@@ -123,53 +120,6 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
         //    }
         //}
 
-        public async Task<CharacterObj?> FetchParseData(long id)
-        {
-            var ctoken = new CancellationToken();
-
-            string graphQLQuery = _firstKillsQuery;
-            var payload = new
-            {
-                query = graphQLQuery,
-                variables = new { id = id, difficulty = 5, metric = "dps" }
-            };
-            string jsonRequestBody = JsonSerializer.Serialize(payload);
-
-            using HttpContent content = new StringContent(content: jsonRequestBody, encoding: Encoding.UTF8, "application/json");
-            var request = new HttpRequestMessage(HttpMethod.Post, "https://www.warcraftlogs.com/api/v2/client");
-            request.Content = content;
-            var token = await _service.GetTokenAsync(ctoken);
-            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-            var response = await _httpClient.SendAsync(request);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                var errorContent = await response.Content.ReadAsStringAsync();
-                _logger.LogError("WarcraftLogs API error ({StatusCode}): {ErrorContent}", response.StatusCode, errorContent);
-                return null;
-            }
-
-
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-
-            using var doc = JsonDocument.Parse(jsonResponse);
-            if (doc.RootElement.TryGetProperty("errors", out var errors))
-            {
-                _logger.LogError("WarcraftLogs GraphQL errors: {Errors}", errors.GetRawText());
-            }
-
-            if (!doc.RootElement.TryGetProperty("data", out var data)
-                || !data.TryGetProperty("characterData", out var characterData)
-                || !characterData.TryGetProperty("character", out var characterElement)
-                || characterElement.ValueKind != JsonValueKind.Object)
-            {
-                return null;
-            }
-
-            return characterElement.Deserialize<CharacterObj>();
-
-        }
     }
 }
 

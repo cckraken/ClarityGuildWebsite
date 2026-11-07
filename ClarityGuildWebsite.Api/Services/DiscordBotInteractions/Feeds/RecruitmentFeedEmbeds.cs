@@ -1,18 +1,46 @@
 ﻿using Discord;
 
-namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
-{
-    public static class RecruitmentFeedEmbeds
-    {
-        public static EmbedBuilder AddLogs(EmbedBuilder builder, FirstKillSummary? summary)
-        {
-            if (summary is null)
-                return builder.AddField("Mythic logs", "No public logs");
+namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds;
 
-            var lines = summary.Bosses.Select(s => s.FirstKillParse is double parse
-                ? $"{s.BossName}: {Math.Floor(parse):0}"
-                : $"{s.BossName}: —");
-            return builder.AddField("Mythic logs", string.Join("\n", lines));
+public static class RecruitmentFeedEmbeds
+{
+    private const string LogsFieldName = "Mythic · first logged kill";
+    private const int FieldValueLimit = 1024;   // Discord's limit for one embed field
+    private const string Fence = "```";
+
+    public static EmbedBuilder AddLogs(EmbedBuilder builder, FirstKillSummary? summary)
+    {
+        if (summary is null || summary.Bosses.Count == 0)
+            return builder.AddField(LogsFieldName, "No public logs");
+
+        var nameWidth = summary.Bosses.Max(b => b.BossName.Length);
+
+        var lines = new List<string>
+        {
+            $"{"".PadRight(nameWidth)}  First  ilvl  Best  Kills"
+        };
+
+        foreach (var boss in summary.Bosses)
+        {
+            var name = boss.BossName.PadRight(nameWidth);
+
+            if (boss.FirstKillParse is not double first)
+            {
+                lines.Add($"{name}  No kill");
+                continue;
+            }
+
+            var best = boss.BestParse is double bestParse ? $"{Math.Floor(bestParse),4:0}" : "   —";
+            lines.Add($"{name}  {Math.Floor(first),5:0}  {boss.FirstKillItemLevel,4}  {best}  {boss.Kills,5}");
         }
+
+        var body = string.Join("\n", lines);
+
+        // The fences and their newlines take 8 characters; never exceed Discord's field limit.
+        var maxBody = FieldValueLimit - (Fence.Length * 2) - 2;
+        if (body.Length > maxBody)
+            body = body[..maxBody];
+
+        return builder.AddField(LogsFieldName, $"{Fence}\n{body}\n{Fence}");
     }
 }
