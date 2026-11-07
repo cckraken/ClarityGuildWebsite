@@ -85,8 +85,10 @@ if (notifierMode == "Bot")
     builder.Services.AddHttpClient<WarcraftLogsClient>(c =>
     {
         c.BaseAddress = new Uri("https://www.warcraftlogs.com/api/v2/");
-        c.Timeout = TimeSpan.FromSeconds(100);
+        c.Timeout = TimeSpan.FromSeconds(15);
     });
+    builder.Services.AddHttpClient("WarcraftLogs", c => c.Timeout = TimeSpan.FromSeconds(10));   //used by WarcraftLogsTokenService
+    builder.Services.AddSingleton<WarcraftLogsTokenService>();
 
     builder.Services.AddSingleton<DiscordRestClient>();
     builder.Services.AddSingleton<DiscordBotConnectionService>();

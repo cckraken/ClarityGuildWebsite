@@ -22,16 +22,16 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
             };
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", await tokens.GetTokenAsync(ctoken));
 
-            using var response = await http.SendAsync(request);
+            using var response = await http.SendAsync(request, ctoken);
 
             if (!response.IsSuccessStatusCode)
             {
-                var errorContent = await response.Content.ReadAsStringAsync();
+                var errorContent = await response.Content.ReadAsStringAsync(ctoken);
                 logger.LogError("WarcraftLogs API error ({StatusCode}): {ErrorContent}", response.StatusCode, errorContent);
                 return null;
             }
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var jsonResponse = await response.Content.ReadAsStringAsync(ctoken);
 
             using var doc = JsonDocument.Parse(jsonResponse);
             if (doc.RootElement.TryGetProperty("errors", out var errors))

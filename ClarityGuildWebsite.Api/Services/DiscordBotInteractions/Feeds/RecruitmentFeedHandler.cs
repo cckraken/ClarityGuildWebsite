@@ -1,15 +1,8 @@
-﻿using ClarityGuildWebsite.Api.Models.Feeds;
-using System.Net.Http;
-using System.Net.Http.Json;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
 using ClarityGuildWebsite.Api.Models.Feeds.WarcraftLogs;
 using ClarityGuildWebsite.Api.Models.Feeds.WarcraftLogs.GQLQueries;
-using ClarityGuildWebsite.Api.Services;
-using System.Text.Json;
-using Azure.Core;
-using Microsoft.IdentityModel.Protocols;
-using System.Text;
+
 
 namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
 {
@@ -37,9 +30,10 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
             if (_outgoingChannelId == 0)
                 throw new InvalidOperationException("RecruitmentFeed:OutgoingChannelId is not configured.");
 
-            _bosses = config.GetSection("WarcraftLogs:Raids:VA:Bosses").Get<BossConfig[]>();
-            if (_bosses is null || _bosses.Length == 0)
-                throw new InvalidOperationException("WarcraftLogs:Bosses is not configured.");
+            var bosses = config.GetSection("WarcraftLogs:Raids:VA:Bosses").Get<BossConfig[]>();
+            if (bosses is null || bosses.Length == 0)
+                throw new InvalidOperationException("WarcraftLogs:Raids:VA:Bosses is not configured.");
+            _bosses = bosses;
 
             _firstKillsQuery = Queries.FirstKills(_bosses);
         }
@@ -47,7 +41,6 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
         public async Task HandleWebhookReceivedAsync(IMessage message)
         {
             if (message.Channel.Id != _incomingChannelId) return;
-            if (message is null) return;
             if (message.Embeds.Count == 0) return;
             if (message.Source != MessageSource.Webhook) return;
 
