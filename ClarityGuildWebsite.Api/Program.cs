@@ -96,7 +96,6 @@ if (notifierMode == "Bot")
     builder.Services.AddScoped<DiscordInteractionRouter>();
     builder.Services.AddScoped<DiscordSlashCommandsRouter>();
     builder.Services.AddScoped<DiscordSlashCommands>();
-    builder.Services.AddSingleton<WarcraftLogsTokenService>();
     builder.Services.AddScoped<RecruitmentFeedHandler>();
 
     builder.Services.AddScoped<IApplicantMessagingService, ApplicantMessagingService>();

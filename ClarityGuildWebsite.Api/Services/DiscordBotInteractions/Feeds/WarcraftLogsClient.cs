@@ -1,5 +1,4 @@
 ﻿using ClarityGuildWebsite.Api.Models.Feeds.WarcraftLogs;
-using ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;

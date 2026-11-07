@@ -1,4 +1,4 @@
-﻿namespace ClarityGuildWebsite.Api.Services
+﻿namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
 {
     public sealed record FirstKillSummary(IReadOnlyList<FirstParse> Bosses);
 
