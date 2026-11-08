@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs.Responses
+namespace ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs
 {
 
     public class CharacterObj

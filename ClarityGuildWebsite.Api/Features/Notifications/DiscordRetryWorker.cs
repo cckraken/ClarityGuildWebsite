@@ -1,7 +1,7 @@
 ﻿using ClarityGuildWebsite.Api.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClarityGuildWebsite.Api.Services
+namespace ClarityGuildWebsite.Api.Features.Notifications
 {
     public class DiscordRetryWorker : BackgroundService
     {

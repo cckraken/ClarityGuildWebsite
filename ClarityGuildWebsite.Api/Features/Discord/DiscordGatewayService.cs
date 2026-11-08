@@ -1,7 +1,7 @@
 ﻿using ClarityGuildWebsite.Api.Features.Discord.Interactions;
 using ClarityGuildWebsite.Api.Features.Discord.Messaging;
 using ClarityGuildWebsite.Api.Features.Discord.SlashCommands;
-using ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs.Processing;
+using ClarityGuildWebsite.Api.Features.RecruitmentFeed;
 using Discord;
 using Discord.WebSocket;
 

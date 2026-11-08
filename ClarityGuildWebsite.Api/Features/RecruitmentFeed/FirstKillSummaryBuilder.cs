@@ -1,5 +1,4 @@
-﻿using ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs;
-using ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs.Responses;
+﻿using ClarityGuildWebsite.Api.Features.RecruitmentFeed;
 using System.Text.Json;
 
 namespace ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs.Processing

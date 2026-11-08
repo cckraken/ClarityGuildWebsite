@@ -1,4 +1,4 @@
-﻿namespace ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs.Responses;
+﻿namespace ClarityGuildWebsite.Api.Features.RecruitmentFeed;
 
 public sealed record WarcraftLogsCandidate(
     long WarcraftLogsId,

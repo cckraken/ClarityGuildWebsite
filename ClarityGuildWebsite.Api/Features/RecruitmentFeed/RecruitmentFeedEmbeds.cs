@@ -1,7 +1,6 @@
-﻿using ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs.Responses;
-using Discord;
+﻿using Discord;
 
-namespace ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs.Processing;
+namespace ClarityGuildWebsite.Api.Features.RecruitmentFeed;
 
 public static class RecruitmentFeedEmbeds
 {
