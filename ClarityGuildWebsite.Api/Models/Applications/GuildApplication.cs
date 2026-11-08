@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
-namespace ClarityGuildWebsite.Api.Models
+namespace ClarityGuildWebsite.Api.Models.Applications
 {
     [Index(nameof(PublicId), IsUnique = true)]
     [Index(nameof(DiscordThreadId), IsUnique = true)]

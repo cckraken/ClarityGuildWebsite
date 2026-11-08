@@ -1,6 +1,6 @@
 ﻿using ClarityGuildWebsite.Api.Data;
 using ClarityGuildWebsite.Api.Helpers;
-using ClarityGuildWebsite.Api.Models;
+using ClarityGuildWebsite.Api.Models.Applications;
 using Discord;
 using Discord.Net;
 using Discord.WebSocket;

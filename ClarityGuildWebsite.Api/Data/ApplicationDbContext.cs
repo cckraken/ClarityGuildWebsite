@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ClarityGuildWebsite.Api.Models;
+using ClarityGuildWebsite.Api.Models.Applications;
 
 namespace ClarityGuildWebsite.Api.Data
 {

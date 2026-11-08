@@ -1,4 +1,4 @@
-﻿using ClarityGuildWebsite.Api.Models;
+﻿using ClarityGuildWebsite.Api.Models.Applications;
 
 namespace ClarityGuildWebsite.Api.Services
 {
