@@ -60,11 +60,36 @@ Dev runs as `Staging`, so it reads production's `appsettings.json` plus App Serv
 - Discord: respond to every interaction within 3 seconds. Modals must be the first response (can't defer); modal submits defer first, then follow up on every exit. User-written text is posted with `AllowedMentions.None`.
 - Tailwind: mobile-first; `gap-*` instead of margins between siblings; `min-w-0` on flex children holding inputs or long text.
 
-## Deploying the API
-1. `dotnet ef migrations script --idempotent -o ../deploy.sql` (outside the repo), review it, run it on the target database.
-2. Publish with the Visual Studio profile (Linux, framework-dependent, Release).
-3. Watch the log stream: the app should start from `/home/site/wwwroot` and Discord.Net should reach `Ready`.
-4. Smoke test: submit an application, use a button, decline it.
+### Before publishing
+- [ ] PR merged to `main`, CI green.
+- [ ] Local: `git checkout main`, `git pull`, `git status` clean, `git log -1 --oneline` = the merge commit you mean to deploy.
+- [ ] Migrations: if `main` has new ones, generate the idempotent script, review it, and apply it to the target database **before** publishing.
+- [ ] New config keys: added to the App Service settings (secrets) or `appsettings.json` (non-secret) for the target environment.
+- [ ] New Discord intents or permissions: enabled on the **target** bot's portal page (Bot → Privileged Gateway Intents) and in the server.
+- [ ] Publish profile points at the right app (dev vs prod).
+
+### After publishing (check in this order)
+1. **Startup:** Log stream shows `Starting ClarityGuildWebsite.Api 1.0.0+<hash>` and the hash matches the merge commit.
+2. **Gateway:** Discord.Net reaches `Ready` (no "disallowed intents" or login errors).
+3. **Website:** submit a test application → embed, thread, buttons and the recruitment team ping appear.
+4. **Buttons:** click **Message Applicant** → the modal opens (then close it, or send a test message).
+5. **Modal submit:** Decline (or Accept) the test application → DM sent, thread record posted, status saved.
+6. **Slash commands:** `/buttons` in an application thread → buttons re-posted.
+7. **DM relay:** reply to the bot by DM → the message appears in the application thread with ✅.
+8. **Recruitment feed:** the next Warcraft Logs post appears in the officers' channel with the logs field (production can't be tested with the test webhook, by design).
+9. **Errors:** after ~5 minutes, check Application Insights:
+   ```kusto
+   union traces, exceptions
+   | where timestamp > ago(30m)
+   | where severityLevel >= 2 or itemType == "exception"
+   | order by timestamp desc
+   ```
+10. Delete the test application (or let the retention worker remove it).
+
+### If something breaks
+- Intent/permission problem: fix it in the Discord portal or server; no redeploy needed.
+- Code problem: republish the previous good commit from `main` (`git checkout <hash>`, publish, then `git checkout main`).
+- Database problem: don't roll back a migration on production without a plan; most migrations are additive and the old code still works with them.
 
 ## Gotchas
 - Config arrays: read with `GetSection("X").Get<T[]>()`. `GetValue<...>` returns null/0 for arrays. Arrays merge by index across config sources.
