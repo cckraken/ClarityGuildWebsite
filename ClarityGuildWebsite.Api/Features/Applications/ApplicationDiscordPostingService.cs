@@ -2,7 +2,6 @@
 using ClarityGuildWebsite.Api.Features.Notifications;
 using ClarityGuildWebsite.Api.Helpers;
 using ClarityGuildWebsite.Api.Models.Applications;
-using ClarityGuildWebsite.Api.Services;
 
 namespace ClarityGuildWebsite.Api.Features.Applications
 {

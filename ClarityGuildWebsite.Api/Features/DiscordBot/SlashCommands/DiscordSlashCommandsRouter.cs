@@ -1,9 +1,9 @@
 ﻿using ClarityGuildWebsite.Api.Data;
-using ClarityGuildWebsite.Api.Features.Discord.Interactions;
+using ClarityGuildWebsite.Api.Features.DiscordBot.Interactions;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClarityGuildWebsite.Api.Features.Discord.SlashCommands
+namespace ClarityGuildWebsite.Api.Features.DiscordBot.SlashCommands
 {
     public class DiscordSlashCommandsRouter
     {

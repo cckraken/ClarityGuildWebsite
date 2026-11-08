@@ -1,9 +1,8 @@
-﻿using ClarityGuildWebsite.Api.Features.Notifications;
-using ClarityGuildWebsite.Api.Helpers;
+﻿using ClarityGuildWebsite.Api.Helpers;
 using ClarityGuildWebsite.Api.Models.Applications;
 using System.Text.Json;
 
-namespace ClarityGuildWebsite.Api.Services
+namespace ClarityGuildWebsite.Api.Features.Notifications
 {
     public class DiscordWebhookNotifier : IApplicationNotifier
     {

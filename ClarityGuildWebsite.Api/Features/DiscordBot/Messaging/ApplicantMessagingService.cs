@@ -5,7 +5,7 @@ using Discord.Net;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClarityGuildWebsite.Api.Features.Discord.Messaging
+namespace ClarityGuildWebsite.Api.Features.DiscordBot.Messaging
 {
     public class ApplicantMessagingService : IApplicantMessagingService
     {

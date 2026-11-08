@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 
-namespace ClarityGuildWebsite.Api.Features.Discord.SlashCommands
+namespace ClarityGuildWebsite.Api.Features.DiscordBot.SlashCommands
 {
     public class DiscordSlashCommands
     {

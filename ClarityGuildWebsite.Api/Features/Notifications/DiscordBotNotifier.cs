@@ -1,11 +1,11 @@
-﻿using ClarityGuildWebsite.Api.Features.Discord;
-using ClarityGuildWebsite.Api.Features.Discord.Interactions;
-using ClarityGuildWebsite.Api.Features.Notifications;
-using ClarityGuildWebsite.Api.Helpers;
+﻿using ClarityGuildWebsite.Api.Helpers;
 using ClarityGuildWebsite.Api.Models.Applications;
 using Discord;
+using ClarityGuildWebsite.Api.Features.DiscordBot.Interactions;
+using ClarityGuildWebsite.Api.Features.DiscordBot;
 
-namespace ClarityGuildWebsite.Api.Services
+
+namespace ClarityGuildWebsite.Api.Features.Notifications
 {
     public class DiscordBotNotifier : IApplicationNotifier
     {

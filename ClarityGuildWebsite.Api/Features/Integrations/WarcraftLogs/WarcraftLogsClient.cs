@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs.Responses;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 

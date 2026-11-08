@@ -1,6 +1,6 @@
 ﻿using Discord;
 
-namespace ClarityGuildWebsite.Api.Features.Discord.Messaging
+namespace ClarityGuildWebsite.Api.Features.DiscordBot.Messaging
 {
     public interface IApplicantMessagingService
     {

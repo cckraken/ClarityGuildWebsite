@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Web;
 
-namespace ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs.Processing;
+namespace ClarityGuildWebsite.Api.Features.RecruitmentFeed;
 
 /// <summary>
 /// Parses the embeds Warcraft Logs recruitment webhook posts.

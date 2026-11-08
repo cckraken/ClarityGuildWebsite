@@ -1,11 +1,11 @@
-﻿using ClarityGuildWebsite.Api.Features.Discord.Interactions;
-using ClarityGuildWebsite.Api.Features.Discord.Messaging;
-using ClarityGuildWebsite.Api.Features.Discord.SlashCommands;
+﻿using ClarityGuildWebsite.Api.Features.DiscordBot.Interactions;
+using ClarityGuildWebsite.Api.Features.DiscordBot.Messaging;
+using ClarityGuildWebsite.Api.Features.DiscordBot.SlashCommands;
 using ClarityGuildWebsite.Api.Features.RecruitmentFeed;
 using Discord;
 using Discord.WebSocket;
 
-namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
+namespace ClarityGuildWebsite.Api.Features.DiscordBot
 {
     public class DiscordGatewayService : IHostedService
     {

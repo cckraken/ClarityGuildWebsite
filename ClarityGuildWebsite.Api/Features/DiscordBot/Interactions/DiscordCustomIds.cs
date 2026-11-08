@@ -1,4 +1,4 @@
-﻿namespace ClarityGuildWebsite.Api.Features.Discord.Interactions
+﻿namespace ClarityGuildWebsite.Api.Features.DiscordBot.Interactions
 {
     public static class DiscordCustomIds
     {

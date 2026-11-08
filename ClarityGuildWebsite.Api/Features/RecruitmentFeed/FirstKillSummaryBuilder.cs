@@ -1,7 +1,8 @@
-﻿using ClarityGuildWebsite.Api.Features.RecruitmentFeed;
+﻿using ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs;
+using ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs.Responses;
 using System.Text.Json;
 
-namespace ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs.Processing
+namespace ClarityGuildWebsite.Api.Features.RecruitmentFeed
 {
     public static class FirstKillSummaryBuilder
     {

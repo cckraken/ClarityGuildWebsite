@@ -2,8 +2,6 @@
 using Discord.WebSocket;
 using ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs;
 using ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs.GQLQueries;
-using ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds;
-using ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs.Processing;
 
 namespace ClarityGuildWebsite.Api.Features.RecruitmentFeed
 {

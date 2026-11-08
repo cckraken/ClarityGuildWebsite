@@ -1,6 +1,5 @@
-﻿using ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs.Responses;
-using ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds;
-using Discord;
+﻿using Discord;
+using ClarityGuildWebsite.Api.Features.RecruitmentFeed;
 
 namespace ClarityGuildWebsite.Api.Tests;
 

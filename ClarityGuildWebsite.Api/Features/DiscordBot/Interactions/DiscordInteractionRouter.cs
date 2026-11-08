@@ -6,9 +6,9 @@ using Discord.Net;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
-using static ClarityGuildWebsite.Api.Features.Discord.Interactions.DiscordModals;
+using static ClarityGuildWebsite.Api.Features.DiscordBot.Interactions.DiscordModals;
 
-namespace ClarityGuildWebsite.Api.Features.Discord.Interactions
+namespace ClarityGuildWebsite.Api.Features.DiscordBot.Interactions
 {
     public class DiscordInteractionRouter
     {

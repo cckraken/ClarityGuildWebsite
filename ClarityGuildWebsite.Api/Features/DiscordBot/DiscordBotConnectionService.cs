@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.Rest;
 
-namespace ClarityGuildWebsite.Api.Features.Discord
+namespace ClarityGuildWebsite.Api.Features.DiscordBot
 {
     public sealed class DiscordBotConnectionService
     {

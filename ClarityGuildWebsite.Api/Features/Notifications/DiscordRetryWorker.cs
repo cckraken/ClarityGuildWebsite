@@ -1,4 +1,5 @@
 ﻿using ClarityGuildWebsite.Api.Data;
+using ClarityGuildWebsite.Api.Features.Applications;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClarityGuildWebsite.Api.Features.Notifications
