@@ -72,11 +72,18 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
 
                 var builder = embed.ToEmbedBuilder();
 
-                var character = await _warcraftLogsClient.GetCharacterRankingsAsync(candidate.WarcraftLogsId, candidate.Metric ?? "dps", _firstKillsQuery, CancellationToken.None);
-                var summary = character is null ? null : FirstKillSummaryBuilder.Build(character, _bosses);
+                try
+                {
+                    var character = await _warcraftLogsClient.GetCharacterRankingsAsync(candidate.WarcraftLogsId, candidate.Metric ?? "dps", _firstKillsQuery, CancellationToken.None);
+                    var summary = character is null ? null : FirstKillSummaryBuilder.Build(character, _bosses);
 
-                RecruitmentFeedEmbeds.AddLogs(builder, summary);
-
+                    RecruitmentFeedEmbeds.AddLogs(builder, summary);
+                }
+                catch (Exception ex) when (ex is HttpRequestException or OperationCanceledException)
+                {
+                    _logger.LogWarning(ex, "Warcraft Logs enrichment failed for feed message {MessageId}", message.Id);
+                    builder.AddField("Mythic - current tier stats:", "Stats temporarily unavailable");
+                }
                 await outgoing.SendMessageAsync(embed: builder.Build(), allowedMentions: AllowedMentions.None);
             }
         }

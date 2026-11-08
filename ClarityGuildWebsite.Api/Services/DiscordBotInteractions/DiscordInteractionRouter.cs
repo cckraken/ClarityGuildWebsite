@@ -21,7 +21,6 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
         private readonly ulong _raidersChatId;
         private readonly ulong _trialRoleId;
         private readonly ulong[] _defaultWelcomeChannelIds;
-        private readonly ulong _sourceChannelId;
 
         public DiscordInteractionRouter(ApplicationDbContext context, DiscordSocketClient socketClient, ILogger<DiscordInteractionRouter> logger, IConfiguration config)
         {
@@ -40,10 +39,6 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions
 
             _defaultWelcomeChannelIds = config.GetSection("Discord:DefaultWelcomeChannelIds").Get<ulong[]>()
                  ?? throw new InvalidOperationException("Discord:DefaultWelcomeChannelIds is not configured.");
-
-            _sourceChannelId = config.GetValue<ulong>("Recruitmentfeed:SourceChannelId");
-            if (_sourceChannelId == 0)
-                throw new InvalidOperationException("Recruitmentfeed:SourceChannelId is not configured");
 
             _context = context;
             _socketClient = socketClient;

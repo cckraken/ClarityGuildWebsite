@@ -40,7 +40,9 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
             }
 
             if (!doc.RootElement.TryGetProperty("data", out var data)
+                || data.ValueKind != JsonValueKind.Object
                 || !data.TryGetProperty("characterData", out var characterData)
+                || characterData.ValueKind != JsonValueKind.Object
                 || !characterData.TryGetProperty("character", out var characterElement)
                 || characterElement.ValueKind != JsonValueKind.Object)
             {

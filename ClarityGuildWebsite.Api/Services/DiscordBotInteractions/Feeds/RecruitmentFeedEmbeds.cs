@@ -11,7 +11,7 @@ public static class RecruitmentFeedEmbeds
     public static EmbedBuilder AddLogs(EmbedBuilder builder, FirstKillSummary? summary)
     {
         if (summary is null || summary.Bosses.Count == 0)
-            return builder.AddField(LogsFieldName, "No public logs");
+            return builder.AddField(LogsFieldName, "Logs unavailable");
 
         var nameWidth = summary.Bosses.Max(b => b.BossName.Length);
 
