@@ -32,6 +32,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
 
             var jsonResponse = await response.Content.ReadAsStringAsync(ctoken);
 
+            // Automatically dispose of the pooled memory JsonDocument uses
             using var doc = JsonDocument.Parse(jsonResponse);
             if (doc.RootElement.TryGetProperty("errors", out var errors))
             {

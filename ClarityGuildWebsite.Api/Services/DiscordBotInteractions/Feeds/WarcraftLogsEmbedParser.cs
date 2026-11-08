@@ -32,6 +32,7 @@ public static partial class WarcraftLogsEmbedParser
         var parts = title[(open + 1)..^1].Split(" - ", StringSplitOptions.TrimEntries);
         if (parts.Length != 4 || parts.Any(string.IsNullOrWhiteSpace)) return null;
 
+        // Protect against future wlogs URL changes? Highly unlikely, but worth doing
         var className = parts[0];
         var realmName = parts[2];
         var region = parts[3];

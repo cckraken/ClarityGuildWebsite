@@ -4,7 +4,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds;
 
 public static class RecruitmentFeedEmbeds
 {
-    private const string LogsFieldName = "Mythic · first logged kill";
+    private const string LogsFieldName = "Mythic - current tier stats:";
     private const int FieldValueLimit = 1024;   // Discord's limit for one embed field
     private const string Fence = "```";
 
@@ -17,7 +17,7 @@ public static class RecruitmentFeedEmbeds
 
         var lines = new List<string>
         {
-            $"{"".PadRight(nameWidth)}  First  ilvl  Best  Kills"
+            $"{"".PadRight(nameWidth)}  First    Ilvl  Best   Kills"
         };
 
         foreach (var boss in summary.Bosses)
@@ -30,8 +30,9 @@ public static class RecruitmentFeedEmbeds
                 continue;
             }
 
-            var best = boss.BestParse is double bestParse ? $"{Math.Floor(bestParse),4:0}" : "   —";
-            lines.Add($"{name}  {Math.Floor(first),5:0}  {boss.FirstKillItemLevel,4}  {best}  {boss.Kills,5}");
+            var best = boss.BestParse is double bestParse ? $"{ParseEmoji(bestParse)}{Math.Floor(bestParse),3:0}" : "   —";
+            
+            lines.Add($"{name}  {ParseEmoji(first)}{Math.Floor(first),4:0}  {boss.FirstKillItemLevel,4}  {best}  {boss.Kills,5}");
         }
 
         var body = string.Join("\n", lines);
@@ -43,4 +44,14 @@ public static class RecruitmentFeedEmbeds
 
         return builder.AddField(LogsFieldName, $"{Fence}\n{body}\n{Fence}");
     }
+
+    private static string ParseEmoji(double parse) => parse switch
+    {
+        >= 100 => "🟨",   // gold
+        >= 95 => "🟧",   // orange
+        >= 75 => "🟪",   // purple
+        >= 50 => "🟦",   // blue
+        >= 25 => "🟩",   // green
+        _ => "⬜",   // grey
+    };
 }

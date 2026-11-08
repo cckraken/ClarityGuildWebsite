@@ -15,6 +15,7 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
         private readonly string _firstKillsQuery;
         private readonly ulong _incomingChannelId;
         private readonly ulong _outgoingChannelId;
+        private readonly HashSet<ulong> _allowedWebhookIds;
 
         public RecruitmentFeedHandler(DiscordSocketClient socketClient, ILogger<RecruitmentFeedHandler> logger, WarcraftLogsClient warcraftLogsClient, IConfiguration config)
         {
@@ -35,6 +36,11 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
                 throw new InvalidOperationException("WarcraftLogs:Raids:VA:Bosses is not configured.");
             _bosses = bosses;
 
+            var allowed = config.GetSection("RecruitmentFeed:AllowedWebhookIds").Get<ulong[]>();
+            if (allowed is null || allowed.Length == 0)
+                throw new InvalidOperationException("RecruitmentFeed:AllowedWebhookIds is not configured.");
+            _allowedWebhookIds = [.. allowed];
+
             _firstKillsQuery = Queries.FirstKills(_bosses);
         }
 
@@ -42,7 +48,12 @@ namespace ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds
         {
             if (message.Channel.Id != _incomingChannelId) return;
             if (message.Embeds.Count == 0) return;
-            if (message.Source != MessageSource.Webhook) return;
+
+            if (message.Author is not IWebhookUser webhookUser || !_allowedWebhookIds.Contains(webhookUser.WebhookId))
+            {
+                _logger.LogWarning("Ignored a message in the feed channel from an unexpected sender {AuthorId}", message.Author.Id);
+                return;
+            }
 
             if (_socketClient.GetChannel(_outgoingChannelId) is not IMessageChannel outgoing)
             {
