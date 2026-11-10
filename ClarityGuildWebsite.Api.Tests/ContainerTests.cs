@@ -1,7 +1,8 @@
-﻿using ClarityGuildWebsite.Api.Services;
-using ClarityGuildWebsite.Api.Services.DiscordBotInteractions;
-using ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds;
-using Microsoft.AspNetCore.Cors;
+﻿using ClarityGuildWebsite.Api.Features.DiscordBot.Interactions;
+using ClarityGuildWebsite.Api.Features.DiscordBot.Messaging;
+using ClarityGuildWebsite.Api.Features.DiscordBot.SlashCommands;
+using ClarityGuildWebsite.Api.Features.Notifications;
+using ClarityGuildWebsite.Api.Features.RecruitmentFeed;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ClarityGuildWebsite.Api.Tests
