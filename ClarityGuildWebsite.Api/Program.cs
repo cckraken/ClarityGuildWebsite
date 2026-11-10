@@ -101,7 +101,7 @@ if (notifierMode == "Bot")
     builder.Services.AddScoped<DiscordInteractionRouter>();
     builder.Services.AddScoped<DiscordSlashCommandsRouter>();
     builder.Services.AddScoped<DiscordSlashCommands>();
-    builder.Services.AddScoped<RecruitmentFeedHandler>();
+    builder.Services.AddRecruitmentFeed(builder.Configuration);
 
     builder.Services.AddScoped<IApplicantMessagingService, ApplicantMessagingService>();
     builder.Services.AddScoped<IApplicationNotifier, DiscordBotNotifier>();
