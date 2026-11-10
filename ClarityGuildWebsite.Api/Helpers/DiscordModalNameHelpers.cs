@@ -1,5 +1,5 @@
 ﻿using Discord.WebSocket;
-using ClarityGuildWebsite.Api.Services.DiscordBotInteractions;
+using ClarityGuildWebsite.Api.Features.DiscordBot.Interactions;
 namespace ClarityGuildWebsite.Api.Helpers
 {
 

@@ -1,8 +1,13 @@
 using ClarityGuildWebsite.Api.Data;
+using ClarityGuildWebsite.Api.Features.Applications;
+using ClarityGuildWebsite.Api.Features.DiscordBot;
+using ClarityGuildWebsite.Api.Features.DiscordBot.Interactions;
+using ClarityGuildWebsite.Api.Features.DiscordBot.Messaging;
+using ClarityGuildWebsite.Api.Features.DiscordBot.SlashCommands;
+using ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs;
+using ClarityGuildWebsite.Api.Features.Notifications;
+using ClarityGuildWebsite.Api.Features.RecruitmentFeed;
 using ClarityGuildWebsite.Api.Middleware;
-using ClarityGuildWebsite.Api.Services;
-using ClarityGuildWebsite.Api.Services.DiscordBotInteractions;
-using ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds;
 using Discord.Rest;
 using Discord.WebSocket;
 using Microsoft.AspNetCore.Authentication.Cookies;
