@@ -1,11 +1,6 @@
-﻿using ClarityGuildWebsite.Api.Services;
-using ClarityGuildWebsite.Api.Services.DiscordBotInteractions;
-using ClarityGuildWebsite.Api.Services.DiscordBotInteractions.Feeds;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
