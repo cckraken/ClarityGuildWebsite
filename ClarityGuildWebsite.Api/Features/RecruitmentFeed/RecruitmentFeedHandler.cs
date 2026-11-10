@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs;
 using ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs.GQLQueries;
+using Microsoft.Extensions.Options;
 
 namespace ClarityGuildWebsite.Api.Features.RecruitmentFeed
 {
@@ -16,29 +17,21 @@ namespace ClarityGuildWebsite.Api.Features.RecruitmentFeed
         private readonly ulong _outgoingChannelId;
         private readonly HashSet<ulong> _allowedWebhookIds;
 
-        public RecruitmentFeedHandler(DiscordSocketClient socketClient, ILogger<RecruitmentFeedHandler> logger, WarcraftLogsClient warcraftLogsClient, IConfiguration config)
+        public RecruitmentFeedHandler(DiscordSocketClient socketClient, ILogger<RecruitmentFeedHandler> logger, WarcraftLogsClient warcraftLogsClient, IOptions<RecruitmentFeedOptions> feedOptions, IConfiguration config)
         {
             _socketClient = socketClient;
             _logger = logger;
             _warcraftLogsClient = warcraftLogsClient;
 
-            _incomingChannelId = config.GetValue<ulong>("RecruitmentFeed:IncomingChannelId");
-            if (_incomingChannelId == 0)
-                throw new InvalidOperationException("RecruitmentFeed:IncomingChannelId is not configured.");
-
-            _outgoingChannelId = config.GetValue<ulong>("RecruitmentFeed:OutgoingChannelId");
-            if (_outgoingChannelId == 0)
-                throw new InvalidOperationException("RecruitmentFeed:OutgoingChannelId is not configured.");
+            var feed = feedOptions.Value;
+            _incomingChannelId = feed.IncomingChannelId;
+            _outgoingChannelId = feed.OutgoingChannelId;
+            _allowedWebhookIds = [..feed.AllowedWebhookIds];
 
             var bosses = config.GetSection("WarcraftLogs:Raids:VA:Bosses").Get<BossConfig[]>();
             if (bosses is null || bosses.Length == 0)
                 throw new InvalidOperationException("WarcraftLogs:Raids:VA:Bosses is not configured.");
             _bosses = bosses;
-
-            var allowed = config.GetSection("RecruitmentFeed:AllowedWebhookIds").Get<ulong[]>();
-            if (allowed is null || allowed.Length == 0)
-                throw new InvalidOperationException("RecruitmentFeed:AllowedWebhookIds is not configured.");
-            _allowedWebhookIds = [.. allowed];
 
             _firstKillsQuery = Queries.FirstKills(_bosses);
         }
