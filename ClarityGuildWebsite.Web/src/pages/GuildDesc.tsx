@@ -25,8 +25,7 @@ export function GuildDesc() {
 
       <div className="text-center">
         <p className="mx-auto w-fit rounded-2xl border border-clarity-blue/60 bg-clarity-blue/10 px-4 py-1 text-clarity-blue md:rounded-full">
-          Currently looking for any exceptional players! Particularly interested
-          in a new <strong>main tank.</strong>
+          We will starting building up our roster for S3 soon. We like to go into the new season with 30 players, so any exceptional gamers are welcome to apply!
         </p>
       </div>
 
