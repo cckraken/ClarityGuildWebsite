@@ -17,23 +17,20 @@ namespace ClarityGuildWebsite.Api.Features.RecruitmentFeed
         private readonly ulong _outgoingChannelId;
         private readonly HashSet<ulong> _allowedWebhookIds;
 
-        public RecruitmentFeedHandler(DiscordSocketClient socketClient, ILogger<RecruitmentFeedHandler> logger, WarcraftLogsClient warcraftLogsClient, IOptions<RecruitmentFeedOptions> feedOptions, IConfiguration config)
+        public RecruitmentFeedHandler(DiscordSocketClient socketClient, ILogger<RecruitmentFeedHandler> logger, WarcraftLogsClient warcraftLogsClient, IOptions<RecruitmentFeedOptions> feedOptions, IOptions<WarcaftLogsOptions> options)
         {
             _socketClient = socketClient;
             _logger = logger;
             _warcraftLogsClient = warcraftLogsClient;
+            var bosses = options.Value.Bosses;
+            _bosses = bosses;
+            _firstKillsQuery = Queries.FirstKills(_bosses);
 
             var feed = feedOptions.Value;
             _incomingChannelId = feed.IncomingChannelId;
             _outgoingChannelId = feed.OutgoingChannelId;
             _allowedWebhookIds = [..feed.AllowedWebhookIds];
-
-            var bosses = config.GetSection("WarcraftLogs:Raids:VA:Bosses").Get<BossConfig[]>();
-            if (bosses is null || bosses.Length == 0)
-                throw new InvalidOperationException("WarcraftLogs:Raids:VA:Bosses is not configured.");
-            _bosses = bosses;
-
-            _firstKillsQuery = Queries.FirstKills(_bosses);
+            
         }
 
         public async Task HandleWebhookReceivedAsync(IMessage message)

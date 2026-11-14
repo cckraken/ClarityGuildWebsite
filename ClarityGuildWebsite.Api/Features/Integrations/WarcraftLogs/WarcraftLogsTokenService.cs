@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -16,17 +17,12 @@ namespace ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs
         private string? _wlApiToken;
         private DateTimeOffset _expiresAt = DateTimeOffset.MinValue;
 
-        public WarcraftLogsTokenService(IHttpClientFactory httpClientFactory, IConfiguration config)
+        public WarcraftLogsTokenService(IHttpClientFactory httpClientFactory, IOptions<WarcaftLogsOptions> logsOptions)
         {
             _httpClientFactory = httpClientFactory;
-
-            _clientId = config["WarcraftLogs:ClientId"] ?? "";
-            if (string.IsNullOrWhiteSpace(_clientId))
-                throw new InvalidOperationException("WarcraftLogs:ClientId is not configured.");
-
-            _clientSecret = config["WarcraftLogs:ClientSecret"] ?? "";
-            if (string.IsNullOrWhiteSpace(_clientSecret))
-                throw new InvalidOperationException("WarcraftLogs:ClientSecret is not configured.");
+            var logs = logsOptions.Value;
+            _clientId = logs.ClientId;
+            _clientSecret = logs.ClientSecret;
         }
 
         public async Task<string> GetTokenAsync(CancellationToken ctoken)
