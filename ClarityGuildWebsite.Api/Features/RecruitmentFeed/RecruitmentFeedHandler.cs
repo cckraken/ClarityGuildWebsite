@@ -17,20 +17,19 @@ namespace ClarityGuildWebsite.Api.Features.RecruitmentFeed
         private readonly ulong _outgoingChannelId;
         private readonly HashSet<ulong> _allowedWebhookIds;
 
-        public RecruitmentFeedHandler(DiscordSocketClient socketClient, ILogger<RecruitmentFeedHandler> logger, WarcraftLogsClient warcraftLogsClient, IOptions<RecruitmentFeedOptions> feedOptions, IOptions<WarcaftLogsOptions> options)
+        public RecruitmentFeedHandler(DiscordSocketClient socketClient, ILogger<RecruitmentFeedHandler> logger, WarcraftLogsClient warcraftLogsClient, IOptions<RecruitmentFeedOptions> feedOptions, IOptions<WarcraftLogsOptions> logOptions)
         {
             _socketClient = socketClient;
             _logger = logger;
             _warcraftLogsClient = warcraftLogsClient;
-            var bosses = options.Value.Bosses;
-            _bosses = bosses;
+
+            _bosses = logOptions.Value.Bosses;
             _firstKillsQuery = Queries.FirstKills(_bosses);
 
             var feed = feedOptions.Value;
             _incomingChannelId = feed.IncomingChannelId;
             _outgoingChannelId = feed.OutgoingChannelId;
-            _allowedWebhookIds = [..feed.AllowedWebhookIds];
-            
+            _allowedWebhookIds = [..feed.AllowedWebhookIds]; 
         }
 
         public async Task HandleWebhookReceivedAsync(IMessage message)

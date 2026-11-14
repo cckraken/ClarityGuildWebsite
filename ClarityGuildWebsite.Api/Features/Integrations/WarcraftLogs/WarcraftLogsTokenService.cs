@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -17,7 +16,7 @@ namespace ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs
         private string? _wlApiToken;
         private DateTimeOffset _expiresAt = DateTimeOffset.MinValue;
 
-        public WarcraftLogsTokenService(IHttpClientFactory httpClientFactory, IOptions<WarcaftLogsOptions> logsOptions)
+        public WarcraftLogsTokenService(IHttpClientFactory httpClientFactory, IOptions<WarcraftLogsOptions> logsOptions)
         {
             _httpClientFactory = httpClientFactory;
             var logs = logsOptions.Value;

@@ -1,6 +1,6 @@
 ﻿namespace ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs
 {
-    public sealed class WarcaftLogsOptions
+    public sealed class WarcraftLogsOptions
     {
         public const string SectionName = "WarcraftLogs";
 
