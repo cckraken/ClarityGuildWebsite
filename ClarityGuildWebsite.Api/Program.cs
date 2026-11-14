@@ -87,8 +87,6 @@ if (notifierMode == "Bot")
         GatewayIntents = Discord.GatewayIntents.Guilds | Discord.GatewayIntents.DirectMessages | Discord.GatewayIntents.GuildMessages | Discord.GatewayIntents.MessageContent,
         UseInteractionSnowflakeDate = false
     }));
-
-
     builder.Services.AddSingleton<DiscordRestClient>();
     builder.Services.AddSingleton<DiscordBotConnectionService>();
     builder.Services.AddHostedService<DiscordGatewayService>();

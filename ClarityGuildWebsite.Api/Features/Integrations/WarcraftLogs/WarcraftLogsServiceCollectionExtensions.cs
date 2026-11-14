@@ -13,7 +13,7 @@
                     "WarcraftLogs:Bosses contains an entry without a valid Id or Name.")
                 .ValidateOnStart();
 
-            services.AddHttpClient(WarcraftLogsOptions.SectionName, c => c.Timeout = TimeSpan.FromSeconds(10));
+            services.AddHttpClient(WarcraftLogsTokenService.HttpClientName, c => c.Timeout = TimeSpan.FromSeconds(10));
             services.AddHttpClient<WarcraftLogsClient>(c =>
             {
                 c.BaseAddress = new Uri("https://www.warcraftlogs.com/api/v2/");

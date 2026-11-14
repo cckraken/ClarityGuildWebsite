@@ -9,6 +9,7 @@ namespace ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs
     public sealed class WarcraftLogsTokenService
     {
         private const string TokenUrl = "https://www.warcraftlogs.com/oauth/token";
+        public const string HttpClientName = "WarcraftLogsAuth";
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly string _clientId;
         private readonly string _clientSecret;
@@ -20,6 +21,7 @@ namespace ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs
         {
             _httpClientFactory = httpClientFactory;
             var logs = logsOptions.Value;
+            var client = _httpClientFactory.CreateClient(HttpClientName);
             _clientId = logs.ClientId;
             _clientSecret = logs.ClientSecret;
         }
