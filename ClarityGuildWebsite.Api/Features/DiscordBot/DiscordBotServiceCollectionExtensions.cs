@@ -18,7 +18,6 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot
                 .Validate(o => o.RecruitmentTeamRoleIds is { Length: > 0 }, "Discord:RecruitmentTeamRoleIds is not configured.")
                 .Validate(o => o.DefaultWelcomeChannelIds is { Length: > 0 }, "Discord:DefaultWelcomeChannelIds is not configured.")
                 .Validate(o => o.ApplicationsChannelId > 0, "Discord:ApplicationsChannelId is not configured.")
-                .Validate(o => !string.IsNullOrWhiteSpace(o.WebhookUrl), "Discord:WebhookUrl is not configured." )
                 .ValidateOnStart();
 
             services.AddSingleton(_ => new DiscordSocketClient(new DiscordSocketConfig
