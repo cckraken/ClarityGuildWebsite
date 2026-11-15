@@ -5,6 +5,7 @@ using Discord;
 using Discord.Net;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System.Text;
 using static ClarityGuildWebsite.Api.Features.DiscordBot.Interactions.DiscordModals;
 
@@ -22,26 +23,15 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot.Interactions
         private readonly ulong _trialRoleId;
         private readonly ulong[] _defaultWelcomeChannelIds;
 
-        public DiscordInteractionRouter(ApplicationDbContext context, DiscordSocketClient socketClient, ILogger<DiscordInteractionRouter> logger, IConfiguration config)
+        public DiscordInteractionRouter(ApplicationDbContext context, DiscordSocketClient socketClient, ILogger<DiscordInteractionRouter> logger, IOptions<DiscordBotOptions> botOptions)
         {
-            _recruitmentTeamRoleIds = config.GetSection("Discord:RecruitmentTeamRoleIds").Get<ulong[]>()
-    ?? throw new InvalidOperationException("Discord:RecruitmentTeamRoleIds is not configured.");
-            if (_recruitmentTeamRoleIds.Length == 0)
-                throw new InvalidOperationException("Discord:RecruitmentTeamRoleIds must contain at least one role ID.");
-
-            _raidersChatId = config.GetValue<ulong>("Discord:RaidersChatId");
-            if (_raidersChatId == 0)
-                throw new InvalidOperationException("Discord:RaidersChatId is not configured.");
-
-            _trialRoleId = config.GetValue<ulong>("Discord:TrialRoleId");
-            if (_trialRoleId == 0)
-                throw new InvalidOperationException("Discord:TrialRoleId is not configured.");
-
-            _defaultWelcomeChannelIds = config.GetSection("Discord:DefaultWelcomeChannelIds").Get<ulong[]>()
-                 ?? throw new InvalidOperationException("Discord:DefaultWelcomeChannelIds is not configured.");
+            _recruitmentTeamRoleIds = [.. botOptions.Value.RecruitmentTeamRoleIds];
+            _raidersChatId = botOptions.Value.RaidersChatId;
+            _trialRoleId = botOptions.Value.TrialRoleId;
+            _defaultWelcomeChannelIds = [.. botOptions.Value.DefaultWelcomeChannelIds];
+            _socketClient = socketClient;
 
             _context = context;
-            _socketClient = socketClient;
             _logger = logger;
         }
 

@@ -1,15 +1,11 @@
 using ClarityGuildWebsite.Api.Data;
 using ClarityGuildWebsite.Api.Features.Applications;
 using ClarityGuildWebsite.Api.Features.DiscordBot;
-using ClarityGuildWebsite.Api.Features.DiscordBot.Interactions;
 using ClarityGuildWebsite.Api.Features.DiscordBot.Messaging;
-using ClarityGuildWebsite.Api.Features.DiscordBot.SlashCommands;
 using ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs;
 using ClarityGuildWebsite.Api.Features.Notifications;
 using ClarityGuildWebsite.Api.Features.RecruitmentFeed;
 using ClarityGuildWebsite.Api.Middleware;
-using Discord.Rest;
-using Discord.WebSocket;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
@@ -81,28 +77,9 @@ var notifierMode = builder.Configuration["Discord:NotifierMode"]
     ?? throw new InvalidOperationException("Discord:NotifierMode is not configured.");
 if (notifierMode == "Bot")
 {
-    builder.Services.AddSingleton(_ => new DiscordSocketClient(new DiscordSocketConfig
-    {
-        ConnectionTimeout = 15000,
-        GatewayIntents = Discord.GatewayIntents.Guilds | Discord.GatewayIntents.DirectMessages | Discord.GatewayIntents.GuildMessages | Discord.GatewayIntents.MessageContent,
-        UseInteractionSnowflakeDate = false
-    }));
-    builder.Services.AddHttpClient<WarcraftLogsClient>(c =>
-    {
-        c.BaseAddress = new Uri("https://www.warcraftlogs.com/api/v2/");
-        c.Timeout = TimeSpan.FromSeconds(15);
-    });
-    builder.Services.AddHttpClient("WarcraftLogs", c => c.Timeout = TimeSpan.FromSeconds(10));   //used by WarcraftLogsTokenService
-    builder.Services.AddSingleton<WarcraftLogsTokenService>();
-
-    builder.Services.AddSingleton<DiscordRestClient>();
-    builder.Services.AddSingleton<DiscordBotConnectionService>();
-    builder.Services.AddHostedService<DiscordGatewayService>();
-    builder.Services.AddScoped<DiscordInteractionRouter>();
-    builder.Services.AddScoped<DiscordSlashCommandsRouter>();
-    builder.Services.AddScoped<DiscordSlashCommands>();
     builder.Services.AddRecruitmentFeed(builder.Configuration);
-
+    builder.Services.AddWarcraftLogs(builder.Configuration);
+    builder.Services.AddDiscordBot(builder.Configuration);
     builder.Services.AddScoped<IApplicantMessagingService, ApplicantMessagingService>();
     builder.Services.AddScoped<IApplicationNotifier, DiscordBotNotifier>();
 }

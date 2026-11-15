@@ -1,5 +1,4 @@
-﻿using ClarityGuildWebsite.Api.Features.RecruitmentFeed;
-using Discord;
+﻿using Discord;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Web;
