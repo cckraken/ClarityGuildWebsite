@@ -81,20 +81,14 @@ var notifierMode = builder.Configuration["Discord:NotifierMode"]
     ?? throw new InvalidOperationException("Discord:NotifierMode is not configured.");
 if (notifierMode == "Bot")
 {
-    builder.Services.AddSingleton(_ => new DiscordSocketClient(new DiscordSocketConfig
-    {
-        ConnectionTimeout = 15000,
-        GatewayIntents = Discord.GatewayIntents.Guilds | Discord.GatewayIntents.DirectMessages | Discord.GatewayIntents.GuildMessages | Discord.GatewayIntents.MessageContent,
-        UseInteractionSnowflakeDate = false
-    }));
     builder.Services.AddSingleton<DiscordRestClient>();
     builder.Services.AddSingleton<DiscordBotConnectionService>();
     builder.Services.AddHostedService<DiscordGatewayService>();
-    builder.Services.AddScoped<DiscordInteractionRouter>();
     builder.Services.AddScoped<DiscordSlashCommandsRouter>();
     builder.Services.AddScoped<DiscordSlashCommands>();
     builder.Services.AddRecruitmentFeed(builder.Configuration);
     builder.Services.AddWarcraftLogs(builder.Configuration);
+    builder.Services.AddDiscordGuildOptions(builder.Configuration);
 
     builder.Services.AddScoped<IApplicantMessagingService, ApplicantMessagingService>();
     builder.Services.AddScoped<IApplicationNotifier, DiscordBotNotifier>();
