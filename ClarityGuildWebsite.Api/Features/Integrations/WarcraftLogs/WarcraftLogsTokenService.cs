@@ -21,7 +21,6 @@ namespace ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs
         {
             _httpClientFactory = httpClientFactory;
             var logs = logsOptions.Value;
-            var client = _httpClientFactory.CreateClient(HttpClientName);
             _clientId = logs.ClientId;
             _clientSecret = logs.ClientSecret;
         }
@@ -35,7 +34,7 @@ namespace ClarityGuildWebsite.Api.Features.Integrations.WarcraftLogs
             {
                 if (_wlApiToken is not null && DateTimeOffset.UtcNow < _expiresAt.AddMinutes(-5)) return _wlApiToken;
 
-                var client = _httpClientFactory.CreateClient("WarcraftLogs");
+                var client = _httpClientFactory.CreateClient(HttpClientName);
                 using var request = new HttpRequestMessage(HttpMethod.Post, TokenUrl)
                 {
                     Content = new FormUrlEncodedContent([new("grant_type", "client_credentials")])

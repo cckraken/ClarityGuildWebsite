@@ -4,6 +4,7 @@ using ClarityGuildWebsite.Api.Features.DiscordBot.SlashCommands;
 using ClarityGuildWebsite.Api.Features.RecruitmentFeed;
 using Discord;
 using Discord.WebSocket;
+using Microsoft.Extensions.Options;
 
 namespace ClarityGuildWebsite.Api.Features.DiscordBot
 {
@@ -14,11 +15,9 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger _logger;
 
-        public DiscordGatewayService(IConfiguration config, DiscordSocketClient client, IServiceScopeFactory scopeFactory, ILogger<DiscordGatewayService> logger)
+        public DiscordGatewayService(IOptions<DiscordBotOptions> botOptions, DiscordSocketClient client, IServiceScopeFactory scopeFactory, ILogger<DiscordGatewayService> logger)
         {
-            var token = config.GetValue<string>("Discord:BotToken");
-            if (string.IsNullOrWhiteSpace(token))
-                throw new InvalidOperationException("Discord:BotToken is missing or invalid.");
+            var token = botOptions.Value.DiscordBotToken;
 
             _socketClient = client;
             _scopeFactory = scopeFactory;

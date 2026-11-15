@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Rest;
+using Microsoft.Extensions.Options;
 
 namespace ClarityGuildWebsite.Api.Features.DiscordBot
 {
@@ -9,10 +10,10 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot
         private readonly string _token;
         private readonly SemaphoreSlim _loginLock = new(1, 1);
 
-        public DiscordBotConnectionService(DiscordRestClient restClient, IConfiguration config)
+        public DiscordBotConnectionService(DiscordRestClient restClient, IOptions<DiscordBotOptions> discordOptions)
         {
             _restClient = restClient;
-            _token = config.GetValue<string>("Discord:BotToken") ?? throw new InvalidOperationException("Discord token is not configured/provided");
+            _token = discordOptions.Value.DiscordBotToken;
         }
 
         public async Task<DiscordRestClient> GetClientAsync(CancellationToken ctoken = default)

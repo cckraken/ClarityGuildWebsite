@@ -5,6 +5,7 @@ using Discord;
 using Discord.Net;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System.Text;
 using static ClarityGuildWebsite.Api.Features.DiscordBot.Interactions.DiscordModals;
 
@@ -22,12 +23,12 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot.Interactions
         private readonly ulong _trialRoleId;
         private readonly ulong[] _defaultWelcomeChannelIds;
 
-        public DiscordInteractionRouter(ApplicationDbContext context, DiscordSocketClient socketClient, ILogger<DiscordInteractionRouter> logger, DiscordGuildOptions discordOptions)
+        public DiscordInteractionRouter(ApplicationDbContext context, DiscordSocketClient socketClient, ILogger<DiscordInteractionRouter> logger, IOptions<DiscordBotOptions> botOptions)
         {
-            _recruitmentTeamRoleIds = [.. discordOptions.RecruitmentTeamRoleIds];
-            _raidersChatId = discordOptions.RaidersChatId;
-            _trialRoleId = discordOptions.TrialRoleId;
-            _defaultWelcomeChannelIds = [.. discordOptions.DefaultWelcomeChannelIds];
+            _recruitmentTeamRoleIds = [.. botOptions.Value.RecruitmentTeamRoleIds];
+            _raidersChatId = botOptions.Value.RaidersChatId;
+            _trialRoleId = botOptions.Value.TrialRoleId;
+            _defaultWelcomeChannelIds = [.. botOptions.Value.DefaultWelcomeChannelIds];
             _socketClient = socketClient;
 
             _context = context;

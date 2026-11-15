@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Microsoft.Extensions.Options;
 
 namespace ClarityGuildWebsite.Api.Features.DiscordBot.SlashCommands
 {
@@ -8,9 +9,9 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot.SlashCommands
         private readonly DiscordSocketClient _socketClient;
         public const string RepostButtonsCommand = "buttons";
         private readonly ulong _guildId;
-        public DiscordSlashCommands(DiscordSocketClient socketClient, DiscordGuildOptions discordOptions)
+        public DiscordSlashCommands(DiscordSocketClient socketClient, IOptions<DiscordBotOptions> discordOptions)
         {
-            _guildId = discordOptions.GuildId;
+            _guildId = discordOptions.Value.GuildId;
             _socketClient = socketClient;
         }
 

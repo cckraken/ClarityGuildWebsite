@@ -2,6 +2,7 @@
 using ClarityGuildWebsite.Api.Features.DiscordBot.Interactions;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace ClarityGuildWebsite.Api.Features.DiscordBot.SlashCommands
 {
@@ -10,12 +11,9 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot.SlashCommands
         private readonly ApplicationDbContext _context;
         private readonly ILogger _logger;
         private readonly ulong[] _recruitmentTeamRoleIds;
-        public DiscordSlashCommandsRouter(ApplicationDbContext context, ILogger<DiscordSlashCommandsRouter> logger, IConfiguration config)
+        public DiscordSlashCommandsRouter(ApplicationDbContext context, ILogger<DiscordSlashCommandsRouter> logger, IOptions<DiscordBotOptions> botOptions)
         {
-            _recruitmentTeamRoleIds = config.GetSection("Discord:RecruitmentTeamRoleIds").Get<ulong[]>()
-             ?? throw new InvalidOperationException("Discord:RecruitmentTeamRoleIds is not configured.");
-            if (_recruitmentTeamRoleIds.Length == 0)
-                throw new InvalidOperationException("Discord:RecruitmentTeamRoleIds must contain at least one role ID.");
+            _recruitmentTeamRoleIds = [.. botOptions.Value.RecruitmentTeamRoleIds];
 
             _context = context;
             _logger = logger;
