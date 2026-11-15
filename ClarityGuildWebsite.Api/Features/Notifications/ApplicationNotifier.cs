@@ -16,7 +16,7 @@ namespace ClarityGuildWebsite.Api.Features.Notifications
         public DiscordWebhookNotifier(HttpClient http, IOptions<DiscordBotOptions> botOptions)
         {
             _http = http;
-            _webhookUrl = botOptions.Value.DiscordWebhookUrl;        
+            _webhookUrl = botOptions.Value.WebhookUrl;        
         }
 
         public async Task<NotificationResult> PostAndRecordAsync(GuildApplication application, CancellationToken ctoken)

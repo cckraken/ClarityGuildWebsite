@@ -17,7 +17,7 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot
 
         public DiscordGatewayService(IOptions<DiscordBotOptions> botOptions, DiscordSocketClient client, IServiceScopeFactory scopeFactory, ILogger<DiscordGatewayService> logger)
         {
-            var token = botOptions.Value.DiscordBotToken;
+            var token = botOptions.Value.BotToken;
 
             _socketClient = client;
             _scopeFactory = scopeFactory;

@@ -13,7 +13,7 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot
         public DiscordBotConnectionService(DiscordRestClient restClient, IOptions<DiscordBotOptions> discordOptions)
         {
             _restClient = restClient;
-            _token = discordOptions.Value.DiscordBotToken;
+            _token = discordOptions.Value.BotToken;
         }
 
         public async Task<DiscordRestClient> GetClientAsync(CancellationToken ctoken = default)
