@@ -1,6 +1,5 @@
 ﻿using ClarityGuildWebsite.Api.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Net.NetworkInformation;
 
 namespace ClarityGuildWebsite.Api.Features.Applications
 {
@@ -8,7 +7,7 @@ namespace ClarityGuildWebsite.Api.Features.Applications
     {
         private const int RetentionMonths = 3;
         private static readonly TimeSpan Interval = TimeSpan.FromHours(24);
-        private static readonly TimeSpan retryDelay = TimeSpan.FromMinutes(2);
+        private static readonly TimeSpan RetryDelay = TimeSpan.FromMinutes(2);
         private const int MaxAttempts = 3;
         private readonly ILogger<PersonalDataDeleteWorker> _logger;
         private readonly IServiceScopeFactory _scopeFactory;
@@ -40,8 +39,8 @@ namespace ClarityGuildWebsite.Api.Features.Applications
                     }
                     catch (Exception ex) when (attempt < MaxAttempts)
                     {
-                        _logger.LogWarning(ex, "Personal data deletion attemp {Attempt} failed; retrying in {Delay}", attempt, retryDelay);
-                        await Task.Delay(retryDelay, ctoken);
+                        _logger.LogWarning(ex, "Personal data deletion attempt {Attempt} failed; retrying in {Delay}", attempt, RetryDelay);
+                        await Task.Delay(RetryDelay, ctoken);
                     }
                     catch (Exception ex)
                     {
