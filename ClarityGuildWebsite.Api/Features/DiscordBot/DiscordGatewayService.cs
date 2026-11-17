@@ -5,13 +5,14 @@ using ClarityGuildWebsite.Api.Features.RecruitmentFeed;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Options;
+using System.Diagnostics;
 
 namespace ClarityGuildWebsite.Api.Features.DiscordBot
 {
     public class DiscordGatewayService : IHostedService
     {
         private readonly string _token;
-        private const string DiscordLogger = "Discord.Net";
+        private const string DiscordNetLogCategory = "Discord.Net"; // Referenced by "Discord.Net" in appsettings.json Logging:LogLevel
         private readonly DiscordSocketClient _socketClient;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger _logger;
@@ -24,7 +25,7 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot
             _socketClient = client;
             _scopeFactory = scopeFactory;
             _logger = logger;
-            _discordNetLogger = loggerFactory.CreateLogger(DiscordLogger);
+            _discordNetLogger = loggerFactory.CreateLogger(DiscordNetLogCategory);
             _token = token;
         }
 
@@ -43,18 +44,21 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot
         }
 
         // Runs the work off Discord.Net's gateway task, so a slow handler can't delay other events
-        private Task RunInBackground(string eventName, Func<IServiceProvider, Task> work)
+        private Task RunInBackground(string label, Func<IServiceProvider, Task> work)
         {
             _ = Task.Run(async () =>
             {
+                var stopwatch = Stopwatch.StartNew();
+                _logger.LogInformation("Handing {Event}", label);
                 try
                 {
                     using var scope = _scopeFactory.CreateScope();
                     await work(scope.ServiceProvider);
+                    _logger.LogInformation("Handled {Event} in {ElapsedMs} ms", label, stopwatch.ElapsedMilliseconds);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "{Event} handler failed", eventName);
+                    _logger.LogError(ex, "{Event} failed after {Elapsed} ms", label, stopwatch.Elapsed.Milliseconds);
                 }
             });
 
