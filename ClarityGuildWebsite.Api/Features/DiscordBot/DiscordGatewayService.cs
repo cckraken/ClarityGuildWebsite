@@ -11,17 +11,20 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot
     public class DiscordGatewayService : IHostedService
     {
         private readonly string _token;
+        private const string DiscordLogger = "Discord.Net";
         private readonly DiscordSocketClient _socketClient;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger _logger;
+        private readonly ILogger _discordNetLogger;
 
-        public DiscordGatewayService(IOptions<DiscordBotOptions> botOptions, DiscordSocketClient client, IServiceScopeFactory scopeFactory, ILogger<DiscordGatewayService> logger)
+        public DiscordGatewayService(IOptions<DiscordBotOptions> botOptions, DiscordSocketClient client, IServiceScopeFactory scopeFactory, ILogger<DiscordGatewayService> logger, ILoggerFactory loggerFactory)
         {
             var token = botOptions.Value.BotToken;
 
             _socketClient = client;
             _scopeFactory = scopeFactory;
             _logger = logger;
+            _discordNetLogger = loggerFactory.CreateLogger(DiscordLogger);
             _token = token;
         }
 
@@ -105,7 +108,7 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot
                 _ => LogLevel.Information
             };
 
-            _logger.Log(level, msg.Exception, "Discord {Source}: {Message}", msg.Source, msg.Message);
+            _discordNetLogger.Log(level, msg.Exception, "Discord {Source}: {Message}", msg.Source, msg.Message);
             return Task.CompletedTask;
         }
     }
