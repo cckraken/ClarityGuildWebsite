@@ -7,6 +7,8 @@ namespace ClarityGuildWebsite.Api.Features.Applications
     {
         private const int RetentionMonths = 3;
         private static readonly TimeSpan Interval = TimeSpan.FromHours(24);
+        private static readonly TimeSpan RetryDelay = TimeSpan.FromMinutes(2);
+        private const int MaxAttempts = 3;
         private readonly ILogger<PersonalDataDeleteWorker> _logger;
         private readonly IServiceScopeFactory _scopeFactory;
 
@@ -24,17 +26,26 @@ namespace ClarityGuildWebsite.Api.Features.Applications
 
             do
             {
-                try
+                for (var attempt = 1; attempt <= MaxAttempts; attempt++)
                 {
-                    await DeleteExpiredAsync(ctoken);
-                }
-                catch (OperationCanceledException) when (ctoken.IsCancellationRequested)
-                {
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Scheduled personal data deletion failed");
+                    try
+                    {
+                        await DeleteExpiredAsync(ctoken);
+                        break;
+                    }
+                    catch (OperationCanceledException) when (ctoken.IsCancellationRequested)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex) when (attempt < MaxAttempts)
+                    {
+                        _logger.LogWarning(ex, "Personal data deletion attempt {Attempt} failed; retrying in {Delay}", attempt, RetryDelay);
+                        await Task.Delay(RetryDelay, ctoken);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Personal data deletion failed after {Attempts} attempts", MaxAttempts);
+                    }
                 }
             }
             while (await timer.WaitForNextTickAsync(ctoken));
