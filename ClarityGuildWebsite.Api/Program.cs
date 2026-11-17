@@ -71,7 +71,12 @@ builder.Services.AddRateLimiter(options =>
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ClarityDb")
-    ?? throw new InvalidOperationException("Connection string 'ClarityDb' is not configured.")));
+    ?? throw new InvalidOperationException("Connection string 'ClarityDb' is not configured."),
+    sql => sql.EnableRetryOnFailure(
+        maxRetryCount: 5,
+        maxRetryDelay: TimeSpan.FromSeconds(5),
+        errorNumbersToAdd: null)));
+    
 builder.Services.AddScoped<IApplicationDiscordPostingService, ApplicationDiscordPostingService>();
 var notifierMode = builder.Configuration["Discord:NotifierMode"]
     ?? throw new InvalidOperationException("Discord:NotifierMode is not configured.");
