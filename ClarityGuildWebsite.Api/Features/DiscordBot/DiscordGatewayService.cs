@@ -88,14 +88,14 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot
                 RunInBackground("Modal", sp => sp.GetRequiredService<DiscordInteractionRouter>().HandleModalSubmittedAsync(modal));
 
         private Task OnApplicantMessageReceivedAsync(SocketMessage message) =>
-                RunInBackground("DM", sp => sp.GetRequiredService<IApplicantMessagingService>().HandleApplicantMessageAsync(message), false);
+                RunInBackground("DM", sp => sp.GetRequiredService<IApplicantMessagingService>().HandleApplicantMessageAsync(message), logTiming: false);
 
         private Task OnSlashCommandExecutedAsync(SocketSlashCommand command) =>
             RunInBackground("SlashCommands", sp => sp.GetRequiredService<DiscordSlashCommandsRouter>().HandleSlashCommandExecutedAsync(command));
         private Task OnReadyAsync() =>
             RunInBackground("Ready", sp => sp.GetRequiredService<DiscordSlashCommands>().RegisterSlashCommandsAsync());
         private Task OnWebhookMessageReceivedAsync(SocketMessage message) =>
-            RunInBackground("RecruitmentFeed", sp => sp.GetRequiredService<RecruitmentFeedHandler>().HandleWebhookReceivedAsync(message), false);
+            RunInBackground("RecruitmentFeed", sp => sp.GetRequiredService<RecruitmentFeedHandler>().HandleWebhookReceivedAsync(message), logTiming: false);
 
         private Task OnLogAsync(LogMessage msg)
         {
