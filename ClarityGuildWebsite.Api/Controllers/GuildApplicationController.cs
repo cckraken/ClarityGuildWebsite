@@ -39,7 +39,7 @@ public class GuildApplicationController : ControllerBase
         application.Retry = 0;
 
         _context.GuildApplications.Add(application);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(ctoken);
 
         await _service.PostAppToDiscord(application, ctoken);
         return CreatedAtAction(nameof(GetById), new { publicId = application.PublicId }, application.ToApplicantResponse());
