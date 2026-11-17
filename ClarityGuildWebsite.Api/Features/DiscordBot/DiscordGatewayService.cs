@@ -44,21 +44,23 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot
         }
 
         // Runs the work off Discord.Net's gateway task, so a slow handler can't delay other events
-        private Task RunInBackground(string label, Func<IServiceProvider, Task> work)
+        private Task RunInBackground(string label, Func<IServiceProvider, Task> work, bool logTiming = true)
         {
             _ = Task.Run(async () =>
             {
                 var stopwatch = Stopwatch.StartNew();
-                _logger.LogInformation("Handing {Event}", label);
+                if (logTiming)
+                    _logger.LogInformation("Handling {Event}", label);
                 try
                 {
                     using var scope = _scopeFactory.CreateScope();
                     await work(scope.ServiceProvider);
-                    _logger.LogInformation("Handled {Event} in {ElapsedMs} ms", label, stopwatch.ElapsedMilliseconds);
+                    if (logTiming)
+                        _logger.LogInformation("Handled {Event} in {ElapsedMs} ms", label, stopwatch.ElapsedMilliseconds);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "{Event} failed after {Elapsed} ms", label, stopwatch.Elapsed.Milliseconds);
+                    _logger.LogError(ex, "{Event} failed after {ElapsedMs} ms", label, stopwatch.ElapsedMilliseconds);
                 }
             });
 
@@ -86,18 +88,14 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot
                 RunInBackground("Modal", sp => sp.GetRequiredService<DiscordInteractionRouter>().HandleModalSubmittedAsync(modal));
 
         private Task OnApplicantMessageReceivedAsync(SocketMessage message) =>
-                RunInBackground("DM", sp => sp.GetRequiredService<IApplicantMessagingService>().HandleApplicantMessageAsync(message));
-        private Task OnSlashCommandExecutedAsync(SocketSlashCommand command)
-        {
-            _logger.LogWarning("TEMP: slash command {CommandName} received by gateway", command.Data.Name);
-            return RunInBackground("SlashCommandExecuted", sp => sp.GetRequiredService<DiscordSlashCommandsRouter>().HandleSlashCommandExecutedAsync(command));
-        }
-        //private Task OnSlashCommandExecutedAsync(SocketSlashCommand command) =>
-        //    RunInBackground("SlashCommands", sp => sp.GetRequiredService<DiscordSlashCommandsRouter>().HandleSlashCommandExecutedAsync(command));
+                RunInBackground("DM", sp => sp.GetRequiredService<IApplicantMessagingService>().HandleApplicantMessageAsync(message), false);
+
+        private Task OnSlashCommandExecutedAsync(SocketSlashCommand command) =>
+            RunInBackground("SlashCommands", sp => sp.GetRequiredService<DiscordSlashCommandsRouter>().HandleSlashCommandExecutedAsync(command));
         private Task OnReadyAsync() =>
             RunInBackground("Ready", sp => sp.GetRequiredService<DiscordSlashCommands>().RegisterSlashCommandsAsync());
         private Task OnWebhookMessageReceivedAsync(SocketMessage message) =>
-            RunInBackground("RecruitmentFeed", sp => sp.GetRequiredService<RecruitmentFeedHandler>().HandleWebhookReceivedAsync(message));
+            RunInBackground("RecruitmentFeed", sp => sp.GetRequiredService<RecruitmentFeedHandler>().HandleWebhookReceivedAsync(message), false);
 
         private Task OnLogAsync(LogMessage msg)
         {
