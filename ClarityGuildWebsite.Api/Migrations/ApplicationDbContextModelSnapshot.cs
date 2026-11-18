@@ -24,9 +24,11 @@ namespace ClarityGuildWebsite.Api.Migrations
 
             modelBuilder.Entity("ClarityGuildWebsite.Api.Models.Applications.GuildApplication", b =>
                 {
-                    b.Property<Guid>("PublicId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("About")
                         .IsRequired()
@@ -83,12 +85,6 @@ namespace ClarityGuildWebsite.Api.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<DateTime?>("LastAttemptedUtc")
                         .HasColumnType("datetime2");
 
@@ -121,6 +117,9 @@ namespace ClarityGuildWebsite.Api.Migrations
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
 
+                    b.Property<Guid>("PublicId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("Retry")
                         .HasColumnType("int");
 
@@ -141,7 +140,7 @@ namespace ClarityGuildWebsite.Api.Migrations
                     b.Property<DateTime>("TimestampUtc")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("PublicId");
+                    b.HasKey("Id");
 
                     b.HasIndex("DiscordThreadId")
                         .IsUnique()
@@ -150,7 +149,7 @@ namespace ClarityGuildWebsite.Api.Migrations
                     b.HasIndex("PublicId")
                         .IsUnique();
 
-                    b.ToTable("GuildApplication", (string)null);
+                    b.ToTable("GuildApplications", (string)null);
                 });
 #pragma warning restore 612, 618
         }

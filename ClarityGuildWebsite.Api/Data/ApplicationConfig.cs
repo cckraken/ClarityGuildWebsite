@@ -8,8 +8,8 @@ namespace ClarityGuildWebsite.Api.Data
     {
         public void Configure(EntityTypeBuilder<GuildApplication> builder)
         {
-            builder.ToTable("GuildApplication");
-            builder.HasKey(k => k.PublicId);
+            builder.ToTable("GuildApplications");
+            builder.HasKey(k => k.Id);
 
             // Form facing fields
             builder.Property(p => p.DiscordId).HasMaxLength(50).IsRequired();
@@ -47,6 +47,7 @@ namespace ClarityGuildWebsite.Api.Data
             builder.Property(p => p.RowVersion).IsRowVersion();
 
             builder.HasIndex(i => i.DiscordThreadId).IsUnique();
+            builder.HasIndex(i => i.PublicId).IsUnique();
         }
     }
 }
