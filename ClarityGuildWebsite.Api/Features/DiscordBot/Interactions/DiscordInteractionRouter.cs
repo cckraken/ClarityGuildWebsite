@@ -166,16 +166,8 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot.Interactions
 
             application.LastRecruitmentTeamMessagedUtc = DateTime.UtcNow;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                _logger.LogWarning("Concurrent update on application {PublicId} during {Action}", application.PublicId, "SendApplicantMessage");
-                await modal.FollowupAsync("Another member of the recruitment team is messaging this applicant. Check for thread for any new message delivered confirmations or try again shortly.", ephemeral: true);
+            if (!await ConcurrencySaveHelper.TrySaveAsync(_context, application, modal, _logger, "SendApplicantDM"))
                 return;
-            }
 
             var delivered = await TryDmApplicantAsync(application, $"**Message from the Clarity Recruitment Team:**\n{text}\nReply in this DM and I'll send it to your application. If successfully sent, I'll react to the message.");
 
@@ -205,28 +197,15 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot.Interactions
 
             var template = string.IsNullOrWhiteSpace(welcomeMessage) ? AcceptModal.DefaultWelcomeMessage : welcomeMessage;
 
-            if (application.Status == ApplicationStatus.Accepted)
-            {
-                await modal.FollowupAsync("This application has already been accepted.", ephemeral: true);
-                return;
-            }
-
-            if (application.Status == ApplicationStatus.Declined)
-            {
-                await modal.FollowupAsync("Changed from declined to accepted.", ephemeral: true);
-            }
-
+            var wasDeclined = application.Status == ApplicationStatus.Declined;
             application.Status = ApplicationStatus.Accepted;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                _logger.LogWarning("Concurrent update on application {PublicId} during {Action}", application.PublicId, "AcceptApplicant");
-                await modal.FollowupAsync("Another member of the recruitment team is accepting this applicant. Check for thread for any new acceptance confirmations or try again shortly.", ephemeral: true);
+            if (!await ConcurrencySaveHelper.TrySaveAsync(_context, application, modal, _logger, "AcceptApplicant"))
                 return;
+
+            if (wasDeclined)
+            {
+                await modal.FollowupAsync("Changed from declined to accepted.", ephemeral: true);
             }
 
             var text = template
@@ -276,16 +255,8 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot.Interactions
             application.LastRecruitmentTeamMessagedUtc = DateTime.UtcNow;
             application.Status = ApplicationStatus.Declined;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch(DbUpdateConcurrencyException)
-            {
-                _logger.LogWarning("Concurrent update on application {PublicId} during {Action}", application.PublicId, "DeclineApplicant");
-                await modal.FollowupAsync("Another member of the recruitment team is declining this applicant. Check for thread for any new decline confirmations or try again shortly.", ephemeral: true);
+            if (!await ConcurrencySaveHelper.TrySaveAsync(_context, application, modal, _logger, "DeclineApplicant"))
                 return;
-            }
 
             var delivered = await TryDmApplicantAsync(application, BuildDeclineMessage(reason, note));
 
