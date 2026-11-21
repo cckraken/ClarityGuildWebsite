@@ -1,5 +1,6 @@
 name: CI
-# NOTE: 'Deploy frontend' (azure-static-web-apps-ashy-coast-096246c0f.yml) is triggered by this workflow's name
+# NOTE: 'Deploy frontend' (azure-static-web-apps-ashy-coast-096246c0f.yml) and 'Deploy API' (deploy-api.yml)
+# are triggered by this workflow's name. Renaming "CI" silently stops both deployments.
 on:
   push:
     branches: [ main ]
