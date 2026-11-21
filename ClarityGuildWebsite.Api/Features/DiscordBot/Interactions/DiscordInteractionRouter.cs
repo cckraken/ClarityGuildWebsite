@@ -197,6 +197,12 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot.Interactions
 
             var template = string.IsNullOrWhiteSpace(welcomeMessage) ? AcceptModal.DefaultWelcomeMessage : welcomeMessage;
 
+            if (application.Status == ApplicationStatus.Accepted)
+            {
+                await modal.FollowupAsync("This application has already been accepted.", ephemeral: true);
+                return;
+            }
+
             var wasDeclined = application.Status == ApplicationStatus.Declined;
             application.Status = ApplicationStatus.Accepted;
 
