@@ -9,6 +9,11 @@ namespace ClarityGuildWebsite.Api.Data
         {            
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+        }
+
         public DbSet<GuildApplication> GuildApplications { get; set; }
     }
 }

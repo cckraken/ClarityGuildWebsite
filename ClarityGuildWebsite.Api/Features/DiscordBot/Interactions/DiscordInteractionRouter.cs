@@ -165,7 +165,9 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot.Interactions
             }
 
             application.LastRecruitmentTeamMessagedUtc = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
+
+            if (!await ConcurrencySaveHelper.TrySaveAsync(_context, application, modal, _logger, "SendApplicantDM"))
+                return;
 
             var delivered = await TryDmApplicantAsync(application, $"**Message from the Clarity Recruitment Team:**\n{text}\nReply in this DM and I'll send it to your application. If successfully sent, I'll react to the message.");
 
@@ -201,13 +203,16 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot.Interactions
                 return;
             }
 
-            if (application.Status == ApplicationStatus.Declined)
+            var wasDeclined = application.Status == ApplicationStatus.Declined;
+            application.Status = ApplicationStatus.Accepted;
+
+            if (!await ConcurrencySaveHelper.TrySaveAsync(_context, application, modal, _logger, "AcceptApplicant"))
+                return;
+
+            if (wasDeclined)
             {
                 await modal.FollowupAsync("Changed from declined to accepted.", ephemeral: true);
             }
-
-            application.Status = ApplicationStatus.Accepted;
-            await _context.SaveChangesAsync();
 
             var text = template
                 .Replace("{member}", $"<@{application.DiscordId}>")
@@ -255,7 +260,9 @@ namespace ClarityGuildWebsite.Api.Features.DiscordBot.Interactions
 
             application.LastRecruitmentTeamMessagedUtc = DateTime.UtcNow;
             application.Status = ApplicationStatus.Declined;
-            await _context.SaveChangesAsync();
+
+            if (!await ConcurrencySaveHelper.TrySaveAsync(_context, application, modal, _logger, "DeclineApplicant"))
+                return;
 
             var delivered = await TryDmApplicantAsync(application, BuildDeclineMessage(reason, note));
 

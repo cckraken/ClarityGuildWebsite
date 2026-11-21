@@ -22,7 +22,7 @@ namespace ClarityGuildWebsite.Api.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("ClarityGuildWebsite.Api.Models.GuildApplication", b =>
+            modelBuilder.Entity("ClarityGuildWebsite.Api.Models.Applications.GuildApplication", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -123,6 +123,12 @@ namespace ClarityGuildWebsite.Api.Migrations
                     b.Property<int>("Retry")
                         .HasColumnType("int");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -143,7 +149,7 @@ namespace ClarityGuildWebsite.Api.Migrations
                     b.HasIndex("PublicId")
                         .IsUnique();
 
-                    b.ToTable("GuildApplications");
+                    b.ToTable("GuildApplications", (string)null);
                 });
 #pragma warning restore 612, 618
         }
