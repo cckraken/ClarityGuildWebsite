@@ -1,5 +1,6 @@
 name: CI
-# NOTE: 'Deploy frontend' (azure-static-web-apps-ashy-coast-096246c0f.yml) is triggered by this workflow's name
+# NOTE: 'Deploy frontend' (azure-static-web-apps-ashy-coast-096246c0f.yml) and 'Deploy API' (deploy-api.yml)
+# are triggered by this workflow's name. Renaming "CI" silently stops both deployments.
 on:
   push:
     branches: [ main ]
@@ -24,10 +25,24 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore -c Release
 
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --no-build --verbosity normal -c Release
+
+    - name: Publish
+      if: github.event_name == 'push'
+      timeout-minutes: 5
+      run: dotnet publish ClarityGuildWebsite.Api -c Release --no-restore --no-build -o api-publish
+
+    - name: Upload API package
+      if: github.event_name == 'push'
+      uses: actions/upload-artifact@v4
+      with:
+        name: api-publish
+        path: api-publish
+        if-no-files-found: error
+        retention-days: 30
 
   web:
     name: Web build and lint
